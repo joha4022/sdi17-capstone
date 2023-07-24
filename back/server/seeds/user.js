@@ -14,7 +14,8 @@ exports.seed = async function (knex) {
       approveremail: 'approver@gmail.com', 
       phonenumber: '123-456-7890', 
       password: 'approver@gmail.com', 
-      sme: true, admin: true,
+      // sme: true, 
+      admin: true,
     }
   ]);
 };
