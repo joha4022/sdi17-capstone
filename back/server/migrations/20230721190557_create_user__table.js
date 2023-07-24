@@ -13,7 +13,7 @@ exports.up = function(knex) {
         table.string('approveremail')
         table.string('phonenumber')
         table.string('password')
-        table.boolean('sme')
+        //table.boolean('sme')
         table.boolean('admin')
 
     }); 
