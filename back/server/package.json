@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "npm run baseline && nodemon ./src/app.js",
+
     "test": "echo \"Error: no test specified\" && exit 1",
     "baseline": "node PG_Run_Start_Migrate_Seed.js"
   },

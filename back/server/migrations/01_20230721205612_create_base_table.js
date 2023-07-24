@@ -10,7 +10,8 @@ exports.up = function(knex) {
         table.string('address')
         table.string('description')
 
-    }); 
+    })
+    .catch(err => console.log(err));
 };
 
 /**
@@ -18,5 +19,5 @@ exports.up = function(knex) {
  * @returns { Promise<void> }
  */
 exports.down = function(knex) {
-    return knex.schema.dropTableIfExists('base') 
+    return knex.schema.dropTableIfExists('base')
 };
