@@ -14,7 +14,7 @@ app.use(cors());
 
 
 app.get('/', function(req, res) {
-    knex('user')
+    knex('users')
         .select('*')
         .then(data => res.status(200).json(data))
         .catch(err =>
@@ -24,7 +24,7 @@ app.get('/', function(req, res) {
         })
         );
     });
-    
+
 
 app.listen(PORT, () => {
     console.log(`The server is running on ${PORT}`);

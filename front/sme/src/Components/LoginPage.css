@@ -1,0 +1,98 @@
+body {
+  background-color: #F8F1F1;
+  font-family: Arial, sans-serif;
+}
+.blue-section {
+  margin: 10px;
+  border-radius: 5px;
+  background: linear-gradient(130deg, #0a065ccd 13%,  #0A065D 83%);
+  display: flex;
+  flex-direction: row;
+  height: 50em;
+}
+.login-section {
+  margin: 10px;
+  border-radius: 5px;
+  background-color: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.logo-section {
+  margin: 0px auto 0px auto;
+  display: flex;
+  flex-direction: column;
+}
+#loginpage-logo {
+  height: 580px;
+}
+.username-input {
+  width: 25ch;
+}
+.username-wrapper {
+  background-color: #F8F1F1;
+  padding: 10px 20px 10px 20px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+.password-wrapper {
+  background-color: #F8F1F1;
+  padding: 2px 12px 2px 12px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+.signin-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  margin: 0px 100px 0px 100px;
+}
+.or-section {
+  color: white;
+  margin: 20px;
+}
+.create-account-section {
+  margin: 0px 100px 0px 100px;
+}
+.reviews-section {
+  background-color: transparent;
+  border-radius: 5px;
+  color: white;
+  position: relative;
+  top: -150px;
+  left: 75px;
+}
+.sme-h2 {
+  position: relative;
+  top: 20px;
+  width: 350px;
+  font-size: 35px;
+}
+.p1 {
+  margin: 0px;
+  width: 400px;
+  opacity: 70%;
+}
+.about-section {
+  background-color: #A3816A;
+  margin: 10px;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+}
+.sponsor-section {
+  background-color: #D2C8C8;
+  margin: 10px;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+}
+.fake-sponsor-img {
+  width: 100px;
+  opacity: 50%;
+  margin: 10px;
+}
