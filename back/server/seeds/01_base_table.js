@@ -8,33 +8,29 @@ exports.seed = async function(knex) {
   await knex('base').insert([
     {
       //baseid: 1, //created id
-      name: 'LASFB',
-      branch: 'Space Force',
-      address: '123 main st',
-      description: 'Space Force Base'
+      basename: 'Los Angeles Space Force Base',
+      basecity: 'El Segundo',
+      basestate: 'CA'
     },
     {
       //baseid: 1, //created id
-      name: 'WPAFB',
-      branch: 'Air Force',
-      address: '123 main st',
-      description: 'Air Force Base'
+      basename: 'Wright-Patterson Air Force Base',
+      basecity: 'Dayton',
+      basestate: 'OH'
     },
     {
       //baseid: 1, //created id
-      name: 'WSMR',
-      branch: 'Army',
-      address: '123 main st',
-      description: 'Army Test Range'
+      basename: 'White Sands Missile Range',
+      basecity: 'Alamogordo',
+      basestate: 'NM'
     },
   ]);
 };
 
 /**
          table.increments('baseid');
-        table.string('name')
-        table.string('branch')
-        table.string('address')
-        table.string('description')
+        table.string('basename')
+        table.string('basecity')
+        table.string('basestate')
 
  */
