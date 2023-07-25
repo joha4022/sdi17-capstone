@@ -130,7 +130,7 @@ app.get('/userMeetings/:meetingid', function (req, res) {
         );
 });
 
-//--------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------
 // API returns everything in database - all tables joined
 app.get('/all', function (req, res) {
     knex('users')
@@ -147,7 +147,6 @@ app.get('/all', function (req, res) {
             })
         );
 });
-
 //-------------------------------------------------------------------------------------------------------------
 // API returns everything in database - all tables joined
 app.get('/all2', function (req, res) {
