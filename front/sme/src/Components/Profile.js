@@ -42,7 +42,7 @@ function Profile() {
   // useEffect(() => {
   //   const fetchProfile = async () => {
   //     try {
-  //       const res = await fetch(`http://localhost:3001/profile/${id}`);
+  //       const res = await fetch(`http://localhost:3001/${id}`);
   //       if (!res.ok) {
   //         throw new Error(`HTTP error! status: ${res.status}`);
   //       }else{
@@ -100,7 +100,7 @@ function Profile() {
       <AppBar position="static">
         <Toolbar>
           <Link to='/'>
-            <img src="/images/SME-logos_transparent.png" alt="Logo" style={{ width: 50, height: 50 }} />
+            <img src="/images/Logo_background_purp.png" alt="Logo" style={{ width: 50, height: 50 }} />
           </Link>
           <MuiBox sx={{ flexGrow: 1 }} />
           <Button color="inherit">Home</Button>
