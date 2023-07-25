@@ -14,8 +14,9 @@ import {
   MenuItem,
   FormControl,
   Select,
+  Button,
 } from "@mui/material";
-import { Search as SearchIcon } from "@mui/icons-material";
+import { Search as SearchIcon, Delete as DeleteIcon } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 import Navbar from "./Navbar";
 import "./Network.css";
@@ -26,12 +27,45 @@ const Network = () => {
   const [category, setCategory] = useState("");
   const [branch, setBranch] = useState("");
   const [location, setLocation] = useState("");
+  const [categoryList, setCategoryList] = useState([]);
 
   useEffect(() => {
     fetch("http://localhost:3001/smes")
       .then((res) => res.json())
       .then((data) => setSMEs(data))
   }, []);
+
+  useEffect(() => {
+    fetch("http://localhost:3001/categories")
+      .then((res) => res.json())
+      .then((data) => setCategoryList(data))
+  }, []);
+
+  const clearHandle = () => {
+    setSearchTerm('')
+    setCategory('')
+    setBranch('')
+  }
+
+  let results = SMEs
+  if(1) {
+    if(searchTerm.length > 0) {
+      
+      results = SMEs.filter(word => {
+        let name =[word.firstname, word.lastname].join(' ');
+        console.log(name)
+        return (
+          name.includes(searchTerm)
+        )
+      })
+    }
+    if(branch) {
+        results = results.filter(word => word.branch == branch)
+    }
+    if(category) {
+        results = results.filter(word => word.categories.includes(category))
+    }
+  }
 
   return (
     <>
@@ -69,9 +103,11 @@ const Network = () => {
             label="Category"
             onChange={(event) => setCategory(event.target.value)}
           >
-            <MenuItem value={"Astrophysics"}>Astrophysics</MenuItem>
-            <MenuItem value={"UX/UI Development"}>UX/UI Development</MenuItem>
-            <MenuItem value={"Everything Else"}>Everything Else</MenuItem>
+            {categoryList.map(e => {
+                return (
+                    <MenuItem value={`${e.name}`}>{e.name}</MenuItem>
+                )
+            })}
           </Select>
         </FormControl>
 
@@ -92,10 +128,14 @@ const Network = () => {
             <MenuItem value={"National Guard"}>National Guard</MenuItem>
           </Select>
         </FormControl>
+
+        <Button id="clearBut" variant="outlined" startIcon={<DeleteIcon />} onClick={clearHandle} sx={{ minWidth: 180, marginLeft: '10px'}}> 
+            Clear Filters
+        </Button>
       </div>
 
       <section className="results">
-        {SMEs.map((e, i) => {
+        {results.map((e, i) => {
           return (
             <Card key={`${i}`} sx={{ maxWidth: "15vw" }}>
               <CardActionArea component={Link} to={`/sme/${e.userid}`}>

@@ -70,6 +70,24 @@ app.get('/', function (req, res) {
             })
         );
 });
+
+//--------------------------------------------------------------------------------------------------------
+// API to get category list
+app.get('/categories', function (req, res) {
+  knex('category')
+      .select('*')
+      .then(data => res.status(200).json(data))
+      .catch(err =>
+          res.status(404).json({
+              message:
+                  'The data you are looking for could not be found. Please try again'
+          })
+      );
+});
+
+
+
+
 //--------------------------------------------------------------------------------------------------------
 // API to get base data only  base name, base
 app.get('/base', function (req, res) {
@@ -254,7 +272,7 @@ app.post('/createuser', (req, res) => {
                         sme,
                         admin
                     })
-                    .then(() => res.status(201).json({ userCreated: true, message: 'Username created successfully' }))
+                    .then(() => res.status(201).json({ userCreated: true, code: 201, message: 'Username created successfully' }))
             }
         })
         .catch((err) =>
@@ -302,13 +320,15 @@ app.post('/login/', (req, res) => {
         .then((data) => {
             if (data.length === 0) {
                 return res.status(404).json({
-                    message: 'User name and/or passowrd are incorrect',
+                    code: 404,
+                    message: 'Username and/or password are incorrect',
                 });
-            }
-            res.status(200).json(data);
-        })
-        .catch((err) =>
-            res.status(500).json({
+                }
+                res.status(200).json(data);
+            })
+            .catch((err) =>
+                res.status(500).json({
+                code: 500,
                 message: 'An error occurred while fetching the login',
                 error: err,
             })
