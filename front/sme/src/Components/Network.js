@@ -27,11 +27,18 @@ const Network = () => {
   const [category, setCategory] = useState("");
   const [branch, setBranch] = useState("");
   const [location, setLocation] = useState("");
+  const [categoryList, setCategoryList] = useState([]);
 
   useEffect(() => {
     fetch("http://localhost:3001/smes")
       .then((res) => res.json())
       .then((data) => setSMEs(data))
+  }, []);
+
+  useEffect(() => {
+    fetch("http://localhost:3001/categories")
+      .then((res) => res.json())
+      .then((data) => setCategoryList(data))
   }, []);
 
   const clearHandle = () => {
@@ -43,7 +50,14 @@ const Network = () => {
   let results = SMEs
   if(1) {
     if(searchTerm.length > 0) {
-      results = SMEs.filter(word => word.firstname.includes(searchTerm))
+      
+      results = SMEs.filter(word => {
+        let name =[word.firstname, word.lastname].join(' ');
+        console.log(name)
+        return (
+          name.includes(searchTerm)
+        )
+      })
     }
     if(branch) {
         results = results.filter(word => word.branch == branch)
@@ -89,9 +103,11 @@ const Network = () => {
             label="Category"
             onChange={(event) => setCategory(event.target.value)}
           >
-            <MenuItem value={"Astrophysics"}>Astrophysics</MenuItem>
-            <MenuItem value={"Payroll"}>Payroll</MenuItem>
-            <MenuItem value={"Orbital Mechanics"}>Orbital Mechanics</MenuItem>
+            {categoryList.map(e => {
+                return (
+                    <MenuItem value={`${e.name}`}>{e.name}</MenuItem>
+                )
+            })}
           </Select>
         </FormControl>
 
