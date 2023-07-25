@@ -13,11 +13,15 @@ export const AppContext = createContext();
 
 function App() {
   const [removethislater, setremovethislater] = useState(false);
+  const [meetings, setMeetings] = useState([]);
 
   return (
     <AppContext.Provider value={{
       removethislater,
-      setremovethislater
+      setremovethislater,
+      meetings,
+      setMeetings
+
     }}
     >
       <Router>
