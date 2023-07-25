@@ -2,7 +2,7 @@
 //  * @param { import("knex").Knex } knex
 //  * @returns { Promise<void> }
 //  */
-exports.up = function(knex) {
+exports.up = function (knex) {
     return knex.schema.createTable('users', table => {
         table.increments('userid');
         table.string('firstname')
@@ -13,9 +13,11 @@ exports.up = function(knex) {
         table.string('approveremail')
         table.string('phonenumber')
         table.string('password')
+        table.string('worklocation')
         table.string('bio')
         table.string('photo')
-       //table.varchar('img_url', 255)
+        table.string('branch')
+        //table.varchar('img_url', 255)
         table.boolean('sme')
         table.boolean('admin')
 
@@ -29,12 +31,12 @@ exports.up = function(knex) {
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.down = function(knex) {
+exports.down = function (knex) {
     //return knex.schema.dropTableIfExists('users')
     return knex.schema.alterTable('users', table => {
         table.dropForeign('base_id');
-     })
-    .then(function() {
-        return knex.schema.dropTableIfExists('users')
-     });
+    })
+        .then(function () {
+            return knex.schema.dropTableIfExists('users')
+        });
 };
