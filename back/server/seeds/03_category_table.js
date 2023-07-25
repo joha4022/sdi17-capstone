@@ -9,7 +9,21 @@ exports.seed = async function(knex) {
     {
       categoryid: 1,
       name: 'Orbital Mechanics'
+    },
+    {
+      categoryid: 2,
+      name: 'Payroll'
+    },
+    {
+      categoryid: 3,
+      name: 'Javascript'
+    },
+    {
+      categoryid: 4,
+      name: 'Space Walking '
     }
+
+
   ])
   .catch(err => console.log(err));
 };

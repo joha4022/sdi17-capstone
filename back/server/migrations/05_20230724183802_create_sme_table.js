@@ -9,8 +9,8 @@ exports.up = function(knex) {
     table.integer('user_id');
     table.foreign('user_id').references('users.userid')
 
-    table.integer('base_id');
-    table.foreign('base_id').references('base.baseid')
+    table.integer('category_id');
+    table.foreign('category_id').references('category.categoryid')
 
 })
 .catch(err => console.log(err));
@@ -23,7 +23,7 @@ exports.up = function(knex) {
 exports.down = function(knex) {
       return knex.schema.alterTable('sme', table => {
         table.dropForeign('user_id');
-        table.dropForeign('base_id');
+        table.dropForeign('category_id');
      })
     .then(function() {
         return knex.schema.dropTableIfExists('sme')

@@ -60,6 +60,7 @@ const Notes = styled(Paper)`
   margin: 20px;
   padding: 20px;
 `;
+
 const FooterGit = styled.img`
   height: 20px;
   margin-left: 10px;
