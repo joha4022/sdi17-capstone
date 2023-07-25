@@ -12,7 +12,6 @@ app.use(express.json());
 app.use(cors());
 
 
-
 app.get('/', function (req, res) {
     knex('users')
         .select('*')
@@ -24,7 +23,8 @@ app.get('/', function (req, res) {
             })
         );
 });
-
+//--------------------------------------------------------------------------------------------------------
+// API to get base data only  base name, base
 app.get('/base', function (req, res) {
     knex('base')
         .select('*')
@@ -37,6 +37,7 @@ app.get('/base', function (req, res) {
         );
 });
 
+//-------------------------------------------------------------------------------------------------------
 // API returns everything in database - all tables joined
 app.get('/all', function (req, res) {
     knex('users')
@@ -54,6 +55,7 @@ app.get('/all', function (req, res) {
         );
 });
 
+//-------------------------------------------------------------------------------------------------------------
 // API returns everything in database - all tables joined
 app.get('/all2', function (req, res) {
     knex('users')
@@ -92,10 +94,23 @@ app.get('/all2', function (req, res) {
         );
 });
 
-
+//----------------------------------------------------------------------------------------------------------
 //API to get all users
-app.get('/users', function (req, res) {
+app.get('/profile/:userid', function(req, res) {
+    const userid = req.params.userid;
 
+    knex('users')
+        .select('*')
+        .where('userid', userid)
+        .then(data => res.status(200).json(data))
+        .catch(err =>
+        res.status(404).json({
+            message: 'The data is not here.'
+        })
+        );
+    });
+//--------------------------------------------//    
+app.get('/users', function (req, res) {
     knex('users')
         .select('users.userid',
             'users.firstname',
@@ -121,7 +136,8 @@ app.get('/users', function (req, res) {
             })
         );
 });
-
+//---------------------------------------------------------------------------------------------------------------
+// API to add a new user (POST)
 app.post('/createuser', (req, res) => {
     const { firstname,
         lastname,
@@ -139,7 +155,7 @@ app.post('/createuser', (req, res) => {
         admin
     } = req.body;
     //console.log(firstname, lastname, username, password);
- 
+    //-----------------------------------------------------------------------------------------------------------------
     knex('users')
         .select('username')
         .where('username', username)
@@ -175,6 +191,53 @@ app.post('/createuser', (req, res) => {
             })
         );
 });
+//----------------------------------------------------------------------------------------------------
+//Comment here
+app.patch('/users/:userid', function (req, res) {
+    let userid = req.params.userid;
+    let {
+        firstname,
+        lastname,
+        username,
+        password,
+        email,
+        supervisoremail,
+        approveremail,
+        phonenumber,
+        worklocation,
+        bio,
+        photo,
+        branch
+    } = req.body;
+
+    knex('users')
+        .where({ 'userid': userid })
+        .update(
+            {
+                firstname: firstname,
+                lastname: lastname,
+                username: username,
+                password: password,
+                email: email,
+                supervisoremail: supervisoremail,
+                approveremail: approveremail,
+                phonenumber: phonenumber,
+                worklocation: worklocation,
+                bio: bio,
+                photo: photo,
+                branch: branch,
+            }
+            , ['firstname', 'lastname', 'username', 'password', 'email', 'supervisoremail',
+                'approveremail', 'phonenumber', 'worklocation', 'bio', 'photo', 'branch'])
+        .then(data => res.status(200).json(data))
+        .catch(err =>
+            res.status(500).json({
+                message:
+                    'Error when doing a patch request'
+            })
+        );
+});
+//---------------------------------------------------------------------------------------------
 app.delete('/deleteuser/:userid', function (req, res) {
     const userid = req.params.userid;
     console.log(userid)
@@ -200,9 +263,7 @@ app.delete('/deleteuser/:userid', function (req, res) {
         );
 });
 
-
-
-
+//---------------------------------------------------------------------------------------------------------
 // Check user name and password against database        
 app.post('/login/', (req, res) => {
     const { user, pw } = req.body;
