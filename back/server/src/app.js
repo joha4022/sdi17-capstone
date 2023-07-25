@@ -169,13 +169,15 @@ app.get('/', function(req, res) {
             .then((data) => {
                 if (data.length === 0) {
                 return res.status(404).json({
-                    message: 'User name and/or passowrd are incorrect',
+                    code: 404,
+                    message: 'Username and/or password are incorrect',
                 });
                 }
                 res.status(200).json(data);
             })
             .catch((err) =>
                 res.status(500).json({
+                code: 500,
                 message: 'An error occurred while fetching the login',
                 error: err,
                 })

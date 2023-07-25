@@ -10,7 +10,7 @@ exports.seed = async function (knex) {
       //userid: 10001, //created id
       firstname: 'John',
       lastname: 'Doe',
-      username: 'User1',
+      username: 'user1',
       email: 'John@gmail.com',
       supervisoremail: 'super@gmail.com',
       approveremail: 'approver@gmail.com',
@@ -26,7 +26,7 @@ exports.seed = async function (knex) {
       //userid: 10002, //created id
       firstname: 'Jane',
       lastname: 'Doe',
-      username: 'User2',
+      username: 'user2',
       email: 'Jane@gmail.com',
       supervisoremail: 'super2@gmail.com',
       approveremail: 'approver2@gmail.com',
