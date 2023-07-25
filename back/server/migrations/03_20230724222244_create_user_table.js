@@ -1,7 +1,7 @@
-/**
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
- */
+// **
+//  * @param { import("knex").Knex } knex
+//  * @returns { Promise<void> }
+//  */
 exports.up = function(knex) {
     return knex.schema.createTable('users', table => {
         table.increments('userid');
@@ -14,8 +14,9 @@ exports.up = function(knex) {
         table.string('phonenumber')
         table.string('password')
         table.string('bio')
+        table.string('photo')
        //table.varchar('img_url', 255)
-        //table.boolean('sme')
+        table.boolean('sme')
         table.boolean('admin')
 
         table.integer('base_id')
