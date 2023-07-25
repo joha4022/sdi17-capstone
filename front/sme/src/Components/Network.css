@@ -1,0 +1,18 @@
+body{
+    background-color: #F8F1F1;
+}
+
+.results {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.results .MuiCard-root {
+    margin: 1vw;
+    min-width: 150px;
+}
+
+.filters .MuiFormControl-root {
+    margin-left: 10px;
+}
