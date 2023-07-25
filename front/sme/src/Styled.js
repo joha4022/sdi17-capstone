@@ -61,15 +61,6 @@ const Notes = styled(Paper)`
   padding: 20px;
 `;
 
-
-export {
-  Title,
-  ProfileDetails,
-  ProfileDetail,
-  Background,
-  AppBar,
-  Bio,
-  Notes,
 const FooterGit = styled.img`
   height: 20px;
   margin-left: 10px;
