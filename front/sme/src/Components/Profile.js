@@ -4,7 +4,9 @@ import { styled } from "styled-components";
 import { ProfileDetails, ProfileDetail, Background, Bio, Notes } from "../Styled";
 import { useParams } from "react-router-dom";
 import Navbar from "./Navbar";
+import ReactCalendar from "react-calendar";
 import Loader from "./Loader";
+import MeetingFormModal from "./MeetingFormModal";
 
 
 const Meetings = styled(Paper)`
@@ -25,6 +27,7 @@ function Profile() {
   const [newNote, setNewNote] = useState("");
   const [editingNoteIndex, setEditingNoteIndex] = useState(null);
   const [editingNoteText, setEditingNoteText] = useState("");
+  const [isMeetingModalOpen, setIsMeetingModalOpen] = useState(false);
   const { id } = useParams();
 
   useEffect(() => {
@@ -83,6 +86,14 @@ function Profile() {
     setNotes((prevNotes) => prevNotes.filter((note, i) => i !== index));
   };
 
+  const openMeetingModal = () => {
+    setIsMeetingModalOpen(true);
+  };
+
+  const closeMeetingModal = () => {
+    setIsMeetingModalOpen(false);
+  };
+
   return (
     <Background>
       <Navbar />
@@ -104,7 +115,7 @@ function Profile() {
               </ProfileDetails>
               <ProfileDetails>
                 <Typography>Location</Typography>
-                <ProfileDetail> {users && users.base}</ProfileDetail>
+                <ProfileDetail> {users && users.branch}</ProfileDetail>
               </ProfileDetails>
               <ProfileDetails>
                 <Typography>Associated Unit</Typography>
@@ -114,6 +125,7 @@ function Profile() {
 
             <MuiBox>
               <Typography>Calendar</Typography>
+              <ReactCalendar />
             </MuiBox>
           </Paper>
         </AvatarAndDetails>
@@ -128,8 +140,15 @@ function Profile() {
 
         <Grid item xs={12} sm={4}>
           <Paper elevation={1} sx={{ margin: 1, padding: 1 }}>
-            <Meetings>Meetings:</Meetings>
+            <Meetings>
+              Meetings:              
+              <Button onClick={openMeetingModal}>Schedule Meeting</Button>
+              <MeetingFormModal
+            open={isMeetingModalOpen}
+            handleClose={closeMeetingModal}/>
+            </Meetings>
           </Paper>
+          
           <MuiBox display="flex" justifyContent="center">
             <Button
               variant="contained"
