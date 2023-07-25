@@ -41,6 +41,122 @@ app.get('/', function(req, res) {
             );
         });
 
+        // API returns everything in database - all tables joined
+    app.get('/all2', function(req, res) {
+        knex('users')
+
+            .join('base', 'users.base_id', 'base.baseid')
+            .join('sme', 'users.userid', 'sme.user_id')
+            .join('network', 'sme.user_id', 'network.user_id')
+            //.join('category', 'sme.category_id', 'category.categoryid')
+            .select('users.userid',
+                    'users.firstname',
+                    'users.lastname',
+                    'users.username',
+                    'users.email',
+                    'users.supervisoremail',
+                    'users.approveremail',
+                    'users.phonenumber',
+                    'users.bio',
+                    'users.photo',
+                    'users.sme',
+                    'users.admin',
+                    'base.name',
+                    'base.branch',
+                    'base.address',
+                    'base.description',
+                    //'category.name'
+
+                    )
+            .then(data => res.status(200).json(data))
+            .catch(err =>
+            res.status(404).json({
+                message:
+                'The data you are looking for could not be found. Please try again'
+            })
+            );
+        });
+
+
+        //API to get all users
+        app.get('/users', function(req, res) {
+
+            knex('users')
+                .select('users.userid',
+                        'users.firstname',
+                        'users.lastname',
+                        'users.username',
+                        'users.email',
+                        'users.supervisoremail',
+                        'users.approveremail',
+                        'users.phonenumber',
+                        'users.bio',
+                        'users.photo',
+                        'users.sme',
+                        'users.admin',
+                        )
+                      
+                .then(data => res.status(200).json(data))
+                .catch(err =>
+                res.status(404).json({
+                    message:
+                    'The data you are looking for could not be found. Please try again'
+                })
+                );
+            });
+
+            app.post('/createuser', (req, res) => {
+                const { firstname, 
+                        lastname, 
+                        username,
+                        password,
+                        email,
+                        supervisoremail, 
+                        approveremail,   
+                        phonenumber,
+                        bio,
+                        photo,
+                        sme,
+                        admin
+                    } = req.body;
+                console.log( firstname, lastname, username, password );
+                //let userid = 4
+                knex('users')
+                .select('username')
+                .where('username', username)
+                .then((data) => {
+                    console.log('data length: ', data.length)
+                    if (data.length > 0){
+                        res.status(404).json({userCreated: false, message: `Username: *${username}* already taken!`});
+                    }else{
+                        
+
+                        knex('users')
+                        .insert({ 
+                            firstname, 
+                            lastname, 
+                            username,
+                            password,
+                            email,
+                            supervisoremail, 
+                            approveremail, 
+                            phonenumber,
+                            bio,
+                            photo,
+                            sme,
+                            admin
+                         })
+                        .then(() => res.status(201).json({userCreated: true, message: 'Username created successfully'}))
+                    }
+                })
+                .catch((err) =>
+                    res.status(500).json({
+                    message: 'An error occurred while fetching the login',
+                    error: err,
+                    })
+                );
+            });
+
 // Check user name and password against database        
         app.post('/login/', (req, res) => {
             const { user, pw} = req.body;
