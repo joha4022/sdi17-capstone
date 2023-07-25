@@ -70,6 +70,24 @@ app.get('/', function (req, res) {
             })
         );
 });
+
+//--------------------------------------------------------------------------------------------------------
+// API to get category list
+app.get('/categories', function (req, res) {
+  knex('category')
+      .select('*')
+      .then(data => res.status(200).json(data))
+      .catch(err =>
+          res.status(404).json({
+              message:
+                  'The data you are looking for could not be found. Please try again'
+          })
+      );
+});
+
+
+
+
 //--------------------------------------------------------------------------------------------------------
 // API to get base data only  base name, base
 app.get('/base', function (req, res) {
