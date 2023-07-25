@@ -38,8 +38,6 @@ export default function LoginPage() {
       setTimeout(() => {
         setAlert(false);
       }, 2000)
-    
-
   }
 
   const signin = () => {
@@ -67,14 +65,14 @@ export default function LoginPage() {
           setTimeout(() => {
             setBackdrop(false);
             navigate(`profile/${data[0].userid}`);
-          }, 2000)
+          }, 2500)
         }
       })
   }
 
   return (
     <>
-      <Collapse in={alert}>
+      <Collapse in={alert} sx={{position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9999}}>
         <Alert severity="error">
           <AlertTitle>Error</AlertTitle>
           Login Error — <strong>{message}</strong>

@@ -181,7 +181,7 @@ app.post('/createuser', (req, res) => {
                         sme,
                         admin
                     })
-                    .then(() => res.status(201).json({ userCreated: true, message: 'Username created successfully' }))
+                    .then(() => res.status(201).json({ userCreated: true, code: 201, message: 'Username created successfully' }))
             }
         })
         .catch((err) =>
