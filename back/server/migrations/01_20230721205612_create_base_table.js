@@ -5,10 +5,9 @@
 exports.up = function(knex) {
     return knex.schema.createTable('base', table => {
         table.increments('baseid');
-        table.string('name')
-        table.string('branch')
-        table.string('address')
-        table.string('description')
+        table.string('basename')
+        table.string('basecity')
+        table.string('basestate')
 
     })
     .catch(err => console.log(err));
