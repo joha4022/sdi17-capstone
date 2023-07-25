@@ -85,6 +85,52 @@ app.get('/base', function (req, res) {
 });
 
 //-------------------------------------------------------------------------------------------------------
+
+app.get('/userMeetings/:meetingid', function (req, res) {
+    //const userid = req.params.userid;
+    const meetingid = req.params.meetingid;
+
+    /**
+     We want to get all the users that are going to a particualr meeting
+     Which ever users assiged to a particular meetingid we want to see
+
+     We want to see a user and which meetings that user is attending
+        ex -> meeting: [
+            "Capstone",
+            "something else",
+        ]
+
+    Then,
+
+    first select: which meetings this guy is going to.
+    second select: how many people are going to that meeting?
+     */
+    knex('users')
+        .join('userMeetings', 'users.userid', 'userMeetings.user_id')
+        .join('meetings', 'meetings.meetingid', 'userMeetings.meeting_id')
+        .select('users.userid',
+            'users.firstname',
+            'users.lastname',
+            'users.username',
+            'meetings.meetingTitle',
+            'meetings.meetingDescription',
+            'meetings.startTime',
+            'meetings.endTime',
+            'meetings.meetingDate',
+        )
+        //.where('userid', userid)
+        .where('meetingid', meetingid)
+        .then(data => res.status(200).json(data))
+        .catch(err =>
+            res.status(404).json({
+                message:
+                    'The data you are looking for could not be found. Please try again',
+                error: err,
+            })
+        );
+});
+
+//--------------------------------------------------------------------------------------------------------
 // API returns everything in database - all tables joined
 app.get('/all', function (req, res) {
     knex('users')
@@ -219,6 +265,7 @@ app.post('/createuser', (req, res) => {
             })
         );
 });
+
 app.delete('/deleteuser/:userid', function (req, res) {
     const userid = req.params.userid;
     console.log(userid)
@@ -243,9 +290,6 @@ app.delete('/deleteuser/:userid', function (req, res) {
             })
         );
 });
-
-
-
 
 // Check user name and password against database
 app.post('/login/', (req, res) => {
@@ -296,6 +340,41 @@ app.post("/login/", (req, res) => {
             })
         );
 });
+
+// post for base
+// Check user name and password against database
+
+app.post('/createbase', (req, res) => {
+    const { basename,
+        basecity,
+        basestate
+    } = req.body;
+    console.log(basename, basecity, basestate);
+    knex('base')
+        .select('basename')
+        .where('basename', basename)
+        .then((data) => {
+            console.log('data length: ', data.length)
+            if (data.length > 0) {
+                res.status(404).json({ baseCreated: false, message: `Base: *${basename}* already exists!` });
+            } else {
+                knex('base')
+                    .insert({
+                        basename,
+                        basecity,
+                        basestate
+                    })
+                    .then(() => res.status(201).json({ baseCreated: true, message: 'Base created successfully' }))
+            }
+        })
+        .catch((err) =>
+            res.status(500).json({
+                message: 'An error occurred while creating a new Base',
+                error: err,
+            })
+        );
+});
+
 
 app.listen(PORT, () => {
     console.log(`The server is running on ${PORT}`);
