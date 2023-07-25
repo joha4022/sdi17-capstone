@@ -1,6 +1,12 @@
+body {
+  background-color: #F8F1F1;
+  font-family: Arial, sans-serif;
+  height: 100%;
+}
 .top-section {
   display: flex;
   justify-content: center;
+  margin-bottom: 60px;
 }
 .register-h1 {
   margin: 0px;
@@ -13,7 +19,7 @@
   flex-direction: column;
   align-items: center;
   width:750px;
-  height: 550px;
+  height: 850px;
   padding: 50px;
 }
 .register-category {
