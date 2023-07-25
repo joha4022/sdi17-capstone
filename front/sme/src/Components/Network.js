@@ -28,9 +28,9 @@ const Network = () => {
   const [location, setLocation] = useState("");
 
   useEffect(() => {
-    fetch("http://localhost:3001/")
+    fetch("http://localhost:3001/smes")
       .then((res) => res.json())
-      .then((data) => setSMEs(Array(10).fill(data[0])));
+      .then((data) => setSMEs(data))
   }, []);
 
   return (
@@ -101,18 +101,20 @@ const Network = () => {
               <CardActionArea component={Link} to={`/sme/${e.userid}`}>
                 <CardMedia
                   component="img"
-                  src="/default.png"
+                  src={"/default.png"}
                   alt="User Profile Picture"
                 />
+                {/* {console.log(`../../../../${e.photo}`)} */}
                 <CardContent>
                   <Typography variant="h5">
                     {`${e.firstname} ${e.lastname}`}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    SME Category (to fetch)
+                    {`Expertise: ${e.categories }`}
+                    {/* {console.log(e.categories)} */}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    SME Location (to fetch)
+                    {`Branch: ${e.branch}`}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     {e.email}
