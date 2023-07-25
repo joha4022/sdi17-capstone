@@ -11,8 +11,6 @@ const knex = require('knex')(require('../knexfile.js')[process.env.NODE_ENV||'de
 app.use(express.json());
 app.use(cors());
 
-
-
 app.get('/', function(req, res) {
     knex('users')
         .select('*')
