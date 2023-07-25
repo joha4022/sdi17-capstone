@@ -129,8 +129,6 @@ app.get('/', function(req, res) {
                     if (data.length > 0){
                         res.status(404).json({userCreated: false, message: `Username: *${username}* already taken!`});
                     }else{
-                        
-
                         knex('users')
                         .insert({ 
                             firstname, 
@@ -156,6 +154,33 @@ app.get('/', function(req, res) {
                     })
                 );
             });
+            app.delete('/deleteuser/:userid', function(req, res) {
+                const userid = req.params.userid;
+                console.log(userid)
+                knex('users')
+                    .where('userid', userid)
+                    .del()
+                    .then((rowCount) => {
+                        console.log("here")
+                        if (rowCount === 0) {
+                        return res.status(404).json({
+                            message: 'User not found',
+                        });
+                        }
+                        res.status(200).json({
+                        message: 'User deleted successfully',
+                        });
+                    })
+                    .catch((err) =>
+                        res.status(500).json({
+                        message: 'An error occurred while deleting the user',
+                        error: err,
+                        })
+                    );
+                });
+
+                
+        
 
 // Check user name and password against database        
         app.post('/login/', (req, res) => {
