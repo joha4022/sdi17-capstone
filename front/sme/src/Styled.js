@@ -64,7 +64,7 @@ const Notes = styled(Paper)`
 const FooterGit = styled.img`
   height: 20px;
   margin-left: 10px;
-`
+`;
 
 export {
   Home,
