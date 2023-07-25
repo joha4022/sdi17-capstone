@@ -7,7 +7,7 @@ exports.seed = async function (knex) {
   await knex('users').del()
   await knex('users').insert([
     {
-      userid: 1, //created id
+      //userid: 10001, //created id
       firstname: 'John',
       lastname: 'Doe',
       username: 'User1',
@@ -23,7 +23,7 @@ exports.seed = async function (knex) {
       base_id: 1 //changed the table name here
     },
     {
-      userid: 2, //created id
+      //userid: 10002, //created id
       firstname: 'Jane',
       lastname: 'Doe',
       username: 'User2',
