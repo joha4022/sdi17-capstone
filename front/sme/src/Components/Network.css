@@ -21,3 +21,20 @@ body{
     color: #0A065D;
     border-color: #0A065D;
 }
+
+.viewToggle {
+    display: flex;
+    justify-content: center;
+}
+
+.map {
+    height: 600px;
+    width: 100%;
+  }
+
+#mapContainer {
+    width: 80%;
+}
+
+
+
