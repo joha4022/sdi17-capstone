@@ -1,7 +1,7 @@
 import './Register.css'
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { TextField, IconButton, OutlinedInput, InputLabel, InputAdornment, FormControl, Button, Collapse, Alert, Typography, AlertTitle, Box, Modal, MenuItem, Backdrop, CircularProgress } from '@mui/material';
+import { redirect, useNavigate } from 'react-router-dom';
+import { TextField, IconButton, OutlinedInput, InputLabel, InputAdornment, FormControl, Button, Collapse, Alert, Typography, AlertTitle, Box, Modal, MenuItem, Backdrop, CircularProgress, FormHelperText } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import FooterBar from './FooterBar';
 import Navbar from './Navbar';
@@ -15,7 +15,7 @@ export default function Register() {
   const [username, setUsername] = useState(false);
   const [branch, setBranch] = useState(false);
   const [email, setEmail] = useState(false);
-  const [password, setPassword] = useState(false);
+  const [password, setPassword] = useState('');
   const [password2, setPassword2] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState(false);
   const [supEmail, setSupEmail] = useState(false);
@@ -27,6 +27,7 @@ export default function Register() {
   const [baseForm, setBaseForm] = useState(false);
   const [currentBases, setCurrentBases] = useState(false);
   const [existingBaseName, setExistingBaseName] = useState(false);
+  const [baseid, setBaseid] = useState(false);
   const [baseName, setBaseName] = useState(false);
   const [baseCity, setBaseCity] = useState(false);
   const [baseState, setBaseState] = useState(false);
@@ -41,12 +42,12 @@ export default function Register() {
     fetch('http://localhost:3001/base')
       .then(res => res.json())
       .then(data => {
-        setCurrentBases(data)
+        setCurrentBases(data);
       })
     fetch('http://localhost:3001/')
       .then(res => res.json())
       .then(data => {
-        setUserid(data.length + 1)
+        setUserid(data.length + 1);
       })
   }, [])
 
@@ -64,9 +65,8 @@ export default function Register() {
       setAlert(false);
     }, 2500)
   }
-
   const register = () => {
-    if (!firstname || !lastname || !username || !email || !password || !password2 || !phoneNumber || !supEmail || !appEmail || !baseName) {
+    if (!firstname || !lastname || !username || !email || !password || !password2 || !supEmail || !appEmail || !baseName) {
       alertDisplay('Please complete all the required fields!');
     } else if (password !== password2) {
       alertDisplay('Please make sure the passwords match.');
@@ -83,7 +83,8 @@ export default function Register() {
         supervisoremail: supEmail,
         approveremail: appEmail,
         phonenumber: phoneNumber,
-        branch: branch
+        branch: branch,
+        base_id: baseid
       })
       const option = {
         method: 'POST',
@@ -104,49 +105,11 @@ export default function Register() {
             setBackdrop(true);
             setTimeout(() => {
               setBackdrop(false);
-              navigate(`profile/${userid}`);
+              navigate(`/profile/${userid}`, { replace: true });
             }, 2500)
           }
         })
-      // adding a new base that has been inputted as it's registering an account
-      if (existingBaseName.name === '+ Add a new base') {
-        const baseBody = JSON.stringify({
-          userid: userid,
-          firstname: firstname,
-          lastname: lastname,
-          username: username,
-          password: password,
-          email: email,
-          supervisoremail: supEmail,
-          approveremail: appEmail,
-          phonenumber: phoneNumber,
-          branch: branch
-        })
-        const baseOption = {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: baseBody
-        }
-        fetch('http://localhost:3001/createbase', baseOption)
-          .then(res => res.json())
-          .then(data => {
-            if (data.code === 404) {
-              alertDisplay(data.message)
-            } else if (data.code === 500) {
-              alertDisplay(data.message)
-            } else if (data.code === 201) {
-              setBackdrop(true);
-              setTimeout(() => {
-                setBackdrop(false);
-                navigate(`profile/${userid}`);
-              }, 2500)
-            }
-          })
-      }
     }
-
   }
 
   const handleOpen = () => setBaseForm(true);
@@ -169,8 +132,37 @@ export default function Register() {
       if (!baseName || !baseCity || !baseState) {
         alertDisplay('Please complete all the required fields!');
       } else {
+        setBaseid(currentBases.length+1);
         setButtonLabel('Change Base');
         setBaseForm(false);
+        // adding a new base that has been inputted as it's registering an account
+        const baseBody = JSON.stringify({
+          baseid: baseid,
+          basename: baseName,
+          basecity: baseCity,
+          basestate: baseState
+        })
+        const baseOption = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: baseBody
+        }
+        fetch('http://localhost:3001/createbase', baseOption)
+          .then(res => res.json())
+          .then(data => {
+            if (data.code === 404) {
+              alertDisplay(data.message)
+            } else if (data.code === 500) {
+              alertDisplay(data.message)
+            } else if (data.code === 201) {
+              setBackdrop(true);
+              setTimeout(() => {
+                setBackdrop(false);
+              }, 1000)
+            }
+          })
       }
     } else {
       if (!existingBaseName) {
@@ -179,6 +171,7 @@ export default function Register() {
         setBaseName(currentBases[existingBaseName.baseid - 1].basename);
         setBaseCity(currentBases[existingBaseName.baseid - 1].basecity);
         setBaseState(currentBases[existingBaseName.baseid - 1].basestate);
+        setBaseid(currentBases[existingBaseName.baseid - 1].baseid);
         setButtonLabel('Change Base');
         setBaseForm(false);
       }
@@ -224,7 +217,7 @@ export default function Register() {
                     <div className='register-category'>Branch</div>
                     <TextField error={!branch ? true : false} sx={{ width: '28ch' }} required select id="outlined-select-branch" label="Branch" variant="outlined" defaultValue='' onClick={(e) => { setBranch(e.target.dataset.value) }}>
                       {militaryBranches.map((branch) => (
-                        <MenuItem key={branch} value={branch}>
+                        <MenuItem key={branch} value={branch} onKeyDown={(e) => { if (e.key === 'Enter') { setBranch(e.target.dataset.value) } }}>
                           {branch}
                         </MenuItem>
                       ))}
@@ -245,7 +238,7 @@ export default function Register() {
                     <FormControl sx={{ width: '28ch' }} variant="outlined">
                       <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
                       <OutlinedInput
-                        error={!password ? true : false}
+                        error={!(/\d/).test(password) ? true : false}
                         onKeyUp={(e) => { setPassword(e.target.value) }}
                         id="outlined-adornment-password"
                         type={showPassword ? 'text' : 'password'}
@@ -263,6 +256,7 @@ export default function Register() {
                         }
                         label="Password"
                       />
+                      <FormHelperText id="outlined-confirmpassword-helper-text">{(/\d/).test(password) ? 'Password requirement met' : 'Please include at least one number'}</FormHelperText>
                     </FormControl>
                   </td>
                   <td>
@@ -270,7 +264,7 @@ export default function Register() {
                     <FormControl sx={{ width: '28ch' }} variant="outlined">
                       <InputLabel htmlFor="outlined-adornment-password2">Confirm Password</InputLabel>
                       <OutlinedInput
-                        error={password === password2 ? true : false}
+                        error={password !== password2 || password2 === false ? true : false}
                         onKeyUp={(e) => { setPassword2(e.target.value) }}
                         id="outlined-adornment-password2"
                         type={showPassword ? 'text' : 'password'}
@@ -288,6 +282,7 @@ export default function Register() {
                         }
                         label="Confirm Password"
                       />
+                      <FormHelperText id="outlined-confirmpassword-helper-text">{password !== password2 || password2 === false ? 'Please cofirm your password' : 'Password match confirmed'}</FormHelperText>
                     </FormControl>
                   </td>
                 </tr>
@@ -327,26 +322,28 @@ export default function Register() {
                           Add Base
                         </Typography>
                         <table>
-                          <tr>
-                            <td>
-                              <div className='register-category'>Select a Base</div>
-                              <TextField error={!existingBaseName ? true : false} required select id="outlined-select-base" label="Select a base" variant="outlined" defaultValue={existingBaseName ? existingBaseName.name : ''} helperText="Please select a base or add one if it does not exist" onClick={(e) => { setExistingBaseName({ name: e.target.dataset.value, baseid: e.target.id }) }}>
-                                {currentBases.map((base) => (
-                                  <MenuItem key={base.basename} value={base.basename} id={base.baseid}>
-                                    {base.basename}
-                                  </MenuItem>
-                                ))}
-                                <MenuItem value={'+ Add a new base'}>+ Add a new base</MenuItem>
-                              </TextField>
-                            </td>
-                          </tr>
+                          <tbody>
+                            <tr>
+                              <td>
+                                <div className='register-category'>Select a Base</div>
+                                <TextField error={!existingBaseName ? true : false} required select id="outlined-select-base" label="Select a base" variant="outlined" value={existingBaseName ? existingBaseName.name : ''} helperText="Please select a base or add one if it does not exist" onClick={(e) => { setExistingBaseName({ name: e.target.dataset.value, baseid: e.target.id }) }}>
+                                  {currentBases.map((base) => (
+                                    <MenuItem key={base.basename} value={base.basename} id={base.baseid} onKeyDown={(e) => {if (e.key === 'Enter') {setExistingBaseName(e.target.dataset.value)}}}>
+                                      {base.basename}
+                                    </MenuItem>
+                                  ))}
+                                  <MenuItem value={'+ Add a new base'}>+ Add a new base</MenuItem>
+                                </TextField>
+                              </td>
+                            </tr>
+                          </tbody>
                         </table>
                         <table className='base-add-table' style={{ display: `${existingBaseName.name === '+ Add a new base' ? 'block' : 'none'}` }}>
                           <tbody>
                             <tr className='register-row'>
                               <td>
                                 <div className='register-category'>Base Name</div>
-                                <TextField error={!baseName ? true : false} required sx={{ width: '28ch' }} id="outlined-basic-basename" label="Base Name" variant="outlined" defaultValue={baseName ? baseName : ''} onKeyUp={(e) => { setBaseName(e.target.value) }} />
+                                <TextField error={!baseName ? true : false} required sx={{ width: '28ch' }} id="outlined-basic-basename" label='Base Name' variant="outlined" defaultValue={baseName ? baseName : ''} onKeyUp={(e) => { setBaseName(e.target.value) }} />
                               </td>
                             </tr>
                             <tr className='register-row'>
@@ -360,7 +357,7 @@ export default function Register() {
                                 <div className='register-category'>State</div>
                                 <TextField error={!baseState ? true : false} required select id="outlined-select-basestate" label="State" variant="outlined" defaultValue={baseState ? baseState : ''} helperText="Please select a state" onClick={(e) => { setBaseState(e.target.dataset.value) }}>
                                   {statesArray.map((state) => (
-                                    <MenuItem key={state} value={state}>
+                                    <MenuItem key={state} value={state} onKeyDown={(e) => {if (e.key === 'Enter') {setBaseState(e.target.dataset.value)}}}>
                                       {state}
                                     </MenuItem>
                                   ))}</TextField>
