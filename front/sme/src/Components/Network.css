@@ -21,3 +21,24 @@ body{
     color: #0A065D;
     border-color: #0A065D;
 }
+
+.viewToggle {
+    display: flex;
+    justify-content: center;
+}
+
+.map {
+    height: 600px;
+    width: 100%;
+    border-radius: 1vh;
+}
+
+#mapContainer {
+    width: 80%;
+    margin-top: 1%;
+    border: 3px solid #0A065D;
+    border-radius: 1vh;
+}
+
+
+
