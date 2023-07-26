@@ -235,7 +235,9 @@ app.get('/profile/:userid', function (req, res) {
 });
 
 app.post('/createuser', (req, res) => {
-    const { firstname,
+    const { 
+        userid,
+        firstname,
         lastname,
         username,
         password,
@@ -260,6 +262,7 @@ app.post('/createuser', (req, res) => {
             } else {
                 knex('users')
                     .insert({
+                        userid,
                         firstname,
                         lastname,
                         username,
@@ -273,7 +276,7 @@ app.post('/createuser', (req, res) => {
                         sme,
                         admin
                     })
-                    .then(() => res.status(201).json({ userCreated: true, code: 201, message: 'Username created successfully' }))
+                    .then(() => res.status(201).json({userCreated: true, code: 201, message: 'Username created successfully' }))
             }
         })
         .catch((err) =>
@@ -331,31 +334,6 @@ app.post('/login/', (req, res) => {
                 res.status(500).json({
                 code: 500,
                 message: 'An error occurred while fetching the login',
-                error: err,
-            })
-        );
-});
-
-// Check user name and password against database
-app.post("/login/", (req, res) => {
-    const { user, pw } = req.body;
-    //console.log('req.body: ',req.body)
-    console.log("user password:", user, pw);
-    knex("users")
-        .select("userid", "firstname", "lastname")
-        .where("username", user)
-        .where("password", pw)
-        .then((data) => {
-            if (data.length === 0) {
-                return res.status(404).json({
-                    message: "User name and/or passowrd are incorrect",
-                });
-            }
-            res.status(200).json(data);
-        })
-        .catch((err) =>
-            res.status(500).json({
-                message: "An error occurred while fetching the login",
                 error: err,
             })
         );
