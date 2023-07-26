@@ -6,6 +6,7 @@ import Profile from './Components/Profile';
 import Register from './Components/Register';
 import Search from './Components/Search';
 import SME from './Components/SME';
+import LandingPage from './Components/LandingPage'
 import './App.css';
 import { createContext, useState } from 'react';
 
@@ -30,6 +31,7 @@ function App() {
         <Routes>
           <Route path='/' element={<LoginPage />}></Route>
           <Route path='/register' element={<Register />}></Route>
+          <Route path='/register/:id' element={<LandingPage />}></Route>
           <Route path='/profile/:id' element={<Profile />}></Route>
           <Route path='/network' element={<Network />}></Route>
           <Route path='/sme/:id' element={<SME />}></Route>
