@@ -30,10 +30,14 @@ body{
 .map {
     height: 600px;
     width: 100%;
-  }
+    border-radius: 1vh;
+}
 
 #mapContainer {
     width: 80%;
+    margin-top: 1%;
+    border: 3px solid #0A065D;
+    border-radius: 1vh;
 }
 
 

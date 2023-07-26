@@ -17,7 +17,7 @@ app.get("/smes", (req, res) => {
     knex("users")
         .join("base", "users.base_id", "base.baseid")
         .join("sme", "users.userid", "sme.user_id")
-        .join("network", "sme.user_id", "network.user_id")
+        // .join("network", "sme.user_id", "network.user_id")
         .join("category", "sme.category_id", "category.categoryid")
         .select(
             "users.userid",
@@ -39,6 +39,9 @@ app.get("/smes", (req, res) => {
             "users.photo",
             "users.branch",
             "base.basename",
+        )
+        .orderBy(
+            'users.userid'
         )
         .then((data) => {
             const formattedData = data.map((item) => {

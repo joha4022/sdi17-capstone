@@ -6,10 +6,8 @@ import {
   CardContent,
   CardMedia,
   Typography,
-  Container,
   InputAdornment,
   TextField,
-  Box,
   InputLabel,
   MenuItem,
   FormControl,
@@ -29,20 +27,24 @@ import { Link } from "react-router-dom";
 import Navbar from "./Navbar";
 import "./Network.css";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import './Map.css';
+import L from "leaflet";
+import "./Map.css";
 
 const Network = () => {
   const [SMEs, setSMEs] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [category, setCategory] = useState("");
   const [branch, setBranch] = useState("");
-  const [location, setLocation] = useState("");
+  //   const [location, setLocation] = useState("");
   const [categoryList, setCategoryList] = useState([]);
   const [onNetwork, setOnNetwork] = useState(false);
   const [view, setView] = useState("module");
 
-  const mapPositions = [11.1271, 78.6569]
-
+  const mapPositions = [37.0902, -95.7129];
+  const myIcon = L.icon({
+    iconUrl: '/smeMarker.png',
+    iconSize: [150, 110],
+  });
   useEffect(() => {
     fetch("http://localhost:3001/smes")
       .then((res) => res.json())
@@ -62,7 +64,7 @@ const Network = () => {
   };
 
   let results = SMEs;
-  if (searchTerm || branch || category) {
+  if (1) {
     if (searchTerm.length > 0) {
       results = SMEs.filter((word) => {
         let name = [word.firstname, word.lastname].join(" ");
@@ -70,7 +72,7 @@ const Network = () => {
       });
     }
     if (branch) {
-      results = results.filter((word) => word.branch == branch);
+      results = results.filter((word) => word.branch === branch);
     }
     if (category) {
       results = results.filter((word) => word.categories.includes(category));
@@ -170,7 +172,7 @@ const Network = () => {
           value={view}
           exclusive
           onChange={() => {
-            setView(view == "module" ? "map" : "module");
+            setView(view === "module" ? "map" : "module");
             console.log(view);
           }}
         >
@@ -184,7 +186,7 @@ const Network = () => {
       </div>
 
       <section className="results">
-        {view == "module" ? (
+        {view === "module" ? (
           results.map((e, i) => {
             return (
               <Card key={`${i}`} sx={{ maxWidth: "15vw" }}>
@@ -219,12 +221,53 @@ const Network = () => {
             <MapContainer
               className="map"
               center={[mapPositions[0], mapPositions[1]]}
-              zoom={5}    
+              zoom={4}
             >
-                <TileLayer 
-                  attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
+              <TileLayer
+                attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+
+              {results.map((e, i) => {
+                return (
+                  <Marker
+                  //! Need to find
+                    position={[mapPositions[0]+Math.random()*10, mapPositions[1]+i]}
+                    icon={myIcon}
+                    riseOnHover={true}
+                  >
+                    <Popup>
+                      <Card key={`map${i}`} sx={{ maxWidth: "15vw" }}>
+                        <CardActionArea
+                          component={Link}
+                          to={`/sme/${e.userid}`}
+                        >
+                          {/* <CardMedia
+                            component="img"
+                            src={"/default.png"}
+                            alt="User Profile Picture"
+                          /> */}
+                          <CardContent>
+                            <Typography variant="h5">
+                              {`${e.firstname} ${e.lastname}`}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              {`Expertise: ${e.categories}`}
+                              {/* {console.log(e.categories)} */}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              {`Branch: ${e.branch}`}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              {e.email}
+                            </Typography>
+                          </CardContent>
+                        </CardActionArea>
+                      </Card>
+                    </Popup>
+                  </Marker>
+                );
+              })}
             </MapContainer>
           </div>
         )}
