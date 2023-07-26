@@ -14,14 +14,16 @@ export const AppContext = createContext();
 function App() {
   const [removethislater, setremovethislater] = useState(false);
   const [meetings, setMeetings] = useState([]);
+  const [currentUser, setCurrentUser] = useState(false);
 
   return (
     <AppContext.Provider value={{
       removethislater,
       setremovethislater,
       meetings,
-      setMeetings
-
+      setMeetings,
+      currentUser,
+      setCurrentUser
     }}
     >
       <Router>
