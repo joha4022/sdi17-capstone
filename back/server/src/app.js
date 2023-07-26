@@ -251,7 +251,9 @@ app.post('/createuser', (req, res) => {
         bio,
         photo,
         sme,
-        admin
+        admin,
+        branch,
+        base_id
     } = req.body;
     console.log(firstname, lastname, username, password);
     //let userid = 4
@@ -261,7 +263,7 @@ app.post('/createuser', (req, res) => {
         .then((data) => {
             console.log('data length: ', data.length)
             if (data.length > 0) {
-                res.status(404).json({ userCreated: false, message: `Username: *${username}* already taken!` });
+                res.status(404).json({ userCreated: false, code: 404, message: `Username: "${username}" is already taken!` });
             } else {
                 knex('users')
                     .insert({
@@ -277,7 +279,9 @@ app.post('/createuser', (req, res) => {
                         bio,
                         photo,
                         sme,
-                        admin
+                        admin,
+                        branch,
+                        base_id
                     })
                     .then(() => res.status(201).json({userCreated: true, code: 201, message: 'Username created successfully' }))
             }
@@ -365,7 +369,7 @@ app.post('/createbase', (req, res) => {
                         basecity,
                         basestate
                     })
-                    .then(() => res.status(201).json({ baseCreated: true, message: 'Base created successfully' }))
+                    .then(() => res.status(201).json({ baseCreated: true, code: 201, message: 'Base created successfully' }))
             }
         })
         .catch((err) =>
