@@ -8,6 +8,7 @@ import Navbar from './Navbar';
 
 export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
+  const [usernameList, setUsernameList] = useState([]);
   // required options
   const [userid, setUserid] = useState(false);
   const [firstname, setFirstname] = useState(false);
@@ -49,6 +50,12 @@ export default function Register() {
       .then(res => res.json())
       .then(data => {
         setUserid(data.length + 1);
+        const usernames = [...usernameList];
+        data.map(user => {
+          usernames.push(user.username);
+        })
+        console.log(usernames);
+        setUsernameList(usernames);
       })
   }, [])
 
@@ -110,6 +117,7 @@ export default function Register() {
               if(sme) {
                 navigate(`/register/${data.code}`, { replace: true });
               } else {
+                sessionStorage.setItem('currentUser', JSON.stringify({firstname: firstname, lastname: lastname, userid: userid}));
                 navigate(`/profile/${userid}`, { replace: true });
               }
             }, 2500)
@@ -242,7 +250,9 @@ export default function Register() {
                 <tr className='register-row'>
                   <td>
                     <div className='register-category'>Username</div>
-                    <TextField error={!username ? true : false} required sx={{ width: '28ch' }} id="outlined-basic-username" label="Username" variant="outlined" onKeyUp={(e) => {
+                    <TextField error={!username || usernameList.includes(username)? true : false} required sx={{ width: '28ch' }} id="outlined-basic-username" label="Username" variant="outlined" 
+                    helperText={usernameList.includes(username) || !username ? 'Username not available' : 'Available username'} 
+                    onKeyUp={(e) => {
                       setUsername(e.target.value);
                     }} />
                   </td>

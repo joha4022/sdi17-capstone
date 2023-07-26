@@ -62,7 +62,7 @@ export default function LoginPage() {
         } else if(data.code === 500) {
           alertDisplay(data.message)
         } else if(data.length === 1) {
-          sessionStorage.setItem('currentuser', JSON.stringify(data[0]));
+          sessionStorage.setItem('currentUser', JSON.stringify(data[0]));
           setCurrentUser(data[0]);
           setBackdrop(true);
           setTimeout(() => {
