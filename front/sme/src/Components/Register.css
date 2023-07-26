@@ -3,31 +3,50 @@ body {
   font-family: Arial, sans-serif;
   height: 100%;
 }
+
 .top-section {
   display: flex;
   justify-content: center;
   margin-bottom: 60px;
 }
+
 .register-h1 {
   margin: 0px;
 }
+
+.sme-helpertext {
+  color: rgba(0, 0, 0, 0.6);
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-weight: 400;
+  font-size: 0.75rem;
+  width: 24ch;
+  display: inline-block;
+  position: relative;
+  top:0.75rem;
+
+}
+
 .register-section {
-  background-color: #D2C8C8;;
+  background-color: #D2C8C8;
+  ;
   margin-top: 10px;
   border-radius: 5px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  width:750px;
-  height: 850px;
+  width: 750px;
+  height: 950px;
   padding: 50px;
 }
+
 .register-category {
   margin-bottom: 5px;
 }
+
 td {
   padding: 0px 10px 10px 0px;
 }
+
 .register-title {
   display: flex;
   flex-direction: row;
@@ -37,6 +56,7 @@ td {
   position: relative;
   left: 100px;
 }
+
 #registration-logo {
   height: 80px;
   width: 80px;
@@ -44,9 +64,11 @@ td {
   border-radius: 5px;
   margin: 10px;
 }
+
 #outlined-basic {
   width: 25ch;
 }
+
 .register-button-row {
   position: relative;
   top: 30px;

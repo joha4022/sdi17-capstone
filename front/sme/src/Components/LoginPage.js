@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './LoginPage.css';
 import { TextField, Button, IconButton, OutlinedInput, InputLabel, InputAdornment, FormControl, Alert, Collapse, AlertTitle, Backdrop, CircularProgress } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import FooterBar from './FooterBar';
 import Navbar from './Navbar';
+import { AppContext } from '../App';
 
 export default function LoginPage() {
+  const {setCurrentUser} = useContext(AppContext);
   const [showPassword, setShowPassword] = useState(false);
   const [alert, setAlert] = useState(false);
   const [backdrop, setBackdrop] = useState(false);
@@ -60,7 +62,8 @@ export default function LoginPage() {
         } else if(data.code === 500) {
           alertDisplay(data.message)
         } else if(data.length === 1) {
-          sessionStorage.setItem('userid', data[0].userid);
+          sessionStorage.setItem('currentuser', JSON.stringify(data[0]));
+          setCurrentUser(data[0]);
           setBackdrop(true);
           setTimeout(() => {
             setBackdrop(false);
