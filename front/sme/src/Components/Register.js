@@ -65,11 +65,11 @@ export default function Register() {
       alertDisplay('Please complete all the required fields!');
     } else if (password !== password2) {
       alertDisplay('Please make sure the passwords match.');
-    } else if (!email.includes('@')) {
-      alertDisplay('Please type in the approriate email.')
-    }
-    
-    else {
+    } else if (!email.includes('@') || !appEmail.includes('@') || !supEmail.includes('@') ) {
+      alertDisplay('Please type in an approriate email.')
+    } else if (phoneNumber.length !== 10) {
+      alertDisplay('Please provide 10 digit phone number.')
+    } else {
       const body = JSON.stringify({
         firstname: firstname,
         lastname: lastname,
@@ -78,6 +78,7 @@ export default function Register() {
         email: email,
         supervisoremail: supEmail,
         approveremail: appEmail,
+        phonenumber: phoneNumber,
         branch: branch
       })
       const option = {
