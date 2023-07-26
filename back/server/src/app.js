@@ -224,7 +224,7 @@ app.get('/profile/:userid', function (req, res) {
             'users.sme',
             'users.admin',
         )
-
+        .where('userid', userid) // Needed this to get the correct user
         .then(data => res.status(200).json(data))
         .catch(err =>
             res.status(404).json({
