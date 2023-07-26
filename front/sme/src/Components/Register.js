@@ -1,7 +1,7 @@
 import './Register.css'
 import React, { useEffect, useState } from 'react';
-import { redirect, useNavigate } from 'react-router-dom';
-import { TextField, IconButton, OutlinedInput, InputLabel, InputAdornment, FormControl, Button, Collapse, Alert, Typography, AlertTitle, Box, Modal, MenuItem, Backdrop, CircularProgress, FormHelperText } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { FormControlLabel, TextField, IconButton, OutlinedInput, InputLabel, InputAdornment, FormControl, Button, Collapse, Alert, Typography, AlertTitle, Box, Modal, MenuItem, Backdrop, CircularProgress, FormHelperText, Checkbox } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import FooterBar from './FooterBar';
 import Navbar from './Navbar';
@@ -20,6 +20,7 @@ export default function Register() {
   const [phoneNumber, setPhoneNumber] = useState(false);
   const [supEmail, setSupEmail] = useState(false);
   const [appEmail, setAppEmail] = useState(false);
+  const [sme, setSme] = useState(false);
   // alertdisplay
   const [message, setMessage] = useState(false);
   const [alert, setAlert] = useState(false);
@@ -66,11 +67,11 @@ export default function Register() {
     }, 2500)
   }
   const register = () => {
-    if (!firstname || !lastname || !username || !email || !password || !password2 || !supEmail || !appEmail || !baseName) {
+    if (!firstname || !lastname || !username || !email || !password || !password2 || !appEmail || !baseName) {
       alertDisplay('Please complete all the required fields!');
     } else if (password !== password2) {
       alertDisplay('Please make sure the passwords match.');
-    } else if (!email.includes('@') || !appEmail.includes('@') || !supEmail.includes('@')) {
+    } else if (!email.includes('@') || !appEmail.includes('@')) {
       alertDisplay('Please include @ and type in an approriate email.')
     } else {
       const body = JSON.stringify({
@@ -84,6 +85,7 @@ export default function Register() {
         approveremail: appEmail,
         phonenumber: phoneNumber,
         branch: branch,
+        sme: sme,
         base_id: baseid
       })
       const option = {
@@ -105,7 +107,11 @@ export default function Register() {
             setBackdrop(true);
             setTimeout(() => {
               setBackdrop(false);
-              navigate(`/profile/${userid}`, { replace: true });
+              if(sme) {
+                navigate(`/register/${data.code}`, { replace: true });
+              } else {
+                navigate(`/profile/${userid}`, { replace: true });
+              }
             }, 2500)
           }
         })
@@ -172,6 +178,10 @@ export default function Register() {
         setBaseCity(currentBases[existingBaseName.baseid - 1].basecity);
         setBaseState(currentBases[existingBaseName.baseid - 1].basestate);
         setBaseid(currentBases[existingBaseName.baseid - 1].baseid);
+        setBackdrop(true);
+              setTimeout(() => {
+                setBackdrop(false);
+              }, 1000)
         setButtonLabel('Change Base');
         setBaseForm(false);
       }
@@ -213,9 +223,14 @@ export default function Register() {
                   </td>
                 </tr>
                 <tr className='register-row'>
+                <div className='register-category'>Account Type</div>
+                  <FormControlLabel control={<Checkbox onClick={(e)=>{setSme(e.target.checked)}}/>} label="SME" />
+                  <span className='sme-helpertext'>SME account will need to be verified before it can be used.</span>
+                </tr>
+                <tr className='register-row'>
                   <td>
                     <div className='register-category'>Branch</div>
-                    <TextField error={!branch ? true : false} sx={{ width: '28ch' }} required select id="outlined-select-branch" label="Branch" variant="outlined" defaultValue='' onClick={(e) => { setBranch(e.target.dataset.value) }}>
+                    <TextField sx={{ width: '28ch' }} select id="outlined-select-branch" label="Branch" variant="outlined" defaultValue='' onClick={(e) => { setBranch(e.target.dataset.value) }}>
                       {militaryBranches.map((branch) => (
                         <MenuItem key={branch} value={branch} onKeyDown={(e) => { if (e.key === 'Enter') { setBranch(e.target.dataset.value) } }}>
                           {branch}
@@ -299,7 +314,7 @@ export default function Register() {
                 <tr className='register-row'>
                   <td>
                     <div className='register-category'>Supervisor's E-mail</div>
-                    <TextField error={!supEmail ? true : false} required id="outlined-basic-supemail" sx={{ width: '28ch' }} label="Supervisor's E-mail" variant="outlined" onKeyUp={(e) => { setSupEmail(e.target.value) }} />
+                    <TextField id="outlined-basic-supemail" sx={{ width: '28ch' }} label="Supervisor's E-mail" variant="outlined" onKeyUp={(e) => { setSupEmail(e.target.value) }} />
                   </td>
                   <td>
                     <div className='register-category'>Approver's E-mail</div>
