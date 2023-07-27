@@ -8,7 +8,6 @@ import ReactCalendar from "react-calendar";
 import Loader from "./Loader";
 import MeetingFormModal from "./MeetingFormModal";
 
-
 const Meetings = styled(Paper)`
   flex-grow: 3;
   overflow: auto;
@@ -18,16 +17,17 @@ const Meetings = styled(Paper)`
 
 const AvatarAndDetails = styled(MuiBox)`
   flex-shrink: 0;
-  flex-basis: 200px;
+  flex-basis: 100px;
 `;
 
-function Profile() {
+function Profile({ userId }) {
   const [users, setUsers] = useState(null);
   const [notes, setNotes] = useState([]);
   const [newNote, setNewNote] = useState("");
   const [editingNoteIndex, setEditingNoteIndex] = useState(null);
   const [editingNoteText, setEditingNoteText] = useState("");
   const [isMeetingModalOpen, setIsMeetingModalOpen] = useState(false);
+  const [meetings, setMeetings] = useState([]);
   const { id } = useParams();
 
   useEffect(() => {
@@ -44,13 +44,19 @@ function Profile() {
         console.error("Failed to fetch profile data: ", error);
       }
     };
-
     fetchProfile();
+  }, [id]);
+
+  useEffect(() => {
+    fetch(`http://localhost:3001/usermeetings/${id}`)
+      .then(res => res.json())
+      .then(data => setMeetings(data))
+      .catch(err => console.log('Error:', err))
   }, [id]);
 
   if (!users) {
     return <Loader />;
-  }
+  };
 
   const handleAddNote = (e) => {
     e.preventDefault();
@@ -97,15 +103,12 @@ function Profile() {
   return (
     <Background>
       <Navbar />
-
       <Grid container spacing={2} style={{ padding: 20, display: "flex" }}>
         <AvatarAndDetails>
           <Paper elevation={4} sx={{ margin: 5, padding: 5 }}>
-            <Avatar
-              alt="Name"
-              src={users && users.image ? users.image : "/images/Blank_Avatar.jpg"}
-              sx={{ width: 200, height: 200 }}
-            />
+            <Avatar              
+              src={users && users.photo ? users.photo : "/images/Blank_Avatar.jpg"}
+              sx={{ width: 200, height: 200 }} />
           </Paper>
           <Paper elevation={2} sx={{ margin: 5, padding: 5 }}>
             <MuiBox>
@@ -115,14 +118,14 @@ function Profile() {
               </ProfileDetails>
               <ProfileDetails>
                 <Typography>Location</Typography>
-                <ProfileDetail> {users && users.branch}</ProfileDetail>
+                <ProfileDetail> {users && users.basename}</ProfileDetail>
+                <ProfileDetail> {users && users.worklocation}</ProfileDetail>
               </ProfileDetails>
               <ProfileDetails>
-                <Typography>Associated Unit</Typography>
-                <ProfileDetail> {users && users.unit}</ProfileDetail>
+                <Typography>Associated Branch</Typography>
+                <ProfileDetail> {users && users.branch}</ProfileDetail>
               </ProfileDetails>
             </MuiBox>
-
             <MuiBox>
               <Typography>Calendar</Typography>
               <ReactCalendar />
@@ -141,7 +144,14 @@ function Profile() {
         <Grid item xs={12} sm={4}>
           <Paper elevation={1} sx={{ margin: 1, padding: 1 }}>
             <Meetings>
-              Meetings:              
+              Meetings:
+              <ul>
+                {meetings.map(meeting => (
+                  <li key={meeting.meetingid}>
+                    <Typography>{meeting.meetingTitle}-{meeting.meetingDescription}-{meeting.startTime}-{meeting.endTime}-{meeting.meetingDate}</Typography>
+                  </li>
+                ))}
+              </ul>              
               <Button onClick={openMeetingModal}>Schedule Meeting</Button>
               <MeetingFormModal
             open={isMeetingModalOpen}
@@ -153,15 +163,13 @@ function Profile() {
             <Button
               variant="contained"
               color="primary"
-              sx={{ margin: 1, padding: 1 }}
-            >
+              sx={{ margin: 1, padding: 1 }}>
               Approve (SME)
             </Button>
             <Button
               variant="contained"
               color="primary"
-              sx={{ margin: 1, padding: 1 }}
-            >
+              sx={{ margin: 1, padding: 1 }}>
               Decline (SME)
             </Button>
           </MuiBox>
