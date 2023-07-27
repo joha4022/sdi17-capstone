@@ -9,7 +9,10 @@
   border-radius: 5px;
   margin: 0px 10px 0px 10px;
   width: 25rem;
+  height: 25rem;
+
 }
+
 .editprofile-main-section{
   display: flex;
   justify-content: center;
@@ -49,4 +52,14 @@
   background: white;
   width: 500px;
   border-radius: 5px;
+  margin: 0px 0px 10px 0px;
+  padding: 10px;
+}
+.editprofile-category {
+  font-weight: bold;
+  font-size: 1.25rem;
+  margin: 10px 0px 0px 15px;
+}
+.dropdown-category{
+  margin-bottom:5px;
 }
