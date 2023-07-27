@@ -74,15 +74,15 @@ app.get('/', function (req, res) {
 //--------------------------------------------------------------------------------------------------------
 // API to get category list
 app.get('/categories', function (req, res) {
-  knex('category')
-      .select('*')
-      .then(data => res.status(200).json(data))
-      .catch(err =>
-          res.status(404).json({
-              message:
-                  'The data you are looking for could not be found. Please try again'
-          })
-      );
+    knex('category')
+        .select('*')
+        .then(data => res.status(200).json(data))
+        .catch(err =>
+            res.status(404).json({
+                message:
+                    'The data you are looking for could not be found. Please try again'
+            })
+        );
 });
 
 
@@ -117,7 +117,6 @@ app.get('/userMeetings/:meetingid', function (req, res) {
             "Capstone",
             "something else",
         ]
-
     Then,
 
     first select: which meetings this guy is going to.
@@ -323,11 +322,11 @@ app.post('/login/', (req, res) => {
                     code: 404,
                     message: 'Username and/or password are incorrect',
                 });
-                }
-                res.status(200).json(data);
-            })
-            .catch((err) =>
-                res.status(500).json({
+            }
+            res.status(200).json(data);
+        })
+        .catch((err) =>
+            res.status(500).json({
                 code: 500,
                 message: 'An error occurred while fetching the login',
                 error: err,
