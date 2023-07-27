@@ -15,15 +15,10 @@ import {
   Snackbar,
 } from "@mui/material";
 import { TabList, TabPanel, TabContext } from "@mui/lab";
-import {
-  Search as SearchIcon,
-  ViewModule as ViewModuleIcon,
-  Close as CloseIcon,
-} from "@mui/icons-material";
+import { Search as SearchIcon } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 import Navbar from "./Navbar";
 import "./Manage.css";
-import { findLastIndex } from "lodash";
 
 const Manage = () => {
   const [SMEs, setSMEs] = useState([]);
@@ -31,7 +26,7 @@ const Manage = () => {
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState("1");
   const [toast, setToast] = useState(false);
-  const [message, setMessage] = useState('')
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     fetch("http://localhost:3001/")
@@ -43,7 +38,7 @@ const Manage = () => {
   if (searchTerm.length > 0) {
     results = SMEs.filter((word) => {
       let name = [word.firstname, word.lastname].join(" ");
-      return name.includes(searchTerm);
+      return name.toUpperCase().includes(searchTerm.toUpperCase());
     });
   }
 
@@ -62,7 +57,7 @@ const Manage = () => {
       .then((data) => {
         setOpen(false);
         setToast(true);
-        setMessage(data.message)
+        setMessage(data.message);
       })
       .catch((error) => console.error("Error:", error));
   };
@@ -89,7 +84,12 @@ const Manage = () => {
       <Box sx={{ width: "100%", typography: "body1" }}>
         <TabContext value={tab}>
           <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-            <TabList id="tabList" onChange={(event, newValue) => setTab(newValue)} textColor="secondary" indicatorColor="secondary">
+            <TabList
+              id="tabList"
+              onChange={(event, newValue) => setTab(newValue)}
+              textColor="secondary"
+              indicatorColor="secondary"
+            >
               <Tab label="Pending SME Requests" value="1" />
               <Tab label="Mangage Existing Users" value="2" />
             </TabList>

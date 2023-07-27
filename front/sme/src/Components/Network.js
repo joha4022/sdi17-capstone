@@ -42,7 +42,7 @@ const Network = () => {
 
   const mapPositions = [37.0902, -95.7129];
   const myIcon = L.icon({
-    iconUrl: '/smeMarker.png',
+    iconUrl: "/smeMarker.png",
     iconSize: [150, 110],
   });
   useEffect(() => {
@@ -68,7 +68,7 @@ const Network = () => {
     if (searchTerm.length > 0) {
       results = SMEs.filter((word) => {
         let name = [word.firstname, word.lastname].join(" ");
-        return name.includes(searchTerm);
+        return name.toUpperCase().includes(searchTerm.toUpperCase());
       });
     }
     if (branch) {
@@ -173,7 +173,7 @@ const Network = () => {
           exclusive
           onChange={() => {
             setView(view === "module" ? "map" : "module");
-            console.log(view);
+            // console.log(view);
           }}
         >
           <ToggleButton value="module" aria-label="module">
@@ -231,8 +231,11 @@ const Network = () => {
               {results.map((e, i) => {
                 return (
                   <Marker
-                  //! Need to find
-                    position={[mapPositions[0]+Math.random()*10, mapPositions[1]+i]}
+                    //! Need to find
+                    position={[
+                      mapPositions[0] + Math.random() * 10,
+                      mapPositions[1] + i,
+                    ]}
                     icon={myIcon}
                     riseOnHover={true}
                   >
@@ -240,7 +243,7 @@ const Network = () => {
                       <Card key={`map${i}`} sx={{ maxWidth: "15vw" }}>
                         <CardActionArea
                           component={Link}
-                          to={`/sme/${e.userid}`}
+                          to={`/profile/${e.userid}`}
                         >
                           {/* <CardMedia
                             component="img"

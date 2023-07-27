@@ -2,7 +2,6 @@ import React from "react";
 import {
   AppBar,
   Box,
-  Button,
   Toolbar,
   IconButton,
   Typography,
@@ -10,7 +9,7 @@ import {
   MenuItem,
 } from "@mui/material";
 import { Link } from "react-router-dom";
-import { Menu as MenuIcon, AccountCircle } from "@mui/icons-material";
+import { AccountCircle } from "@mui/icons-material";
 import "./Navbar.css";
 
 const Navbar = () => {
@@ -18,10 +17,6 @@ const Navbar = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
 
   const url = window.location.href;
-
-  const handleChange = (event) => {
-    setAuth(event.target.checked);
-  };
 
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
