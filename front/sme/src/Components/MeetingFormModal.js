@@ -1,15 +1,18 @@
 import React, { useState, useContext } from "react";
 import { AppContext } from "../App";
+import Autosuggest from 'react-autosuggest';
+import { debounce } from "lodash";
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material";
 
 function MeetingFormModal ({ open, handleClose }) {
   const { meetings, setMeetings } = useContext(AppContext);
+  const [suggestions, setSuggestions] = useState([]);
   const [meetingData, setMeetingData] = useState({
-    title: "",
-    description: "",
-    start_time: "",
-    end_time: "",
-    date: "",
+    meetingTitle: "",
+    meetingDescription: "",
+    startTime: "",
+    endTime: "",
+    meetingDate: "",
     attendees: "",
   });
 
@@ -21,21 +24,69 @@ function MeetingFormModal ({ open, handleClose }) {
     e.preventDefault();
 
     const newMeeting = {
-      ...meetingData,
-      attendees: meetingData.attendees.split(","),
+      meetingTitle: meetingData.meetingTitle,
+      meetingDescription: meetingData.meetingDescription,
+      startTime: meetingData.startTime,
+      endTime: meetingData.endTime,
+      meetingDate: meetingData.meetingDate,
+      attendees: meetingData.attendees
+        .split(",")
+        .map((attendee) => attendee.trim()),
     };
-    setMeetings([...meetings, newMeeting]);
-
-    setMeetingData({
-      title: "",
-      description: "",
-      start_time: "",
-      end_time: "",
-      date: "",
-      attendees: "",
-    });
-    handleClose();
+    // setMeetings([...meetings, newMeeting]);
+    fetch("http://localhost:3001/meetings", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(newMeeting),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Success:", data);
+        setMeetings([...meetings, newMeeting]);
+        setMeetingData({
+          meetingTitle: "",
+          meetingDescription: "",
+          startTime: "",
+          endTime: "",
+          meetingDate: "",
+          attendees: "",
+        });
+        handleClose();
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
   };
+
+  const getSuggestions = async (value) => {
+    try {
+      const response = await fetch(`http://localhost:3001/users/suggest?q=${value}`);
+      const data = await response.json();
+      setSuggestions(data);
+    } catch (error) {
+      console.log('Failed to fetch suggestions:', error);
+    }
+  };
+
+  const debounceGetSuggestions = debounce(getSuggestions, 500);
+
+  const onSuggestionFetchRequested = ( value ) => {
+    debounceGetSuggestions(value.value);
+  };
+
+  const onSuggestionsClearRequested = () => {
+    setSuggestions([]);
+  };
+
+  const getSuggestionValue = (suggestion) => suggestion.username;
+
+  const renderSuggestion = (suggestion) => (
+    <div>
+      {suggestion.username}
+    </div>);
+
 
 
   return (
@@ -47,57 +98,63 @@ function MeetingFormModal ({ open, handleClose }) {
             <TextField
               autoFocus
               margin="dense"
-              name="title"
+              name="meetingTitle"
               label="Title"
               type="text"
               fullWidth
-              value={meetingData.title}
+              value={meetingData.meetingTitle}
               onChange={handleInputChange}
             />
             <TextField
               margin="dense"
-              name="description"
+              name="meetingDescription"
               label="Description"
               type="text"
               fullWidth
-              value={meetingData.description}
+              value={meetingData.meetingDescription}
               onChange={handleInputChange}
             />
             <TextField
               margin="dense"
-              name="start_time"
+              name="startTime"
               label="Start Time"
               type="time"
               fullWidth
-              value={meetingData.start_time}
+              value={meetingData.startTime}
               onChange={handleInputChange}
             />
             <TextField
               margin="dense"
-              name="end_time"
+              name="endTime"
               label="End Time"
               type="time"
               fullWidth
-              value={meetingData.end_time}
+              value={meetingData.endTime}
               onChange={handleInputChange}
             />
             <TextField
               margin="dense"
-              name="date"
+              name="meetingDate"
               label="Date"
               type="date"
               fullWidth
-              value={meetingData.date}
+              value={meetingData.meetingDate}
               onChange={handleInputChange}
             />
-            <TextField
-              margin="dense"
-              name="attendees"
-              label="Add Attendees"
-              type="text"
-              fullWidth
-              value={meetingData.attendees}
-              onChange={handleInputChange}
+            <Autosuggest
+              suggestions={suggestions}
+              onSuggestionsFetchRequested={onSuggestionFetchRequested}
+              onSuggestionsClearRequested={onSuggestionsClearRequested}
+              getSuggestionValue={getSuggestionValue}
+              renderSuggestion={renderSuggestion}
+              inputProps={{
+                value: meetingData.attendees,
+                placeholder: "Attendees",
+                onChange: (_, { newValue }) => {
+                  setMeetingData({ ...meetingData, attendees: newValue });
+                },
+                name: "attendees",
+              }}
             />
             <DialogActions>
               <Button onClick={handleClose} color="primary">

@@ -11,12 +11,7 @@ exports.seed = async function(knex) {
       basecity: 'N/A',
       basestate: 'N/A'
    },
-    {
-       basename: 'Joint Base Lewis McChord ',
-       basecity: 'Tacoma',
-       basestate: 'WA'
-    },
-
+    
     {  
       basename: 'Los Angeles Space Force Base',
       basecity: 'El Segundo',

@@ -469,7 +469,8 @@ app.patch('/updateuser', (req, res) => {
         .then((data) => res.status(201).json(data))
         .catch((err) => res.status(500).json({
             message: 'Error updating user information',
-            error: err
+            error: err,
+            code: 500
         }))
 })
 
