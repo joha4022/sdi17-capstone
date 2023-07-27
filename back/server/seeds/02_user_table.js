@@ -18,7 +18,7 @@ exports.seed = async function (knex) {
       worklocation: 'BLDG 272 RM 1',
       bio:'Active Duty Space Force , 1 ',
       photo:'back/server/photos/soldier.png',
-      branch: 'USSF',
+      branch: 'Space Force',
       sme: true,
       admin: true,
       base_id: 1 //changed the table name here
@@ -36,7 +36,7 @@ exports.seed = async function (knex) {
       worklocation: 'BLDG 271 RM 2',
       bio:'10 year Air Force veteran, 2 ',
       photo:'back/server/photos/Lady.jpg',
-      branch: 'USAF',
+      branch: 'Air Force',
       sme: true,
       admin: false,
       base_id: 2 //changed the table name here
@@ -53,7 +53,7 @@ exports.seed = async function (knex) {
       worklocation: 'BLDG 271 RM 4',
       bio:'10 year Air Force veteran, 3 ',
       photo:'back/server/photos/Lady.jpg',
-      branch: 'USAF',
+      branch: 'Air Force',
       sme: true,
       admin: false,
       base_id: '1' //changed the table name here
@@ -71,7 +71,7 @@ exports.seed = async function (knex) {
       worklocation: 'BLDG 271 RM 4',
       bio:'10 year Air Force veteran, 4 ',
       photo:'back/server/photos/Lady.jpg',
-      branch: 'USAF',
+      branch: 'Air Force',
       sme: true,
       admin: false,
       base_id: '1' //changed the table name here
@@ -88,7 +88,7 @@ exports.seed = async function (knex) {
       worklocation: 'BLDG 271 RM 5',
       bio:'10 year Air Force veteran, 5 ',
       photo:'back/server/photos/Lady.jpg',
-      branch: 'USAF',
+      branch: 'Air Force',
       sme: true,
       admin: false,
       base_id: '1' //changed the table name here
@@ -105,7 +105,7 @@ exports.seed = async function (knex) {
       worklocation: 'BLDG 271 RM 6',
       bio:'10 year Air Force veteran, 6 ',
       photo:'back/server/photos/Lady.jpg',
-      branch: 'USAF',
+      branch: 'Air Force',
       sme: true,
       admin: false,
       base_id: '1' //changed the table name here
@@ -122,7 +122,7 @@ exports.seed = async function (knex) {
       worklocation: 'BLDG 271 RM 7',
       bio:'10 year Air Force veteran, 7 ',
       photo:'back/server/photos/Lady.jpg',
-      branch: 'USAF',
+      branch: 'Air Force',
       sme: true,
       admin: false,
       base_id: '1' //changed the table name here
@@ -139,7 +139,7 @@ exports.seed = async function (knex) {
       worklocation: 'BLDG 271 RM 8',
       bio:'10 year Air Force veteran, 8 ',
       photo:'back/server/photos/Lady.jpg',
-      branch: 'USAF',
+      branch: 'Air Force',
       sme: true,
       admin: false,
       base_id: '1' //changed the table name here
@@ -156,7 +156,7 @@ exports.seed = async function (knex) {
       worklocation: 'BLDG 271 RM 9',
       bio:'10 year Air Force veteran, 9 ',
       photo:'back/server/photos/Lady.jpg',
-      branch: 'USAF',
+      branch: 'Air Force',
       sme: true,
       admin: false,
       base_id: '1' //changed the table name here
@@ -173,7 +173,7 @@ exports.seed = async function (knex) {
       worklocation: 'BLDG 271 RM 10',
       bio:'10 year Air Force veteran, 10 ',
       photo:'back/server/photos/Lady.jpg',
-      branch: 'USAF',
+      branch: 'Air Force',
       sme: true,
       admin: false,
       base_id: '1' //changed the table name here
@@ -190,7 +190,7 @@ exports.seed = async function (knex) {
       worklocation: 'BLDG 271 RM 11',
       bio:'10 year Air Force veteran, 11 ',
       photo:'back/server/photos/Lady.jpg',
-      branch: 'USAF',
+      branch: 'Air Force',
       sme: true,
       admin: false,
       base_id: '1' //changed the table name here
@@ -209,7 +209,7 @@ exports.seed = async function (knex) {
       worklocation: 'BLDG 271 RM 12',
       bio:'10 year Air Force veteran, 12 ',
       photo:'back/server/photos/Lady.jpg',
-      branch: 'USAF',
+      branch: 'Air Force',
       sme: true,
       admin: false,
       base_id: 2 //changed the table name here
@@ -226,7 +226,7 @@ exports.seed = async function (knex) {
       worklocation: 'BLDG 271 RM 13',
       bio:'10 year Air Force veteran, 13 ',
       photo:'back/server/photos/Lady.jpg',
-      branch: 'USAF',
+      branch: 'Air Force',
       sme: true,
       admin: false,
       base_id: '1' //changed the table name here
@@ -244,7 +244,7 @@ exports.seed = async function (knex) {
       worklocation: 'BLDG 271 RM 14',
       bio:'10 year Air Force veteran, 14 ',
       photo:'back/server/photos/Lady.jpg',
-      branch: 'USAF',
+      branch: 'Air Force',
       sme: true,
       admin: false,
       base_id: '1' //changed the table name here
@@ -261,7 +261,7 @@ exports.seed = async function (knex) {
       worklocation: 'BLDG 271 RM 15',
       bio:'10 year Air Force veteran, 15 ',
       photo:'back/server/photos/Lady.jpg',
-      branch: 'USAF',
+      branch: 'Air Force',
       sme: true,
       admin: false,
       base_id: '1' //changed the table name here
@@ -278,7 +278,7 @@ exports.seed = async function (knex) {
       worklocation: 'BLDG 271 RM 16',
       bio:'10 year Air Force veteran, 16 ',
       photo:'back/server/photos/Lady.jpg',
-      branch: 'USAF',
+      branch: 'Air Force',
       sme: true,
       admin: false,
       base_id: '1' //changed the table name here
@@ -295,7 +295,7 @@ exports.seed = async function (knex) {
       worklocation: 'BLDG 271 RM 17',
       bio:'10 year Air Force veteran, 17 ',
       photo:'back/server/photos/Lady.jpg',
-      branch: 'USAF',
+      branch: 'Air Force',
       sme: true,
       admin: false,
       base_id: '1' //changed the table name here
@@ -312,7 +312,7 @@ exports.seed = async function (knex) {
       worklocation: 'BLDG 271 RM 18',
       bio:'10 year Air Force veteran, 18 ',
       photo:'back/server/photos/Lady.jpg',
-      branch: 'USAF',
+      branch: 'Air Force',
       sme: true,
       admin: false,
       base_id: '1' //changed the table name here
@@ -329,7 +329,7 @@ exports.seed = async function (knex) {
       worklocation: 'BLDG 271 RM 19',
       bio:'10 year Air Force veteran, 19 ',
       photo:'back/server/photos/Lady.jpg',
-      branch: 'USAF',
+      branch: 'Air Force',
       sme: true,
       admin: false,
       base_id: '1' //changed the table name here
@@ -346,7 +346,7 @@ exports.seed = async function (knex) {
       worklocation: 'BLDG 271 RM 20',
       bio:'10 year Air Force veteran, 20 ',
       photo:'back/server/photos/Lady.jpg',
-      branch: 'USAF',
+      branch: 'Air Force',
       sme: true,
       admin: false,
       base_id: '1' //changed the table name here
@@ -363,7 +363,7 @@ exports.seed = async function (knex) {
       worklocation: 'BLDG 271 RM 21',
       bio:'10 year Air Force veteran, 21 ',
       photo:'back/server/photos/Lady.jpg',
-      branch: 'USAF',
+      branch: 'Air Force',
       sme: true,
       admin: false,
       base_id: '1' //changed the table name here
