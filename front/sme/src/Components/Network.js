@@ -190,7 +190,7 @@ const Network = () => {
           results.map((e, i) => {
             return (
               <Card key={`${i}`} sx={{ maxWidth: "15vw" }}>
-                <CardActionArea component={Link} to={`/sme/${e.userid}`}>
+                <CardActionArea component={Link} to={`/profile/${e.userid}`}>
                   <CardMedia
                     component="img"
                     src={"/default.png"}
