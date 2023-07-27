@@ -5,13 +5,13 @@ const Home = styled.div`
   background-color: #D2C8C8;
   margin: 10px;
   border-radius: 5px;
-`
+`;
 const Footer = styled.footer`
   background-color: #A3816A;
   margin: 10px;
   border-radius: 5px;
   padding: 5px 0px 5px 0px;
-`
+`;
 const FooterDiv = styled.div`
   color: white;
   font-weight: ${props => props.theme === 'bold' ? 'bold' : ''};
@@ -19,22 +19,24 @@ const FooterDiv = styled.div`
   display: flex;
   align-items: center;
   font-size: ${props => props.theme === 'bold' ? '' : '12px'};
-`
+`;
 const FooterA = styled.a`
   text-decoration: none;
   margin-left: 10px;
   color: white;
   font-size: 12px;
   font-weight: bold;
-`
-const ProfileDetails = styled.div`
-  font-size: 1.2em;
-  text-decoration: underline;
 `;
 
 const ProfileDetail = styled.p`
-  margin-bottom: 0.5em;
+text-decoration: none;  
+margin-bottom: 0.9em;
   padding-left: 0.5em;
+`;
+
+const ProfileDetails = styled.div`
+  font-size: 1.2em;
+  text-decoration: underline;
 `;
 
 const Background = styled.div`
