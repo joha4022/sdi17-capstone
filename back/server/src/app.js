@@ -170,7 +170,7 @@ app.get("/smes", (req, res) => {
     knex("users")
         .join("base", "users.base_id", "base.baseid")
         .join("sme", "users.userid", "sme.user_id")
-        .join("network", "sme.user_id", "network.user_id")
+        // .join("network", "sme.user_id", "network.user_id")
         .join("category", "sme.category_id", "category.categoryid")
         .select(
             "users.userid",
@@ -192,6 +192,9 @@ app.get("/smes", (req, res) => {
             "users.photo",
             "users.branch",
             "base.basename",
+        )
+        .orderBy(
+            'users.userid'
         )
         .then((data) => {
             const formattedData = data.map((item) => {
@@ -326,7 +329,9 @@ app.get('/profile/:userid', function (req, res) {
 });
 
 app.post('/createuser', (req, res) => {
-    const { firstname,
+    const { 
+        userid,
+        firstname,
         lastname,
         username,
         password,
@@ -337,7 +342,9 @@ app.post('/createuser', (req, res) => {
         bio,
         photo,
         sme,
-        admin
+        admin,
+        branch,
+        base_id
     } = req.body;
     console.log(firstname, lastname, username, password);
     //let userid = 4
@@ -347,10 +354,11 @@ app.post('/createuser', (req, res) => {
         .then((data) => {
             console.log('data length: ', data.length)
             if (data.length > 0) {
-                res.status(404).json({ userCreated: false, message: `Username: *${username}* already taken!` });
+                res.status(404).json({ userCreated: false, code: 404, message: `Username: "${username}" is already taken!` });
             } else {
                 knex('users')
                     .insert({
+                        userid,
                         firstname,
                         lastname,
                         username,
@@ -362,9 +370,11 @@ app.post('/createuser', (req, res) => {
                         bio,
                         photo,
                         sme,
-                        admin
+                        admin,
+                        branch,
+                        base_id
                     })
-                    .then(() => res.status(201).json({ userCreated: true, code: 201, message: 'Username created successfully' }))
+                    .then(() => res.status(201).json({userCreated: true, code: 201, message: 'Username created successfully' }))
             }
         })
         .catch((err) =>
@@ -773,30 +783,6 @@ app.post('/login/', (req, res) => {
         );
 });
 
-// Check user name and password against database
-app.post("/login/", (req, res) => {
-    const { user, pw } = req.body;
-    //console.log('req.body: ',req.body)
-    console.log("user password:", user, pw);
-    knex("users")
-        .select("userid", "firstname", "lastname")
-        .where("username", user)
-        .where("password", pw)
-        .then((data) => {
-            if (data.length === 0) {
-                return res.status(404).json({
-                    message: "User name and/or passowrd are incorrect",
-                });
-            }
-            res.status(200).json(data);
-        })
-        .catch((err) =>
-            res.status(500).json({
-                message: "An error occurred while fetching the login",
-                error: err,
-            })
-        );
-});
 
 ////----------------------------------------------------------//
 // All CRUD for categories

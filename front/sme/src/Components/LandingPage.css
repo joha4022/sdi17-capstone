@@ -1,0 +1,32 @@
+body {
+  background-color: #F8F1F1;
+  font-family: Arial, sans-serif;
+  height: 100%;
+}
+.blue-section {
+  margin: 10px;
+  border-radius: 5px;
+  background: linear-gradient(130deg, #0a065ccd 13%,  #0A065D 83%);
+  display: flex;
+  flex-direction: row;
+  height: 50em;
+}
+.thankyou-section{
+  position: relative;
+  top: -12rem;
+  left: 6.5rem;
+}
+#landingpage-logo {
+  height: 700px;
+  width: 700px;
+}
+.register-landing-h1{
+  color: white;
+}
+.register-landing-message{
+  width: 500px;
+  color: white;
+}
+.register-landing-button{
+  margin-top: 30px;
+}

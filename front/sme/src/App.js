@@ -6,6 +6,7 @@ import Profile from './Components/Profile';
 import Register from './Components/Register';
 import Search from './Components/Search';
 import SME from './Components/SME';
+import LandingPage from './Components/LandingPage'
 import './App.css';
 import { createContext, useState } from 'react';
 
@@ -14,20 +15,23 @@ export const AppContext = createContext();
 function App() {
   const [removethislater, setremovethislater] = useState(false);
   const [meetings, setMeetings] = useState([]);
+  const [currentUser, setCurrentUser] = useState(false);
 
   return (
     <AppContext.Provider value={{
       removethislater,
       setremovethislater,
       meetings,
-      setMeetings
-
+      setMeetings,
+      currentUser,
+      setCurrentUser
     }}
     >
       <Router>
         <Routes>
           <Route path='/' element={<LoginPage />}></Route>
           <Route path='/register' element={<Register />}></Route>
+          <Route path='/register/:id' element={<LandingPage />}></Route>
           <Route path='/profile/:id' element={<Profile />}></Route>
           <Route path='/network' element={<Network />}></Route>
           <Route path='/sme/:id' element={<SME />}></Route>
