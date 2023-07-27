@@ -77,17 +77,16 @@ app.get('/', function (req, res) {
 //--------------------------------------------------------------------------------------------------------
 // API to get category list
 app.get('/categories', function (req, res) {
-  knex('category')
-      .select('*')
-      .then(data => res.status(200).json(data))
-      .catch(err =>
-          res.status(404).json({
-              message:
-                  'The data you are looking for could not be found. Please try again'
-          })
-      );
+    knex('category')
+        .select('*')
+        .then(data => res.status(200).json(data))
+        .catch(err =>
+            res.status(404).json({
+                message:
+                    'The data you are looking for could not be found. Please try again'
+            })
+        );
 });
-
 
 
 
@@ -107,59 +106,17 @@ app.get('/base', function (req, res) {
 
 //-------------------------------------------------------------------------------------------------------
 
-app.get('/userMeetings/:meetingid', function (req, res) {
-    //const userid = req.params.userid;
-    const meetingid = req.params.meetingid;
-
-    /**
-     We want to get all the users that are going to a particualr meeting
-     Which ever users assiged to a particular meetingid we want to see
-
-     We want to see a user and which meetings that user is attending
-        ex -> meeting: [
-            "Capstone",
-            "something else",
-        ]
-
-    Then,
-
-    first select: which meetings this guy is going to.
-    second select: how many people are going to that meeting?
-     */
-    knex('users')
-        .join('userMeetings', 'users.userid', 'userMeetings.user_id')
-        .join('meetings', 'meetings.meetingid', 'userMeetings.meeting_id')
-        .select('users.userid',
-            'users.firstname',
-            'users.lastname',
-            'users.username',
-            'meetings.meetingTitle',
-            'meetings.meetingDescription',
-            'meetings.startTime',
-            'meetings.endTime',
-            'meetings.meetingDate',
-        )
-        //.where('userid', userid)
-        .where('meetingid', meetingid)
-        .then(data => res.status(200).json(data))
-        .catch(err =>
-            res.status(404).json({
-                message:
-                    'The data you are looking for could not be found. Please try again',
-                error: err,
-            })
-        );
-});
 
 //--------------------------------------------------------------------------------------------------------
 // API returns everything in database - all tables joined
 app.get('/all', function (req, res) {
     knex('users')
-        .select('*')
+        //.select('*')
         .join('base', 'users.base_id', 'base.baseid')
         .join('sme', 'users.userid', 'sme.user_id')
         .join('network', 'sme.user_id', 'network.user_id')
         .join('category', 'sme.category_id', 'category.categoryid')
+        .select('*')
         .then(data => res.status(200).json(data))
         .catch(err =>
             res.status(404).json({
@@ -169,6 +126,19 @@ app.get('/all', function (req, res) {
         );
 });
 
+// API returns everything in database - all tables joined
+app.get('/getusers', function (req, res) {
+    knex('users')  
+        .select('username')
+        .then(data => res.status(200).json(data))
+        .catch(err =>
+            res.status(404).json({
+                message:
+                    'The data you are looking for could not be found. Please try again',
+                error: err
+            })
+        );
+});
 //-------------------------------------------------------------------------------------------------------------
 // API returns everything in database - all tables joined
 app.get('/all2', function (req, res) {
@@ -319,6 +289,163 @@ app.delete('/deleteuser/:userid', function (req, res) {
         );
 });
 
+//=============================================================================================//
+// "sme" Table APIs
+app.post('/smes', (req, res) => {
+    const { user_id, category_id } = req.body;
+    console.log('USERID AND CATID: ', user_id, category_id);
+    knex('sme')
+        .select('user_id')
+        .where('user_id', user_id)
+        .where('category_id', category_id)
+        .then((data) => {
+            console.log('data length: ', data.length)
+            if (data.length > 0) {
+                res.status(404).json({ message: `User *${user_id}* already has this SME category!` });
+            } else {
+                knex('sme')
+                    .insert({
+                        user_id,
+                        category_id
+                    })
+                    .then(() => res.status(201).json({ smeUserAndCatCreated: true, code: 201, message: 'SME relationship successful' }))
+            }
+        })
+        .catch((err) =>
+            res.status(500).json({
+                message: 'An error occurred while posting',
+                error: err,
+            })
+        );
+
+});
+
+//=============================================================================================//
+// "users" Table APIs
+
+
+
+//=============================================================================================//
+// "base" Table APIs
+
+
+
+//=============================================================================================//
+// "meetings" Table APIs
+
+
+//=============================================================================================//
+// "usermeetings" Table APIs
+//get all the users that are attending one meeting
+app.get('/listameeting/:meetingid', function (req, res) {
+    const meetingid = req.params.meetingid;
+
+    knex('meetings')
+        .join('usermeetings', 'meetings.meetingid', 'usermeetings.meeting_id')
+        .join('users', 'users.userid', 'usermeetings.user_id')
+        .select('users.userid',
+            'users.firstname',
+            'users.lastname',
+            'meetings.meetingTitle',
+            'meetings.meetingDescription',
+            'meetings.startTime',
+            'meetings.endTime',
+            'meetings.meetingDate',
+        )
+        .where('meetingid', meetingid)
+        .then(data => res.status(200).json(data))
+        .catch(err =>
+            res.status(404).json({
+                message:
+                    'The data you are looking for could not be found. Please try again',
+                error: err,
+            })
+        );
+});
+
+//We get all of the meetings that one user is in
+app.get('/usermeetings/:userid', function (req, res) {
+    const userid = req.params.userid;
+
+    knex('meetings')
+        .join('usermeetings', 'meetings.meetingid', 'usermeetings.meeting_id')
+        .join('users', 'users.userid', 'usermeetings.user_id')
+        .select('users.userid',
+            'users.firstname',
+            'users.lastname',
+            'meetings.meetingTitle',
+            'meetings.meetingDescription',
+            'meetings.startTime',
+            'meetings.endTime',
+            'meetings.meetingDate',
+        )
+        .where('userid', userid)
+        .then(data => res.status(200).json(data))
+        .catch(err =>
+            res.status(404).json({
+                message:
+                    'The data you are looking for could not be found. Please try again',
+                error: err,
+            })
+        );
+});
+
+//this post would post meetingid and userid
+app.post('/attendmeeting', (req, res) => {
+    const { user_id, meeting_id } = req.body;
+    console.log('USERID AND MEETINGID: ', user_id, meeting_id);
+    knex('usermeetings')
+        .select('user_id')
+        .where('user_id', user_id)
+        .where('meeting_id', meeting_id)
+        .then((data) => {
+            console.log('data length: ', data.length)
+            if (data.length > 0) {
+                res.status(404).json({ message: `User *${user_id}* already attending this meeting!` });
+            } else {
+                knex('usermeetings')
+                    .insert({
+                        user_id,
+                        meeting_id
+                    })
+                    .then(() => res.status(201).json({ userAndmeetingCreated: true, code: 201, message: `added user as an attendee to meeting ${meeting_id} successful` }))
+            }
+        })
+        .catch((err) =>
+            res.status(500).json({
+                message: 'An error occurred while trying to add user as a meeting attendee',
+                error: err,
+            })
+        );
+
+});
+
+app.delete('/deleteuserfrommeeting', function (req, res) {
+    const { user_id, meeting_id } = req.body;
+    console.log('USER OUTPUT ', user_id);
+
+    knex('users')
+        .where('userid', userid)
+        .del()
+        .then((rowCount) => {
+            console.log("here")
+            if (rowCount === 0) {
+                return res.status(404).json({
+                    message: 'User not found',
+                });
+            }
+            res.status(200).json({
+                message: 'User deleted successfully',
+            });
+        })
+        .catch((err) =>
+            res.status(500).json({
+                message: 'An error occurred while deleting the user',
+                error: err,
+            })
+        );
+});
+
 // Check user name and password against database
 app.post('/login/', (req, res) => {
     const { user, pw } = req.body;
@@ -334,11 +461,11 @@ app.post('/login/', (req, res) => {
                     code: 404,
                     message: 'Username and/or password are incorrect',
                 });
-                }
-                res.status(200).json(data);
-            })
-            .catch((err) =>
-                res.status(500).json({
+            }
+            res.status(200).json(data);
+        })
+        .catch((err) =>
+            res.status(500).json({
                 code: 500,
                 message: 'An error occurred while fetching the login',
                 error: err,
@@ -380,6 +507,9 @@ app.post('/createbase', (req, res) => {
         );
 });
 
+
+//const smeRouter = require(''./routes/sme')
+//app.use('/sme', smeRouter)
 
 app.listen(PORT, () => {
     console.log(`The server is running on ${PORT}`);

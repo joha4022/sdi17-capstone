@@ -3,8 +3,8 @@
  * @returns { Promise<void> }
  */
 exports.up = function (knex) {
-  return knex.schema.createTable('userMeetings', table => {
-    table.increments('userMeetingid');
+  return knex.schema.createTable('usermeetings', table => {
+    table.increments('usermeetingid');
 
     table.integer('user_id');
     table.foreign('user_id').references('users.userid')
@@ -20,11 +20,11 @@ exports.up = function (knex) {
  * @returns { Promise<void> }
  */
 exports.down = function (knex) {
-  return knex.schema.alterTable('userMeetings', table => {
+  return knex.schema.alterTable('usermeetings', table => {
     table.dropForeign('user_id');
     table.dropForeign('meeting_id');
   })
     .then(function () {
-      return knex.schema.dropTableIfExists('userMeetings')
+      return knex.schema.dropTableIfExists('usermeetings')
     });
 };

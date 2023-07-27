@@ -28,5 +28,11 @@ exports.seed = async function(knex) {
     {user_id: 19, category_id: 7},
     {user_id: 20, category_id: 11},
     {user_id: 21, category_id: 11},
+    {user_id: 2, category_id: 3},
+    {user_id: 3, category_id: 5},
+    {user_id: 3, category_id: 6},
+    {user_id: 3, category_id: 7},
+    {user_id: 4, category_id: 1},
+
   ]);
 };
