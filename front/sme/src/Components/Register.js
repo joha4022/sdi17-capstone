@@ -25,6 +25,7 @@ export default function Register() {
   // alertdisplay
   const [message, setMessage] = useState(false);
   const [alert, setAlert] = useState(false);
+  const [backdrop, setBackdrop] = useState(false);
   // baseForm
   const [baseForm, setBaseForm] = useState(false);
   const [currentBases, setCurrentBases] = useState(false);
@@ -34,8 +35,7 @@ export default function Register() {
   const [baseCity, setBaseCity] = useState(false);
   const [baseState, setBaseState] = useState(false);
   const [buttonLabel, setButtonLabel] = useState('Add Base *');
-  // backdrop
-  const [backdrop, setBackdrop] = useState(false);
+
 
   const navigate = useNavigate();
   const militaryBranches = ['Army', 'Navy', 'Air Force', 'Marines Corps', 'Space Force', 'Coast Guard', 'National Guard']
@@ -114,10 +114,10 @@ export default function Register() {
             setBackdrop(true);
             setTimeout(() => {
               setBackdrop(false);
-              if(sme) {
+              if (sme) {
                 navigate(`/register/${data.code}`, { replace: true });
               } else {
-                sessionStorage.setItem('currentUser', JSON.stringify({firstname: firstname, lastname: lastname, userid: userid}));
+                sessionStorage.setItem('currentUser', JSON.stringify({ userid: userid }));
                 navigate(`/profile/${userid}`, { replace: true });
               }
             }, 2500)
@@ -146,7 +146,7 @@ export default function Register() {
       if (!baseName || !baseCity || !baseState) {
         alertDisplay('Please complete all the required fields!');
       } else {
-        setBaseid(currentBases.length+1);
+        setBaseid(currentBases.length + 1);
         setButtonLabel('Change Base');
         setBaseForm(false);
         // adding a new base that has been inputted as it's registering an account
@@ -179,7 +179,7 @@ export default function Register() {
           })
       }
     } else {
-      if (!existingBaseName) {
+      if (existingBaseName.name !== '+ Add a new base') {
         alertDisplay('Please complete all the required fields!');
       } else {
         setBaseName(currentBases[existingBaseName.baseid - 1].basename);
@@ -187,14 +187,15 @@ export default function Register() {
         setBaseState(currentBases[existingBaseName.baseid - 1].basestate);
         setBaseid(currentBases[existingBaseName.baseid - 1].baseid);
         setBackdrop(true);
-              setTimeout(() => {
-                setBackdrop(false);
-              }, 1000)
+        setTimeout(() => {
+          setBackdrop(false);
+        }, 1000)
         setButtonLabel('Change Base');
         setBaseForm(false);
       }
     }
   }
+
 
   if (currentBases) {
     return (
@@ -231,8 +232,8 @@ export default function Register() {
                   </td>
                 </tr>
                 <tr className='register-row'>
-                <div className='register-category'>Account Type</div>
-                  <FormControlLabel control={<Checkbox onClick={(e)=>{setSme(e.target.checked)}}/>} label="SME" />
+                  <div className='register-category'>Account Type</div>
+                  <FormControlLabel control={<Checkbox onClick={(e) => { setSme(e.target.checked) }} />} label="SME" />
                   <span className='sme-helpertext'>SME account will need to be verified before it can be used.</span>
                 </tr>
                 <tr className='register-row'>
@@ -250,11 +251,11 @@ export default function Register() {
                 <tr className='register-row'>
                   <td>
                     <div className='register-category'>Username</div>
-                    <TextField error={!username || usernameList.includes(username)? true : false} required sx={{ width: '28ch' }} id="outlined-basic-username" label="Username" variant="outlined" 
-                    helperText={usernameList.includes(username) || !username ? 'Username not available' : 'Available username'} 
-                    onKeyUp={(e) => {
-                      setUsername(e.target.value);
-                    }} />
+                    <TextField error={!username || usernameList.includes(username) ? true : false} required sx={{ width: '28ch' }} id="outlined-basic-username" label="Username" variant="outlined"
+                      helperText={usernameList.includes(username) || !username ? 'Username not available' : 'Available username'}
+                      onKeyUp={(e) => {
+                        setUsername(e.target.value);
+                      }} />
                   </td>
                 </tr>
                 <tr className='register-row'>
@@ -314,7 +315,7 @@ export default function Register() {
                 <tr className='register-row'>
                   <td>
                     <div className='register-category'>E-mail</div>
-                    <TextField error={!email ? true : false} required id="outlined-basic-email" sx={{ width: '28ch' }} label="E-mail" variant="outlined" helperText='DoD or Personal E-mail' onKeyUp={(e) => { setEmail(e.target.value) }} />
+                    <TextField error={!email || !email.includes('@') ? true : false} required id="outlined-basic-email" sx={{ width: '28ch' }} label="E-mail" variant="outlined" helperText='DoD or Personal E-mail' onKeyUp={(e) => { setEmail(e.target.value) }} />
                   </td>
                   <td>
                     <div className='register-category'>Phone Number</div>
@@ -328,7 +329,7 @@ export default function Register() {
                   </td>
                   <td>
                     <div className='register-category'>Approver's E-mail</div>
-                    <TextField error={!appEmail ? true : false} required id="outlined-basic-appemail" sx={{ width: '28ch' }} label="Approver's E-mail" variant="outlined" onKeyUp={(e) => { setAppEmail(e.target.value) }} />
+                    <TextField error={!appEmail || !appEmail.includes('@') ? true : false} required id="outlined-basic-appemail" sx={{ width: '28ch' }} label="Approver's E-mail" variant="outlined" onKeyUp={(e) => { setAppEmail(e.target.value) }} />
                   </td>
                 </tr>
                 <tr className='register-row'>
@@ -353,7 +354,7 @@ export default function Register() {
                                 <div className='register-category'>Select a Base</div>
                                 <TextField error={!existingBaseName ? true : false} required select id="outlined-select-base" label="Select a base" variant="outlined" value={existingBaseName ? existingBaseName.name : ''} helperText="Please select a base or add one if it does not exist" onClick={(e) => { setExistingBaseName({ name: e.target.dataset.value, baseid: e.target.id }) }}>
                                   {currentBases.map((base) => (
-                                    <MenuItem key={base.basename} value={base.basename} id={base.baseid} onKeyDown={(e) => {if (e.key === 'Enter') {setExistingBaseName(e.target.dataset.value)}}}>
+                                    <MenuItem key={base.basename} value={base.basename} id={base.baseid} onKeyDown={(e) => { if (e.key === 'Enter') { setExistingBaseName({ name: e.target.dataset.value, baseid: e.target.id }) } }}>
                                       {base.basename}
                                     </MenuItem>
                                   ))}
@@ -382,7 +383,7 @@ export default function Register() {
                                 <div className='register-category'>State</div>
                                 <TextField error={!baseState ? true : false} required select id="outlined-select-basestate" label="State" variant="outlined" defaultValue={baseState ? baseState : ''} helperText="Please select a state" onClick={(e) => { setBaseState(e.target.dataset.value) }}>
                                   {statesArray.map((state) => (
-                                    <MenuItem key={state} value={state} onKeyDown={(e) => {if (e.key === 'Enter') {setBaseState(e.target.dataset.value)}}}>
+                                    <MenuItem key={state} value={state} onKeyDown={(e) => { if (e.key === 'Enter') { setBaseState(e.target.dataset.value) } }}>
                                       {state}
                                     </MenuItem>
                                   ))}</TextField>

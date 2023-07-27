@@ -1,48 +1,28 @@
 .editprofile-body-section{
   display:flex;
   flex-flow: row;
+  justify-content: center;
 }
-.editprofile-side-menu{
-  display:flex;
-  flex-flow:column;
-  background-color: white;
-  border-radius: 5px;
-  margin: 0px 10px 0px 10px;
-  width: 25rem;
-  height: 25rem;
-
-}
-
 .editprofile-main-section{
   display: flex;
   justify-content: center;
-  width: -webkit-fill-available;
+  width: 1200px;
   background: #D2C8C8;
   border-radius: 5px;
-  margin: 0px 10px 0px 0px;
+  margin: 0px 10px 0px 10px;
+  padding-bottom: 30px;
 }
-.editprofile-side-menu-div{
-  display: flex;
-}
-.side-menu-title{
+.main-menu-title{
   font-weight: bold;
   font-size: 2.5rem;
-  margin: 30px 0px 50px 20px;
+  margin: 30px 0px 50px 0px;
 }
 .side-menu-icon{
   height: 1.5rem;
-  margin: 0px 20px 30px 20px;
-}
-.side-menu-span{
-  font-weight: bold;
-  font-size: 1.5rem;
-  margin: 0px 20px 30px 20px;
-}
-.side-menu-span:hover{
-  cursor:pointer;
+  margin: 0px 15px 0px 0px;
 }
 .editprofile-avatar{
-  margin: 20px 0px 20px 20px;
+  margin: 20px 0px 30px 20px;
 }
 .editprofile-avatar:hover{
   cursor: pointer;
@@ -50,7 +30,7 @@
 }
 .editprofile-main-menu-bar{
   background: white;
-  width: 500px;
+  width: 800px;
   border-radius: 5px;
   margin: 0px 0px 10px 0px;
   padding: 10px;
@@ -62,4 +42,16 @@
 }
 .dropdown-category{
   margin-bottom:5px;
+}
+.css-8je8zh-MuiTouchRipple-root{
+  display: none;
+}
+.delete-question{
+  margin-top: 10px;
+  font-weight: bold;
+}
+.delete-statement{
+  margin: 10px 0px 10px 0px;
+  font-size: 0.9rem;
+
 }
