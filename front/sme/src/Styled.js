@@ -1,5 +1,5 @@
 import {styled} from 'styled-components';
-import { Paper, AppBar as MuiAppBar } from "@mui/material";
+import { Paper, AppBar as MuiAppBar, Box as MuiBox  } from "@mui/material";
 
 const Home = styled.div`
   background-color: #D2C8C8;
@@ -29,14 +29,13 @@ const FooterA = styled.a`
 `;
 
 const ProfileDetail = styled.p`
-text-decoration: none;  
-margin-bottom: 0.9em;
+  text-decoration: none;  
+  margin-bottom: 0.9em;
   padding-left: 0.5em;
-`;
+  `;
 
 const ProfileDetails = styled.div`
-  font-size: 1.2em;
-  text-decoration: underline;
+  font-size: 1.2em; 
 `;
 
 const Background = styled.div`
@@ -68,6 +67,18 @@ const FooterGit = styled.img`
   margin-left: 10px;
 `;
 
+const Meetings = styled(Paper)`
+  flex-grow: 3;
+  overflow: auto;
+  margin: 20px;
+  padding: 20px;
+`;
+
+const AvatarAndDetails = styled(MuiBox)`
+  flex-shrink: 0;
+  flex-basis: 100px;
+`;
+
 export {
   Home,
   Footer,
@@ -80,4 +91,6 @@ export {
   AppBar,
   Bio,
   Notes,
+  Meetings,
+  AvatarAndDetails,
 }

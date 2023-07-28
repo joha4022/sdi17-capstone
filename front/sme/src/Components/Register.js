@@ -118,6 +118,7 @@ export default function Register() {
                 navigate(`/register/${data.code}`, { replace: true });
               } else {
                 sessionStorage.setItem('currentUser', JSON.stringify({ userid: userid }));
+                sessionStorage.setItem('loggedInUser', JSON.stringify({ userid: userid, firstname: firstname, lastname: lastname, sme: sme, admin: false}));
                 navigate(`/profile/${userid}`, { replace: true });
               }
             }, 2500)
@@ -180,8 +181,6 @@ export default function Register() {
       }
     } else {
       if (existingBaseName.name !== '+ Add a new base') {
-        alertDisplay('Please complete all the required fields!');
-      } else {
         setBaseName(currentBases[existingBaseName.baseid - 1].basename);
         setBaseCity(currentBases[existingBaseName.baseid - 1].basecity);
         setBaseState(currentBases[existingBaseName.baseid - 1].basestate);
@@ -336,7 +335,16 @@ export default function Register() {
                   {/* list out bases from the database */}
                   <td>
                     <div className='register-category'>Base</div>
-                    <Button className='loginpage-button' size='large' variant='contained' onClick={handleOpen}>{buttonLabel}</Button>
+                    <TextField
+                      disabled
+                      size='large'
+                      sx={{ width: '28ch', marginRight: '10px' }}
+                      id="outlined-disabled"
+                      value={baseName !== false ? `${baseName}, ${baseCity} ${baseState}`: 'Add Base *'}
+                    />
+                  </td>
+                  <td>
+                    <Button sx={{margin: '23px 0px 0px 0px'}}className='loginpage-button' size='large' variant='contained' onClick={handleOpen}>{buttonLabel}</Button>
                     <Modal
                       open={baseForm}
                       onClose={handleClose}
@@ -399,7 +407,7 @@ export default function Register() {
               </tbody>
             </table>
             <div className='register-button-row'>
-              <Button className='loginpage-button' size='large' variant='contained' onClick={() => {
+              <Button sx={{marginTop: '20px'}}className='loginpage-button' size='large' variant='contained' onClick={() => {
                 register();
               }}>Register</Button>
             </div>

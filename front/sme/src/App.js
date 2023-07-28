@@ -9,8 +9,9 @@ import SME from './Components/SME';
 import Photo from './Components/GetPhoto'; //to delete later
 import LandingPage from './Components/LandingPage'
 import './App.css';
-import { createContext, useState } from 'react';
+import { createContext, useEffect, useState } from 'react';
 import EditProfile from './Components/EditProfile';
+import Denied from './Denied';
 
 export const AppContext = createContext();
 
@@ -18,6 +19,12 @@ function App() {
   const [removethislater, setremovethislater] = useState(false);
   const [meetings, setMeetings] = useState([]);
   const [currentUser, setCurrentUser] = useState(false);
+
+  useEffect(()=> {
+    if(sessionStorage.getItem('loggedInUser') !== null) {
+      setCurrentUser(JSON.parse(sessionStorage.getItem('loggedInUser')));
+    } 
+  },[])
 
   return (
     <AppContext.Provider value={{
@@ -41,6 +48,7 @@ function App() {
           <Route path='/search/:searchQuery' element={<Search />}></Route>
           <Route path='/editProfile' element={<EditProfile />}></Route>
           <Route path='/getphoto' element={<Photo />}></Route>
+          <Route path='/denied' element={<Denied />}></Route>
         </Routes>
       </Router>
     </AppContext.Provider>
