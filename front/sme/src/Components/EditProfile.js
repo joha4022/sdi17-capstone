@@ -8,7 +8,7 @@ import { faUser, faBriefcase, faNewspaper, faGear, faUserXmark } from '@fortawes
 import { useEffect, useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppContext } from '../App';
-import Message from './Message';
+
 
 export default function EditProfile() {
   const { currentUser, setCurrentUser } = useContext(AppContext);
@@ -661,7 +661,6 @@ export default function EditProfile() {
           </div>
         </div>
         <FooterBar />
-        <Message />
       </>
     )
   }
