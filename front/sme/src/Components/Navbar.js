@@ -27,7 +27,7 @@ const Navbar = () => {
   };
 
   //!delete
-  const id = 1;
+  const id = JSON.parse (sessionStorage.getItem('currentUser')).userid;
 
   return (
     <Box sx={{ flexGrow: 1 }}>

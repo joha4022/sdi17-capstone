@@ -1,31 +1,16 @@
 import React,{ useState, useEffect, useRef } from "react";
-import { Typography, Button, Avatar, Paper, Grid, Badge, TextField, Box as MuiBox } from "@mui/material";
-import { styled } from "styled-components";
-import { ProfileDetails, ProfileDetail, Background, Bio, Notes } from "../Styled";
+import { Typography, Button, Avatar, Paper, Grid, Box as MuiBox } from "@mui/material";
+import { ProfileDetails, ProfileDetail, Background, Bio, Notes, Meetings, AvatarAndDetails } from "../Styled";
 import { useParams } from "react-router-dom";
 import Navbar from "./Navbar";
 import { DateCalendar } from "@mui/x-date-pickers";
-import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
+import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import EventNoteIcon from '@mui/icons-material/EventNote';
 import Loader from "./Loader";
 import MeetingFormModal from "./MeetingFormModal";
 import dayjs from "dayjs";
 import TextareaAutosize from '@mui/base/TextareaAutosize';
-import { Highlight } from "@mui/icons-material";
-import HighlightedDay from "./HighlightedDay";
 
-const Meetings = styled(Paper)`
-  flex-grow: 3;
-  overflow: auto;
-  margin: 20px;
-  padding: 20px;
-`;
-
-const AvatarAndDetails = styled(MuiBox)`
-  flex-shrink: 0;
-  flex-basis: 100px;
-`;
 
 function Profile({ userId }) {
   const [users, setUsers] = useState(null);
@@ -35,12 +20,13 @@ function Profile({ userId }) {
   const [editingNoteText, setEditingNoteText] = useState("");
   const [isMeetingModalOpen, setIsMeetingModalOpen] = useState(false);
   const [meetings, setMeetings] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [highlightedDays, setHighlightedDays] = useState([]);
+  // const [selectedDate, setSelectedDate] = useState(null);
+  // const [highlightedDays, setHighlightedDays] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [bio, setBio] = useState('');
-  const requestAbortController = useRef(null);
-  const { id } = useParams();
+  // const requestAbortController = useRef(null);
+  // const { id } = useParams();
+  const id = JSON.parse (sessionStorage.getItem('currentUser')).userid;
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -54,7 +40,7 @@ function Profile({ userId }) {
         setBio(data[0].bio);
         }
       } catch (error) {
-        console.error("Failed to fetch profile data: ", error);
+        console.error("Failed to fetch Profile Data: ", error);
       }
     };
     fetchProfile();
@@ -70,31 +56,6 @@ function Profile({ userId }) {
   useEffect(() => {
     localStorage.setItem('notes', JSON.stringify(notes));
   }, [notes]);
-
-  useEffect(() => {
-    fetchHighlightedDays(selectedDate);
-    return () => {requestAbortController.current?.abort()};
-  }, []);
-
-  const fetchHighlightedDays = async (date) => {
-    const controller = new AbortController();
-    fetch(`http://localhost:3001/usermeetings/${id}`, {
-      signal: controller.signal,
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        const dayToHighlight = data.map((meeting) => meeting.meetingDate);
-        setHighlightedDays(dayToHighlight);
-        console.log(dayToHighlight);
-        setIsLoading(false);
-      })
-      .catch((err) => {
-        if (err.name === "AbortError") {
-          console.log("Aborted", err);
-        }
-      });
-    requestAbortController.current = controller;
-  };
 
   function updateUserBio(userid,newBio) {
     fetch(`http://localhost:3001/updateuser`, {
@@ -195,22 +156,13 @@ function Profile({ userId }) {
                 <ProfileDetail> {users && users.branch}</ProfileDetail>
               </ProfileDetails>
             </MuiBox>
-            <MuiBox sx={{display: 'flex', justifyContent:'center', border: '1px solid #A3816A'}}>            
+            <MuiBox sx={{display: 'flex', justifyContent:'center', border: '1px solid #A3816A',  marginTop:8}}>            
             <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DateCalendar 
             defaultValue={dayjs()}
             loading={isLoading}
-            onMonthChange={fetchHighlightedDays}
             views={['year', 'month', 'day']}
             showDaysOutsideCurrentMonth fixedWeekNumber={6}
-            slots={{
-              day: HighlightedDay,
-            }}
-            slotProps={{
-              day: {
-                highlightedDays,
-              },
-            }}
             />
             </LocalizationProvider>
               </MuiBox>
