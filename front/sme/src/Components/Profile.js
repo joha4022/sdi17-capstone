@@ -238,27 +238,27 @@ function Profile({ userId }) {
             </Meetings>
           </Paper>
 
-          {/* Admin Button for Approve/Decline */}
+          {/* Admin Button for Approve/Decline
           <MuiBox display="flex" justifyContent="center">
-            {users.admin /* && users.smestatus === 'pending'*/ && (
+            {users.admin  && users.smestatus === 'pending' && (
               <>
                 <Button
                   variant="contained"
                   color="primary"
                   sx={{ margin: 1, padding: 1 }}>
-                    {/* onClick={() => { approveSME(users.userid) }}> */}
+                    { onClick={() => { approveSME(users.userid) }}> 
                   Approve (SME)
                 </Button>
                 <Button
                   variant="contained"
                   color="primary"
                   sx={{ margin: 1, padding: 1 }} >
-                    {/* onClick={() => { denySME(users.userid) }}> */}
+                     onClick={() => { denySME(users.userid) }}> 
                   Deny (SME)
                 </Button>
               </>
             )}
-          </MuiBox>
+          </MuiBox> */}
 
           <Paper elevation={1} sx={{ margin: 1, padding: 1 }}>
             <Notes>
