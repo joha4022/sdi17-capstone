@@ -11,6 +11,7 @@ export default function LoginPage() {
   const {setCurrentUser} = useContext(AppContext);
   const [showPassword, setShowPassword] = useState(false);
   const [alert, setAlert] = useState(false);
+  // const [alert2, setAlert2] = useState(false);
   const [backdrop, setBackdrop] = useState(false);
   const [message, setMessage] = useState(false);
   const [username, setUsername] = useState(false);
@@ -39,7 +40,7 @@ export default function LoginPage() {
       setAlert(true);
       setTimeout(() => {
         setAlert(false);
-      }, 2000)
+      }, 2500)
   }
 
   const signin = () => {
@@ -62,7 +63,7 @@ export default function LoginPage() {
         } else if(data.code === 500) {
           alertDisplay(data.message)
         } else if(data.length === 1) {
-          sessionStorage.setItem('currentuser', JSON.stringify(data[0]));
+          sessionStorage.setItem('currentUser', JSON.stringify({userid: data[0].userid}));
           setCurrentUser(data[0]);
           setBackdrop(true);
           setTimeout(() => {

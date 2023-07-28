@@ -9,6 +9,7 @@ import SME from './Components/SME';
 import LandingPage from './Components/LandingPage'
 import './App.css';
 import { createContext, useState } from 'react';
+import EditProfile from './Components/EditProfile';
 
 export const AppContext = createContext();
 
@@ -37,6 +38,7 @@ function App() {
           <Route path='/sme/:id' element={<SME />}></Route>
           <Route path='/manage' element={<Manage />}></Route>
           <Route path='/search/:searchQuery' element={<Search />}></Route>
+          <Route path='/editProfile' element={<EditProfile />}></Route>
         </Routes>
       </Router>
     </AppContext.Provider>
