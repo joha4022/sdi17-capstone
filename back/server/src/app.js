@@ -269,6 +269,7 @@ app.delete('/deletesme', function (req, res) {
         );
 });
 
+
 //=============================================================================================//
 // "users" Table APIs
 //API to get all user data. GET, POST, PATCH & DELETE
@@ -301,11 +302,7 @@ app.get('/users/suggest', function (req, res) {
         );
 });
 
-//-------------------------------------------------------------------------------------------------------
-app.get('/userMeetings/:meetingid', function (req, res) {
-    //const userid = req.params.userid;
-    const meetingid = req.params.meetingid;
-
+app.get('/getusers', function (req, res) {
     knex('users')
         .select('username')
         .then(data => res.status(200).json(data))
@@ -313,73 +310,17 @@ app.get('/userMeetings/:meetingid', function (req, res) {
             res.status(404).json({
                 message:
                     'The data you are looking for could not be found. Please try again',
-                error: err,
+                error: err
             })
         );
 });
 
-//--------------------------------------------------------------------------------------------------------
-// API returns everything in database - all tables joined
-app.get('/all', function (req, res) {
-    knex('users')
-        .select('*')
-        .join('base', 'users.base_id', 'base.baseid')
-        .join('sme', 'users.userid', 'sme.user_id')
-        .join('network', 'sme.user_id', 'network.user_id')
-        .join('category', 'sme.category_id', 'category.categoryid')
-        .then(data => res.status(200).json(data))
-        .catch(err =>
-            res.status(404).json({
-                message:
-                    'The data you are looking for could not be found. Please try again'
-            })
-        );
-});
-
-//-------------------------------------------------------------------------------------------------------------
-// API returns everything in database - all tables joined
-app.get('/all2', function (req, res) {
-    knex('users')
-
-        .join('base', 'users.base_id', 'base.baseid')
-        .join('sme', 'users.userid', 'sme.user_id')
-        .join('network', 'sme.user_id', 'network.user_id')
-        //.join('category', 'sme.category_id', 'category.categoryid')
-        .select('users.userid',
-            'users.firstname',
-            'users.lastname',
-            'users.username',
-            'users.email',
-            'users.supervisoremail',
-            'users.approveremail',
-            'users.phonenumber',
-            'users.worklocation',
-            'users.bio',
-            'users.photo',
-            'users.branch',
-            'users.sme',
-            'users.admin',
-            'base.basename',
-            'base.branch',
-            'base.city',
-            'base.state',
-            //'category.name'
-
-        )
-        .then(data => res.status(200).json(data))
-        .catch(err =>
-            res.status(404).json({
-                message:
-                    'The data you are looking for could not be found. Please try again'
-            })
-        );
-});
 
 app.get('/profile/:userid', function (req, res) {
     const userid = req.params.userid;
     console.log('userid: ', userid)
     knex('users')
-        .join('base', 'user.base_id', 'base.baseid') //added from jacobs comment
+        .join('base', 'users.base_id', 'base.baseid') //added from jacobs comment
         .select(
             'users.userid',
             'users.firstname',
@@ -749,8 +690,7 @@ app.delete('/deletenetworkSME', function (req, res) {
 
 
 //=============================================================================================//
-// "meetings" Table APIs. GET, POST, PATCH(TBD), & DELETE(TBD)
-
+// "meetings" Table APIs. GET, POST, PATCH(TBD), & DELETE
 // API to get all meetings
 app.get('/meetinglist', function (req, res) {
     const meetingid = req.params.meetingid;
@@ -978,9 +918,7 @@ app.post('/login/', (req, res) => {
 
 
 ////----------------------------------------------------------//
-// All CRUD for categories
 
 app.listen(PORT, () => {
     console.log(`The server is running on ${PORT} `);
 });
-
