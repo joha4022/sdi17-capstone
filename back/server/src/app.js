@@ -11,13 +11,6 @@ const knex = require('knex')(require('../knexfile.js')[process.env.NODE_ENV || '
 app.use(express.json());
 app.use(cors());
 
-
-
-
-//--------------------------------------------------------------------------------------------------------
-
-
-
 //--------------------------------------------------------------------------------------------------------
 // API returns everything in database - all tables joined
 app.get('/all', function (req, res) {
@@ -59,6 +52,7 @@ app.get('/all2', function (req, res) {
             'users.branch',
             'users.sme',
             'users.admin',
+            'user.userverified',
             'base.basename',
             'base.branch',
             'base.city',
@@ -92,7 +86,7 @@ app.get('/categories', function (req, res) {
 });
 
 app.post('/createcategory', (req, res) => {
-    const {categoryname} = req.body;
+    const { categoryname } = req.body;
     console.log(categoryname);
     knex('category')
         .select('categoryname')
@@ -139,6 +133,11 @@ app.patch('/updatecategory', (req, res) => {
 
 app.delete('/deletecategory', function (req, res) {
     const { categoryid } = req.body;
+
+    knex('sme')
+        .where('meeting_id', meetingid)
+        .del()
+        .then((rowCount) => console.log("removed from user meeting", rowCount))
 
     knex('category')
         .where('categoryid', categoryid)
@@ -246,7 +245,6 @@ app.post('/smes', (req, res) => {
 
 app.delete('/deletesme', function (req, res) {
     const { user_id, category_id } = req.body;
-    console.log('USER OUTPUT ', user_id);
 
     knex('sme')
         .where('user_id', user_id)
@@ -287,6 +285,23 @@ app.get('/', function (req, res) {
         );
 });
 
+// API provides suggestions for user search
+app.get('/users/suggest', function (req, res) {
+    const query = req.query.q;
+
+    knex('users')
+        .select('userid', 'username')
+        .where('username', 'like', `${query}%`)
+        .where('admin', false)  // Exclude admin users
+        .then(data => res.status(200).json(data))
+        .catch(err =>
+            res.status(404).json({
+                message:
+                    'The data you are looking for could not be found. Please try again'
+            })
+        );
+});
+
 app.get('/getusers', function (req, res) {
     knex('users')
         .select('username')
@@ -303,9 +318,11 @@ app.get('/getusers', function (req, res) {
 
 app.get('/profile/:userid', function (req, res) {
     const userid = req.params.userid;
-
+    console.log('userid: ', userid)
     knex('users')
-        .select('users.userid',
+        .join('base', 'user.base_id', 'base.baseid') //added from jacobs comment
+        .select(
+            'users.userid',
             'users.firstname',
             'users.lastname',
             'users.username',
@@ -317,6 +334,10 @@ app.get('/profile/:userid', function (req, res) {
             'users.photo',
             'users.sme',
             'users.admin',
+            'users.userverified',
+            'base.basename',
+            'users.worklocation',
+            'users.branch'
         )
         .where('userid', userid) // Needed this to get the correct user
         .then(data => res.status(200).json(data))
@@ -329,7 +350,7 @@ app.get('/profile/:userid', function (req, res) {
 });
 
 app.post('/createuser', (req, res) => {
-    const { 
+    const {
         userid,
         firstname,
         lastname,
@@ -343,10 +364,10 @@ app.post('/createuser', (req, res) => {
         photo,
         sme,
         admin,
+        userverified,
         branch,
         base_id
     } = req.body;
-    console.log(firstname, lastname, username, password);
     //let userid = 4
     knex('users')
         .select('username')
@@ -371,10 +392,11 @@ app.post('/createuser', (req, res) => {
                         photo,
                         sme,
                         admin,
+                        userverified,
                         branch,
                         base_id
                     })
-                    .then(() => res.status(201).json({userCreated: true, code: 201, message: 'Username created successfully' }))
+                    .then(() => res.status(201).json({ userCreated: true, code: 201, message: 'Username created successfully' }))
             }
         })
         .catch((err) =>
@@ -403,6 +425,7 @@ app.patch('/updateuser', (req, res) => {
             branch,
             sme,
             admin,
+            userverified,
             base_id
         } = req.body
 
@@ -423,6 +446,7 @@ app.patch('/updateuser', (req, res) => {
             branch: branch,
             sme: sme,
             admin: admin,
+            userverified: userverified,
             base_id: base_id
         }, [
             'firstname',
@@ -439,6 +463,7 @@ app.patch('/updateuser', (req, res) => {
             'branch',
             'sme',
             'admin',
+            'userverified',
             'base_id'
         ])
         .then((data) => res.status(201).json(data))
@@ -451,30 +476,52 @@ app.patch('/updateuser', (req, res) => {
 
 app.delete('/deleteuser/:userid', function (req, res) {
     const userid = req.params.userid;
-    console.log(userid)
-    knex('users')
-        .where('userid', userid)
+
+    knex('network')
+        .where('user_id', userid)
         .del()
-        .then((rowCount) => {
-            console.log("here")
-            if (rowCount === 0) {
-                return res.status(404).json({
-                    message: 'User not found',
-                });
-            }
-            res.status(200).json({
-                message: 'User deleted successfully',
-            });
+        .then(() => console.log('1'))
+        //.then(()=> {return res.json({message: 'first user deleted!'})})
+        .then(() => {
+            knex('sme')
+                .where('user_id', userid)
+                //.returning('sme_id')
+                .then((output) => {
+                    output.map((elem, index) => {
+                        console.log(index + 2)
+                        knex('network')
+                            //.then(() => console.log('entering first'))
+                            .where('sme_id', elem.smeid)
+                            .del()
+                            .then(() => console.log('leaving 1st'))
+                    })
+                })
+
+                .then(() => {
+                    knex('sme')
+                        .where('user_id', userid)
+                        .del()
+                        .then(() => console.log('4'))
+                        //.then(() => res.json({ message: 'fourth knex deleted!' }))
+                        .then(() => {
+                            knex('usermeetings')
+                                .where('user_id', userid)
+                                .del()
+                                .then(() => console.log('5'))
+                                //.then(()=> {return res.json({message: 'first user deleted!'})})
+                                .then(() => {
+                                    knex('users')
+                                        .where('userid', userid)
+                                        .del()
+                                        .then(() => {
+                                            return res.json({ message: 'this user deleted!' })
+
+                                        })
+                                })
+                        })
+                })
         })
-        .catch((err) =>
-            res.status(500).json({
-                message: 'An error occurred while deleting the user',
-                error: err,
-            })
-        );
-});
-
-
+})
 //=============================================================================================//
 // "base" Table APIs. GET, POST, PATCH, & DELETE.
 // API to get base data only  base name, base
@@ -504,7 +551,7 @@ app.post('/createbase', (req, res) => {
         .then((data) => {
             console.log('data length: ', data.length)
             if (data.length > 0) {
-                res.status(404).json({ baseCreated: false, message: `Base: *${basename}* already exists!` });
+                res.status(404).json({ baseCreated: false, message: `Base: * ${basename}* already exists!` });
             } else {
                 knex('base')
                     .insert({
@@ -643,7 +690,24 @@ app.delete('/deletenetworkSME', function (req, res) {
 
 
 //=============================================================================================//
-// "meetings" Table APIs
+// "meetings" Table APIs. GET, POST, PATCH(TBD), & DELETE(TBD)
+
+// API to get all meetings
+app.get('/meetinglist', function (req, res) {
+    const meetingid = req.params.meetingid;
+
+    knex('meetings')
+        .select()
+        .then(data => res.status(200).json(data))
+        .catch(err =>
+            res.status(404).json({
+                message:
+                    'The data you are looking for could not be found. Please try again',
+                error: err,
+            })
+        );
+});
+
 //get all the users that are attending one meeting
 app.get('/listameeting/:meetingid', function (req, res) {
     const meetingid = req.params.meetingid;
@@ -697,6 +761,74 @@ app.get('/usermeetings/:userid', function (req, res) {
             })
         );
 });
+
+//created meetings
+app.post('/meetings', (req, res) => {
+    const { meetingTitle, meetingDescription, startTime, endTime, meetingDate, attendees } = req.body;
+
+    knex('meetings')
+        .insert({
+            meetingTitle,
+            meetingDescription,
+            startTime,
+            endTime,
+            meetingDate,
+        })
+        .returning('meetingid')
+        .then((meetingid) => {
+            const attendeeUsernames = attendees.map((attendee) => attendee.trim());
+            return Promise.all(attendeeUsernames.map((username) =>
+                knex('users')
+                    .select('userid')
+                    .where('username', username)
+                    .then((rows) => rows[0].userid)
+            ))
+                .then((userIds) => {
+                    const userMeetings = userIds.map((userId) => ({ user_id: userId, meeting_id: meetingid[0].meetingid }));
+                    console.log(userMeetings)
+                    return knex('usermeetings').insert(userMeetings);
+                });
+        })
+        .then(() => res.status(201).json({ message: 'Meeting created successfully' }))
+        .catch((err) => {
+            console.log(err);
+            res.status(500).json({
+                message: 'An error occurred while creating a new meeting',
+                error: err,
+            });
+        }
+        );
+});
+
+app.delete('/deletemeeting', function (req, res) {
+    const { meetingid } = req.body;
+
+    knex('usermeetings')
+        .where('meeting_id', meetingid)
+        .del()
+        .then((data) => console.log("removed from user meeting", data))
+
+    knex('meetings')
+        .where('meetingid', meetingid)
+        .del()
+        .then((rowCount) => {
+            if (rowCount === 0) {
+                return res.status(404).json({
+                    message: 'This meeting is not found',
+                });
+            }
+            res.status(201).json({
+                message: 'Meeting deleted successfully',
+            });
+        })
+        .catch((err) =>
+            res.status(500).json({
+                message: 'An error occurred while deleting meeting',
+                error: err,
+            })
+        );
+});
+
 //=============================================================================================//
 // "usermeetings" Table APIs
 //this post would post meetingid and userid
@@ -710,7 +842,7 @@ app.post('/attendmeeting', (req, res) => {
         .then((data) => {
             console.log('data length: ', data.length)
             if (data.length > 0) {
-                res.status(404).json({ message: `User *${user_id}* already attending this meeting!` });
+                res.status(404).json({ message: `User * ${user_id}* already attending this meeting!` });
             } else {
                 knex('usermeetings')
                     .insert({
@@ -733,27 +865,29 @@ app.delete('/deleteuserfrommeeting', function (req, res) {
     const { user_id, meeting_id } = req.body;
     console.log('USER OUTPUT ', user_id);
 
-    knex('users')
-        .where('userid', userid)
+    knex('usermeetings')
+        .where('user_id', user_id)
+        .where('meeting_id', meeting_id)
         .del()
         .then((rowCount) => {
             console.log("here")
             if (rowCount === 0) {
                 return res.status(404).json({
-                    message: 'User not found',
+                    message: 'User is not attending this meeting',
                 });
             }
             res.status(200).json({
-                message: 'User deleted successfully',
+                message: 'User removed from meeting successfully',
             });
         })
         .catch((err) =>
             res.status(500).json({
-                message: 'An error occurred while deleting the user',
+                message: 'An error occurred while removing user from meeting',
                 error: err,
             })
         );
 });
+
 //===================================================================================================
 // Login 
 // Check user name and password against database
@@ -788,6 +922,6 @@ app.post('/login/', (req, res) => {
 // All CRUD for categories
 
 app.listen(PORT, () => {
-    console.log(`The server is running on ${PORT}`);
+    console.log(`The server is running on ${PORT} `);
 });
 

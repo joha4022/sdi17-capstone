@@ -7,11 +7,11 @@ exports.seed = async function(knex) {
   await knex('base').del()
   await knex('base').insert([
     {
-       basename: 'Joint Base Lewis McChord',
-       basecity: 'Tacoma',
-       basestate: 'WA'
-    },
-
+      basename: 'Not Listed ',
+      basecity: 'N/A',
+      basestate: 'N/A'
+   },
+    
     {  
       basename: 'Los Angeles Space Force Base',
       basecity: 'El Segundo',
