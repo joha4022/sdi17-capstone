@@ -28,6 +28,7 @@ const Manage = () => {
   const [tab, setTab] = useState("1");
   const [toast, setToast] = useState(false);
   const [message, setMessage] = useState("");
+  const [dummy, setDummy] = useState(false)
   const { currentUser, setCurrentUser } = useContext(AppContext);
 
   const navigate = useNavigate();
@@ -36,13 +37,19 @@ const Manage = () => {
     fetch("http://localhost:3001/")
       .then((res) => res.json())
       .then((data) => setSMEs(data));
-  }, [open]);
+  }, [open, dummy]);
 
   let results = [];
-  if (searchTerm.length > 0) {
-    results = SMEs.filter((word) => {
-      let name = [word.firstname, word.lastname].join(" ");
-      return name.toUpperCase().includes(searchTerm.toUpperCase());
+  if (tab === "2") {
+    if (searchTerm.length > 0) {
+      results = SMEs.filter((word) => {
+        let name = [word.firstname, word.lastname].join(" ");
+        return name.toUpperCase().includes(searchTerm.toUpperCase());
+      });
+    }
+  } else if (tab === "1") {
+    results = SMEs.filter((element) => {
+      return !element.userverified;
     });
   }
 
@@ -54,6 +61,18 @@ const Manage = () => {
     setOpen(false);
     setToast(false);
   };
+
+  const handleAccept = (e) => {
+    let resBody = e
+    e.userverified = true
+
+    fetch(`http://localhost:3001/updateuser`, { method: "PATCH", headers: {'Content-Type': 'application/json'}, body: JSON.stringify(resBody)})
+    .then((res) => res.json())
+    .then((data) => {
+      setDummy(!dummy);
+    })
+      .catch((error) => console.error("Error:", error));
+  }
 
   const handleDelete = (id) => {
     fetch(`http://localhost:3001/deleteuser/${id}`, { method: "DELETE" })
@@ -100,7 +119,53 @@ const Manage = () => {
                   <Tab label="Mangage Existing Users" value="2" />
                 </TabList>
               </Box>
-              <TabPanel value="1">Pending Requests</TabPanel>
+              <TabPanel value="1">
+                <section className="results">
+                  {(results.length != 0) ? (
+                    results.map((e, i) => {
+                    return (
+                      <Card key={`${i}`} sx={{ maxWidth: "15vw" }}>
+                        <CardMedia
+                          component="img"
+                          src={"/default.png"}
+                          alt="User Profile Picture"
+                        />
+                        {/* {console.log(`../../../../${e.photo}`)} */}
+                        <CardContent>
+                          <Typography variant="h5">
+                            {`${e.firstname} ${e.lastname}`}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {`User: ${e.email}`}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {`Supervisor: ${e.supervisoremail}`}
+                          </Typography>
+                        </CardContent>
+                        <CardActions>
+                          <Button
+                            className="manageBut"
+                            size="large"
+                            variant="contained"
+                            onClick={() => handleAccept(e)}
+                          >
+                            Accept
+                          </Button>
+                          <Button
+                            className="manageBut"
+                            size="large"
+                            variant="contained"
+                            // onClick={handleOpen}
+                          >
+                            Decline
+                          </Button>
+                        </CardActions>
+                      </Card>
+                    );
+                  })) : (<p>No requests pending</p>)
+                }
+                </section>
+              </TabPanel>
               <TabPanel value="2">
                 <div
                   className="filters"
@@ -211,7 +276,7 @@ const Manage = () => {
           </Box>
         </>
       ) : (
-        navigate("/")
+        navigate("/denied")
       )}{" "}
     </>
   );
