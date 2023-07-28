@@ -5,7 +5,6 @@
   "main": "index.js",
   "scripts": {
     "start": "npm run baseline && nodemon ./src/app.js",
-
     "test": "echo \"Error: no test specified\" && exit 1",
     "baseline": "node PG_Run_Start_Migrate_Seed.js"
   },
@@ -15,6 +14,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
+    "express-fileupload": "^1.4.0",
     "knex": "^2.5.1",
     "nodemon": "^3.0.1",
     "pg": "^8.11.1"
