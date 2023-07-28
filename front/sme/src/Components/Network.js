@@ -37,7 +37,6 @@ const Network = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [category, setCategory] = useState("");
   const [branch, setBranch] = useState("");
-  //   const [location, setLocation] = useState("");
   const [categoryList, setCategoryList] = useState([]);
   const [onNetwork, setOnNetwork] = useState(false);
   const [view, setView] = useState("module");
@@ -50,11 +49,18 @@ const Network = () => {
     iconUrl: "/smeMarker.png",
     iconSize: [150, 110],
   });
+
   useEffect(() => {
+    (!onNetwork) ? (
     fetch("http://localhost:3001/smes")
       .then((res) => res.json())
-      .then((data) => setSMEs(data));
-  }, []);
+      .then((data) => setSMEs(data))
+    ) : (
+      fetch(`http://localhost:3001/smes/${currentUser.userid}`)
+      .then((res) => res.json())
+      .then((data) => setSMEs(data))
+    )
+  }, [onNetwork]);
 
   useEffect(() => {
     fetch("http://localhost:3001/categories")
@@ -69,8 +75,9 @@ const Network = () => {
   };
 
   let results = SMEs;
+  results = SMEs.filter((e) => e.userid != currentUser.userid)
   if (searchTerm.length > 0) {
-    results = SMEs.filter((word) => {
+    results = results.filter((word) => {
       let name = [word.firstname, word.lastname].join(" ");
       return name.toUpperCase().includes(searchTerm.toUpperCase());
     });
