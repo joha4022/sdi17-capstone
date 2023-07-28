@@ -320,7 +320,7 @@ app.get('/profile/:userid', function (req, res) {
     const userid = req.params.userid;
     console.log('userid: ', userid)
     knex('users')
-        .join('base', 'user.base_id', 'base.baseid') //added from jacobs comment
+        .join('base', 'users.base_id', 'base.baseid') //added from jacobs comment
         .select(
             'users.userid',
             'users.firstname',
@@ -896,7 +896,7 @@ app.post('/login/', (req, res) => {
     //console.log('req.body: ',req.body)
     console.log('user password:', user, pw)
     knex('users')
-        .select('userid', 'firstname', 'lastname')
+        .select('userid', 'firstname', 'lastname', 'admin')
         .where('username', user)
         .where('password', pw)
         .then((data) => {
