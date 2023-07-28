@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './LoginPage.css';
 import { TextField, Button, IconButton, OutlinedInput, InputLabel, InputAdornment, FormControl, Alert, Collapse, AlertTitle, Backdrop, CircularProgress } from '@mui/material';
@@ -16,6 +16,7 @@ export default function LoginPage() {
   const [message, setMessage] = useState(false);
   const [username, setUsername] = useState(false);
   const [password, setPassword] = useState(false);
+  const [usernameList, setUsernameList] = useState([]);
 
   const navigate = useNavigate();
   const handleClickShowPassword = () => setShowPassword((show) => !show);
@@ -44,6 +45,9 @@ export default function LoginPage() {
   }
 
   const signin = () => {
+    if(!usernameList.includes(username)) {
+      return alertDisplay('Username does not exist, please register for an account.')
+    }
     const body = JSON.stringify({
       user: username,
       pw: password
@@ -74,6 +78,18 @@ export default function LoginPage() {
         }
       })
   }
+
+  useEffect(()=>{
+    fetch('http://localhost:3001/getusers')
+    .then(res=>res.json())
+    .then(data=>{
+      const users = [...usernameList];
+      data.map(user=> {
+        users.push(user.username);
+      })
+      setUsernameList(users);
+    })
+  },[])
 
   return (
     <>
