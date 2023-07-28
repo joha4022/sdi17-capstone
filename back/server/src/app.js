@@ -1,15 +1,39 @@
 // app.js
 //require('dotenv').config();
 const express = require("express");
+const fileUpload = require('express-fileupload');
 
 const app = express();
 const cors = require('cors');
+const path = require('path');
 const PORT = process.env.PORT || 3001;
 const knex = require('knex')(require('../knexfile.js')[process.env.NODE_ENV || 'development']);
 
 
 app.use(express.json());
 app.use(cors());
+app.use(fileUpload());
+
+//send file command?
+
+//front end needs to send the file path ex './photos/soldier/png'
+app.post('/getphoto', (req, res) => {
+   const {photopath} = req.body;
+   console.log(photopath);
+    //const photo = './photos/soldier.png';
+    //res.download(path.resolve('./photos/Lady.jpg'))
+    res.download(path.resolve(`${photopath}`))
+    //  res.attachment(path.resolve(`${photo}`))
+    // res.send()
+
+})
+
+// app.post('/uploadPhoto', (req, res) => {
+//     const {name, data} = req.files.pic; //change pic to something else
+//     //we need a table to inser this in
+//     //insert in users.photo -> insert using a patch
+
+// })
 
 //--------------------------------------------------------------------------------------------------------
 // API returns everything in database - all tables joined
@@ -214,6 +238,57 @@ app.get("/smes", (req, res) => {
         );
 });
 
+app.get("/smes/:id", (req, res) => {
+    const userid = req.params.id
+    knex("users")
+        .join("base", "users.base_id", "base.baseid")
+        .join("sme", "users.userid", "sme.user_id")
+        .join("network", "network.sme_id", "users.userid")
+        .join("category", "sme.category_id", "category.categoryid")
+        .select(
+            "users.userid",
+            "users.firstname",
+            "users.lastname",
+            "users.email",
+            "users.phonenumber",
+            "users.photo",
+            "users.branch",
+            "base.basename AS base",
+            knex.raw("ARRAY_AGG(category.categoryname) AS categories")
+        )
+        .where("network.user_id", userid)
+        .groupBy(
+            "users.userid",
+            "users.firstname",
+            "users.lastname",
+            "users.email",
+            "users.phonenumber",
+            "users.photo",
+            "users.branch",
+            "base.basename",
+        )
+        .orderBy(
+            'users.userid'
+        )
+        .then((data) => {
+            const formattedData = data.map((item) => {
+                return {
+                    ...item,
+                    categories: item.categories, // categories will be returned as an array directly from the query
+                };
+            });
+
+            res.status(200).json(formattedData);
+        })
+        .catch((err) =>
+            res.status(404).json({
+                message:
+                    "The data you are looking for could not be found. Please try again",
+                error: err,
+            })
+        );
+});
+
 app.post('/smes', (req, res) => {
     const { user_id, category_id } = req.body;
     console.log('USERID AND CATID: ', user_id, category_id);
@@ -320,7 +395,7 @@ app.get('/profile/:userid', function (req, res) {
     const userid = req.params.userid;
     console.log('userid: ', userid)
     knex('users')
-        .join('base', 'users.base_id', 'base.baseid') //added from jacobs comment
+        .join('base', 'userss.base_id', 'base.baseid') //added from jacobs comment
         .select(
             'users.userid',
             'users.firstname',
@@ -691,6 +766,7 @@ app.delete('/deletenetworkSME', function (req, res) {
 
 //=============================================================================================//
 // "meetings" Table APIs. GET, POST, PATCH(TBD), & DELETE
+
 // API to get all meetings
 app.get('/meetinglist', function (req, res) {
     const meetingid = req.params.meetingid;
@@ -895,7 +971,7 @@ app.post('/login/', (req, res) => {
     //console.log('req.body: ',req.body)
     console.log('user password:', user, pw)
     knex('users')
-        .select('userid', 'firstname', 'lastname')
+        .select('userid', 'firstname', 'lastname', 'admin', 'sme')
         .where('username', user)
         .where('password', pw)
         .then((data) => {
