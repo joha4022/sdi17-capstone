@@ -30,7 +30,6 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import "./Map.css";
 import { AppContext } from "../App";
-import LoginPage from "./LoginPage";
 
 const Network = () => {
   const [SMEs, setSMEs] = useState([]);
@@ -75,6 +74,7 @@ const Network = () => {
   };
 
   let results = SMEs;
+  
   results = SMEs.filter((e) => e.userid != currentUser.userid)
   if (searchTerm.length > 0) {
     results = results.filter((word) => {
@@ -309,7 +309,7 @@ const Network = () => {
           </section>
         </>
       ) : (
-        navigate('/')
+        navigate('/denied')
       )}
     </>
   );

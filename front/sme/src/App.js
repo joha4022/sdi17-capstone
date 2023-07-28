@@ -10,6 +10,7 @@ import LandingPage from './Components/LandingPage'
 import './App.css';
 import { createContext, useEffect, useState } from 'react';
 import EditProfile from './Components/EditProfile';
+import Denied from './Denied';
 
 export const AppContext = createContext();
 
@@ -45,6 +46,7 @@ function App() {
           <Route path='/manage' element={<Manage />}></Route>
           <Route path='/search/:searchQuery' element={<Search />}></Route>
           <Route path='/editProfile' element={<EditProfile />}></Route>
+          <Route path='/denied' element={<Denied />}></Route>
         </Routes>
       </Router>
     </AppContext.Provider>
