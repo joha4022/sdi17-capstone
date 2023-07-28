@@ -8,7 +8,7 @@ import { faUser, faBriefcase, faNewspaper, faGear, faUserXmark } from '@fortawes
 import { useEffect, useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppContext } from '../App';
-import Message from './Message';
+
 
 export default function EditProfile() {
   const { currentUser, setCurrentUser } = useContext(AppContext);
@@ -68,14 +68,6 @@ export default function EditProfile() {
   const handleRow3 = () => { setRow3(!row3) };
   const handleRow4 = () => { setRow4(!row4) };
 
-  const changeProfilePic = (img) => {
-    console.log(img);
-    const formData = new FormData();
-    formData('')
-
-    setImage(img);
-  }
-
 
   const save = (row) => {
     if (newPassword) {
@@ -97,7 +89,8 @@ export default function EditProfile() {
       approveremail: appEmail,
       phonenumber: phoneNumber,
       branch: branch,
-      base_id: baseid
+      base_id: baseid,
+      bio: bio
     })
     const option = {
       method: 'PATCH',
@@ -126,7 +119,18 @@ export default function EditProfile() {
   const closeDeleteForm = () => setDeleteForm(false);
   const deleteAccount = () => {
     if (username === deleteUsername) {
-      // add delete request
+      const deleteBody = JSON.stringify({
+        userid: userid
+      })
+      const deleteOption = {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: deleteBody
+      }
+      fetch(`http://localhost:3001/deleteuser/${userid}`,deleteOption)
+      .then()
       setBackdrop(true);
       setDeleteForm(false);
       alertDisplay2('Your account has been deleted and you will be redirected to the login page.');
@@ -308,6 +312,10 @@ export default function EditProfile() {
                   accept='img/*'
                   onChange={(e) => setImage(e.target.files[0])}>
                 </input> */}
+                <div className='editprofile-username-display'>{username}
+                  <div className='editprofile-email-display'>{email}</div>
+                  <div className='editprofile-user-type'>{currentUser.admin ? 'Admin' : ''} {currentUser.sme ? 'SME' : ''}</div>
+                </div>
               </div>
               <div className='editprofile-main-menu-bar'>
                 <div className='editprofile-category'><FontAwesomeIcon className='side-menu-icon' icon={faUser} />Personal</div>
@@ -661,7 +669,6 @@ export default function EditProfile() {
           </div>
         </div>
         <FooterBar />
-        <Message />
       </>
     )
   }

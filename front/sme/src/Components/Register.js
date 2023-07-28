@@ -118,6 +118,7 @@ export default function Register() {
                 navigate(`/register/${data.code}`, { replace: true });
               } else {
                 sessionStorage.setItem('currentUser', JSON.stringify({ userid: userid }));
+                sessionStorage.setItem('loggedInUser', JSON.stringify({ userid: userid, firstname: firstname, lastname: lastname, sme: sme, admin: false}));
                 navigate(`/profile/${userid}`, { replace: true });
               }
             }, 2500)
