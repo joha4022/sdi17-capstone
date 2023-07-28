@@ -2,9 +2,9 @@ import { Badge } from "@mui/material";
 import { PickersDay } from '@mui/x-date-pickers/PickersDay';
 
 function HighlightedDay(props) {
+  console.log(props.highlightedDays[0]);
   const { highlightedDays = [], day, outsideCurrentMonth, ...other } = props;
-  const isSelected =
-    !props.outsideCurrentMonth && highlightedDays.includes(day.format('YYYY-MM-DD'));
+  const isSelected = !props.outsideCurrentMonth && highlightedDays.includes(day.format('MM-DD-YYYY'));
 
   return (
     <Badge
@@ -17,7 +17,4 @@ function HighlightedDay(props) {
   );
 }
 
-export default HighlightedDay;
-
-
-// style={{ width: "100%", resize: "none", fontSize: "1.3em", fontFamily: "Arial",border: '1px solid #A3816A' }}
+// export default HighlightedDay;
