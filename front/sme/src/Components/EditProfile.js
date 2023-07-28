@@ -9,6 +9,7 @@ import { useEffect, useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppContext } from '../App';
 
+
 export default function EditProfile() {
   const { currentUser, setCurrentUser } = useContext(AppContext);
   const [showPassword, setShowPassword] = useState(false);
@@ -49,6 +50,8 @@ export default function EditProfile() {
   const [alert, setAlert] = useState(false);
   const [alert2, setAlert2] = useState(false);
   const [backdrop, setBackdrop] = useState(false);
+  // profile image
+  const [image, setImage] = useState(false);
 
   const navigate = useNavigate();
 
@@ -86,7 +89,8 @@ export default function EditProfile() {
       approveremail: appEmail,
       phonenumber: phoneNumber,
       branch: branch,
-      base_id: baseid
+      base_id: baseid,
+      bio: bio
     })
     const option = {
       method: 'PATCH',
@@ -115,16 +119,26 @@ export default function EditProfile() {
   const closeDeleteForm = () => setDeleteForm(false);
   const deleteAccount = () => {
     if (username === deleteUsername) {
-
-
-      // setBackdrop(true);
-      // setDeleteForm(false);
-      // alertDisplay2('Your account has been deleted and you will be redirected to the login page.');
-      // sessionStorage.clear();
-      // setTimeout(() => {
-      //   setBackdrop(false);
-      //   navigate('/', {replace: true})
-      // }, 3000)
+      const deleteBody = JSON.stringify({
+        userid: userid
+      })
+      const deleteOption = {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: deleteBody
+      }
+      fetch(`http://localhost:3001/deleteuser/${userid}`,deleteOption)
+      .then()
+      setBackdrop(true);
+      setDeleteForm(false);
+      alertDisplay2('Your account has been deleted and you will be redirected to the login page.');
+      sessionStorage.clear();
+      setTimeout(() => {
+        setBackdrop(false);
+        navigate('/', { replace: true })
+      }, 3000)
     } else {
       alertDisplay('Please provide the correct username!')
     }
@@ -293,6 +307,15 @@ export default function EditProfile() {
               <div className='main-menu-title'>Edit Profile</div>
               <div className='editprofile-main-photo'>
                 <Avatar sx={{ width: 130, height: 130 }} className='editprofile-avatar' alt="Remy Sharp" src="../images/Blank_Avatar.jpg" />
+                {/* <input
+                  type='file'
+                  accept='img/*'
+                  onChange={(e) => setImage(e.target.files[0])}>
+                </input> */}
+                <div className='editprofile-username-display'>{username}
+                  <div className='editprofile-email-display'>{email}</div>
+                  <div className='editprofile-user-type'>{currentUser.admin ? 'Admin' : ''} {currentUser.sme ? 'SME' : ''}</div>
+                </div>
               </div>
               <div className='editprofile-main-menu-bar'>
                 <div className='editprofile-category'><FontAwesomeIcon className='side-menu-icon' icon={faUser} />Personal</div>
