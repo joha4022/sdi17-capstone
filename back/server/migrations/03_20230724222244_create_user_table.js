@@ -15,7 +15,7 @@ exports.up = function (knex) {
         table.string('password')
         table.string('worklocation')
         table.string('bio').defaultTo('User has yet to fill out their bio!')
-        table.binary('photo')
+        table.string('photo')
         table.string('branch')
         //table.varchar('img_url', 255)
         table.boolean('sme').defaultTo(false)
