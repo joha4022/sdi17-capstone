@@ -8,7 +8,7 @@ import Search from './Components/Search';
 import SME from './Components/SME';
 import LandingPage from './Components/LandingPage'
 import './App.css';
-import { createContext, useState } from 'react';
+import { createContext, useEffect, useState } from 'react';
 import EditProfile from './Components/EditProfile';
 
 export const AppContext = createContext();
@@ -17,6 +17,12 @@ function App() {
   const [removethislater, setremovethislater] = useState(false);
   const [meetings, setMeetings] = useState([]);
   const [currentUser, setCurrentUser] = useState(false);
+
+  useEffect(()=> {
+    if(sessionStorage.getItem('loggedInUser') !== null) {
+      setCurrentUser(JSON.parse(sessionStorage.getItem('loggedInUser')));
+    } 
+  },[])
 
   return (
     <AppContext.Provider value={{

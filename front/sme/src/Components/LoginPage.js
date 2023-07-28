@@ -64,6 +64,7 @@ export default function LoginPage() {
           alertDisplay(data.message)
         } else if(data.length === 1) {
           sessionStorage.setItem('currentUser', JSON.stringify({userid: data[0].userid}));
+          sessionStorage.setItem('loggedInUser', JSON.stringify(data[0]));
           setCurrentUser(data[0]);
           setBackdrop(true);
           setTimeout(() => {
