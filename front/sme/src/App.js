@@ -6,6 +6,7 @@ import Profile from './Components/Profile';
 import Register from './Components/Register';
 import Search from './Components/Search';
 import SME from './Components/SME';
+import Photo from './Components/GetPhoto'; //to delete later
 import LandingPage from './Components/LandingPage'
 import './App.css';
 import { createContext, useEffect, useState } from 'react';
@@ -46,6 +47,7 @@ function App() {
           <Route path='/manage' element={<Manage />}></Route>
           <Route path='/search/:searchQuery' element={<Search />}></Route>
           <Route path='/editProfile' element={<EditProfile />}></Route>
+          <Route path='/getphoto' element={<Photo />}></Route>
           <Route path='/denied' element={<Denied />}></Route>
         </Routes>
       </Router>
