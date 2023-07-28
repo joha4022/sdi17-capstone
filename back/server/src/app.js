@@ -1,15 +1,39 @@
 // app.js
 //require('dotenv').config();
 const express = require("express");
+const fileUpload = require('express-fileupload');
 
 const app = express();
 const cors = require('cors');
+const path = require('path');
 const PORT = process.env.PORT || 3001;
 const knex = require('knex')(require('../knexfile.js')[process.env.NODE_ENV || 'development']);
 
 
 app.use(express.json());
 app.use(cors());
+app.use(fileUpload());
+
+//send file command?
+
+//front end needs to send the file path ex './photos/soldier/png'
+app.post('/getphoto', (req, res) => {
+   const {photopath} = req.body;
+   console.log(photopath);
+    //const photo = './photos/soldier.png';
+    //res.download(path.resolve('./photos/Lady.jpg'))
+    res.download(path.resolve(`${photopath}`))
+    //  res.attachment(path.resolve(`${photo}`))
+    // res.send()
+
+})
+
+// app.post('/uploadPhoto', (req, res) => {
+//     const {name, data} = req.files.pic; //change pic to something else
+//     //we need a table to inser this in
+//     //insert in users.photo -> insert using a patch
+
+// })
 
 //--------------------------------------------------------------------------------------------------------
 // API returns everything in database - all tables joined
@@ -320,7 +344,7 @@ app.get('/profile/:userid', function (req, res) {
     const userid = req.params.userid;
     console.log('userid: ', userid)
     knex('users')
-        .join('base', 'user.base_id', 'base.baseid') //added from jacobs comment
+        .join('base', 'users.base_id', 'base.baseid') //added from jacobs comment
         .select(
             'users.userid',
             'users.firstname',
@@ -690,7 +714,7 @@ app.delete('/deletenetworkSME', function (req, res) {
 
 
 //=============================================================================================//
-// "meetings" Table APIs. GET, POST, PATCH(TBD), & DELETE(TBD)
+// "meetings" Table APIs. GET, POST, PATCH(TBD), & DELETE
 
 // API to get all meetings
 app.get('/meetinglist', function (req, res) {
