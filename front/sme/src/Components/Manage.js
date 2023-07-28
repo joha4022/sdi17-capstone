@@ -211,7 +211,7 @@ const Manage = () => {
           </Box>
         </>
       ) : (
-        navigate("/")
+        navigate("/denied")
       )}{" "}
     </>
   );
