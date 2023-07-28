@@ -214,6 +214,57 @@ app.get("/smes", (req, res) => {
         );
 });
 
+app.get("/smes/:id", (req, res) => {
+    const userid = req.params.id
+    knex("users")
+        .join("base", "users.base_id", "base.baseid")
+        .join("sme", "users.userid", "sme.user_id")
+        .join("network", "network.sme_id", "users.userid")
+        .join("category", "sme.category_id", "category.categoryid")
+        .select(
+            "users.userid",
+            "users.firstname",
+            "users.lastname",
+            "users.email",
+            "users.phonenumber",
+            "users.photo",
+            "users.branch",
+            "base.basename AS base",
+            knex.raw("ARRAY_AGG(category.categoryname) AS categories")
+        )
+        .where("network.user_id", userid)
+        .groupBy(
+            "users.userid",
+            "users.firstname",
+            "users.lastname",
+            "users.email",
+            "users.phonenumber",
+            "users.photo",
+            "users.branch",
+            "base.basename",
+        )
+        .orderBy(
+            'users.userid'
+        )
+        .then((data) => {
+            const formattedData = data.map((item) => {
+                return {
+                    ...item,
+                    categories: item.categories, // categories will be returned as an array directly from the query
+                };
+            });
+
+            res.status(200).json(formattedData);
+        })
+        .catch((err) =>
+            res.status(404).json({
+                message:
+                    "The data you are looking for could not be found. Please try again",
+                error: err,
+            })
+        );
+});
+
 app.post('/smes', (req, res) => {
     const { user_id, category_id } = req.body;
     console.log('USERID AND CATID: ', user_id, category_id);
@@ -896,7 +947,7 @@ app.post('/login/', (req, res) => {
     //console.log('req.body: ',req.body)
     console.log('user password:', user, pw)
     knex('users')
-        .select('userid', 'firstname', 'lastname')
+        .select('userid', 'firstname', 'lastname', 'admin')
         .where('username', user)
         .where('password', pw)
         .then((data) => {
