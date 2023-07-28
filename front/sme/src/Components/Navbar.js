@@ -49,7 +49,6 @@ const Navbar = () => {
       style={{ background: "#D2C8C8", marginBottom: "6vh" }}
     >
       <Toolbar>
-        {/* Logo */}
         <div>
           <IconButton
             size="small"
@@ -72,7 +71,6 @@ const Navbar = () => {
           </IconButton>
         </div>
 
-        {/* Your menu items */}
         <div style={{ flexGrow: 1 }}>
           {url.includes("network") ||
           url.includes("manage") ||
