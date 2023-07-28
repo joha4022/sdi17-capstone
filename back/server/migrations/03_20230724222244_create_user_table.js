@@ -14,13 +14,13 @@ exports.up = function (knex) {
         table.string('phonenumber')
         table.string('password')
         table.string('worklocation')
-        table.string('bio')
+        table.string('bio').defaultTo('User has yet to fill out their bio!')
         table.string('photo')
         table.string('branch')
         //table.varchar('img_url', 255)
-        table.boolean('sme')
-        table.boolean('admin')
-
+        table.boolean('sme').defaultTo(false)
+        table.boolean('admin').defaultTo(false)
+        table.boolean('userverified').defaultTo(false)
         table.integer('base_id')
         table.foreign('base_id').references('base.baseid')
 
