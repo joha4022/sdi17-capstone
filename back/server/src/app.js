@@ -17,7 +17,6 @@ app.use(fileUpload());
 
 // For handling the upload request
 app.post("/upload", function (req, res) {
-
     // When a file has been uploaded
     if (req.files && Object.keys(req.files).length !== 0) {
 

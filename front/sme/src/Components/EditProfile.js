@@ -39,6 +39,8 @@ export default function EditProfile() {
   const [appEmail, setAppEmail] = useState(false);
   const [worklocation, setWorklocation] = useState(false);
   const [bio, setBio] = useState(false);
+  const [photo, setPhoto] = useState(false);
+  const [changePhoto, setChangePhoto] = useState(false);
   // baseForm
   const [baseForm, setBaseForm] = useState(false);
   const [currentBases, setCurrentBases] = useState(false);
@@ -81,7 +83,7 @@ export default function EditProfile() {
         return alertDisplay('Your new password cannot be same as your current password!');
       }
     }
-    if(username === '') {
+    if (username === '') {
       return alertDisplay('Your username cannot be blank!')
     }
     row();
@@ -164,7 +166,7 @@ export default function EditProfile() {
               user = individual;
             }
           })
-          console.log(user);
+          // console.log(user);
           setCurrentUser(user);
           setUserid(user.userid);
           setFirstname(user.firstname);
@@ -179,6 +181,14 @@ export default function EditProfile() {
           setWorklocation(user.worklocation);
           setBio(user.bio);
           setBaseid(user.base_id);
+          // fetch photo
+          fetch('http://localhost:3001/getphoto', {
+            method: 'POST',
+            headers: { 'Content-type': 'application/json' },
+            body: JSON.stringify({ photopath: user.photo })
+          })
+            .then(res => res.blob())
+            .then(data => setPhoto(URL.createObjectURL(data)))
           // fetch the usernames
           fetch('http://localhost:3001/getusers')
             .then(res => res.json())
@@ -284,7 +294,43 @@ export default function EditProfile() {
     }, 2500)
   }
 
-  console.log(username, deleteUsername)
+  const changeProfilePic = () => {
+    const formData = new FormData();
+    formData.append("uploadFile", photo, photo.name)
+    const option = {
+      method: 'POST',
+      body: formData
+    }
+    fetch('http://localhost:3001/upload', option)
+      .then(res => res.text())
+      .then(data => {
+        const body = JSON.stringify({
+          userid: userid,
+          photo: `./photos/${photo.name}`
+        })
+        const option = {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: body
+        }
+        // adding a user
+        fetch('http://localhost:3001/updateuser', option)
+          .then(res => res.json())
+          .then(data => {
+            if (data.code === 500) {
+              alertDisplay(data.message)
+            } else {
+              setBackdrop(true);
+              setTimeout(() => {
+                setBackdrop(false);
+                alertDisplay2('Your profile has been updated!');
+              }, 1500)
+            }
+          })
+      })
+  }
 
   if (currentUser && currentBases) {
     return (
@@ -313,15 +359,29 @@ export default function EditProfile() {
             <div className='editprofile-main-menus'>
               <div className='main-menu-title'>Edit Profile</div>
               <div className='editprofile-main-photo'>
-                <Avatar sx={{ width: 130, height: 130 }} className='editprofile-avatar' alt="Remy Sharp" src="../images/Blank_Avatar.jpg" />
-                {/* <input
-                  type='file'
-                  accept='img/*'
-                  onChange={(e) => setImage(e.target.files[0])}>
-                </input> */}
+                <Avatar sx={{ width: 200, height: 200 }} className='editprofile-avatar' alt="Remy Sharp" 
+                src={changePhoto ? changePhoto : photo} 
+                onClick={()=>{document.querySelector('#image-upload').click()}}
+                />
+                  {/* File to be uploaded:  */}
+                  <input type="file"
+                    name="uploadFile"
+                    id='image-upload'
+                    onChange={(e) => {
+                      setPhoto(e.target.files[0]);
+                      setChangePhoto(URL.createObjectURL(e.target.files[0]));
+                    }} />
                 <div className='editprofile-username-display'>{username}
                   <div className='editprofile-email-display'>{email}</div>
                   <div className='editprofile-user-type'>{currentUser.admin ? 'Admin' : ''} {currentUser.sme ? 'SME' : ''}</div>
+                  <Button className='loginpage-button' size='large'
+                    sx={{
+                      marginTop: '2.5rem',
+                      display: `${changePhoto ? 'block' : 'none'}`,
+                    }}
+                    onClick={()=>{changeProfilePic()}}
+                    variant='contained'
+                    type='submit'>Save</Button>
                 </div>
               </div>
               <div className='editprofile-main-menu-bar'>
@@ -629,7 +689,7 @@ export default function EditProfile() {
                                     label="Confirm New Password"
                                   />
                                   <div className='checkmarks-confirmpassword'>
-                                    {newPassword === newPassword2 && newPassword2 !== false? <CheckCircleOutlineIcon fontSize='small' sx={{ color: 'green' }} /> : <WarningAmberIcon fontSize='small' sx={{ color: 'red' }} />}
+                                    {newPassword === newPassword2 && newPassword2 !== false ? <CheckCircleOutlineIcon fontSize='small' sx={{ color: 'green' }} /> : <WarningAmberIcon fontSize='small' sx={{ color: 'red' }} />}
                                   </div>
                                   <FormHelperText sx={{ width: '29ch', margin: '0px 0px 0px 25px' }} id="outlined-confirmpassword-helper-text">{newPassword !== newPassword2 || newPassword2 === false ? 'Please cofirm your password' : 'Password match confirmed'}</FormHelperText>
                                 </FormControl>
