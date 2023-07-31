@@ -255,7 +255,7 @@ app.get("/smes", (req, res) => {
             "users.phonenumber",
             "users.photo",
             "users.branch",
-            "base.basename AS base",
+            "base.baseid AS base",
             knex.raw("ARRAY_AGG(category.categoryname) AS categories")
         )
         .groupBy(
@@ -266,7 +266,7 @@ app.get("/smes", (req, res) => {
             "users.phonenumber",
             "users.photo",
             "users.branch",
-            "base.basename",
+            "base.baseid",
         )
         .orderBy(
             'users.userid'
@@ -305,7 +305,7 @@ app.get("/smes/:id", (req, res) => {
             "users.phonenumber",
             "users.photo",
             "users.branch",
-            "base.basename AS base",
+            "base.baseid AS base",
             knex.raw("ARRAY_AGG(category.categoryname) AS categories")
         )
         .where("network.user_id", userid)
@@ -317,7 +317,7 @@ app.get("/smes/:id", (req, res) => {
             "users.phonenumber",
             "users.photo",
             "users.branch",
-            "base.basename",
+            "base.baseid",
         )
         .orderBy(
             'users.userid'
@@ -668,7 +668,9 @@ app.get('/base', function (req, res) {
 app.post('/createbase', (req, res) => {
     const { basename,
         basecity,
-        basestate
+        basestate,
+        baselat,
+        baselon
     } = req.body;
     console.log(basename, basecity, basestate);
     knex('base')
@@ -683,7 +685,9 @@ app.post('/createbase', (req, res) => {
                     .insert({
                         basename,
                         basecity,
-                        basestate
+                        basestate,
+                        baselat,
+                        baselon
                     })
                     .then(() => res.status(201).json({ baseCreated: true, message: 'Base created successfully' }))
             }
@@ -702,7 +706,9 @@ app.patch('/updatebase', (req, res) => {
             baseid,
             basename,
             basecity,
-            basestate
+            basestate,
+            baselat,
+            baselon
         } = req.body
 
     knex('base')
@@ -710,8 +716,10 @@ app.patch('/updatebase', (req, res) => {
         .update({
             basename: basename,
             basecity: basecity,
-            basestate: basestate
-        }, ['basename', 'basecity', 'basestate'])
+            basestate: basestate,
+            baselat: baselat,
+            baselon: baselon   
+        }, ['basename', 'basecity', 'basestate', 'baselat', 'baselon'])
         .then((data) => res.status(201).json(data))
         .catch((err) => res.status(500).json({
             message: 'Error updating base information',

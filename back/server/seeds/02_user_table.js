@@ -60,7 +60,7 @@ exports.seed = async function (knex) {
       sme: true,
       admin: false,
       userverified: false,
-      base_id: '1' //changed the table name here
+      base_id: 3 //changed the table name here
     },
 
     {
@@ -79,7 +79,7 @@ exports.seed = async function (knex) {
       sme: true,
       admin: false,
       userverified: false,
-      base_id: '1' //changed the table name here
+      base_id: 4 //changed the table name here
     },
     {
       firstname: 'Henry',
@@ -97,7 +97,7 @@ exports.seed = async function (knex) {
       sme: true,
       admin: false,
       userverified: false,
-      base_id: '1' //changed the table name here
+      base_id: 5 //changed the table name here
     },
     {
       firstname: 'Olivia',
@@ -115,7 +115,7 @@ exports.seed = async function (knex) {
       sme: true,
       admin: false,
       userverified: false,
-      base_id: '1' //changed the table name here
+      base_id: 5 //changed the table name here
     },
     {
       firstname: 'Daniel',
@@ -133,7 +133,7 @@ exports.seed = async function (knex) {
       sme: true,
       admin: false,
       userverified: false,
-      base_id: '1' //changed the table name here
+      base_id: 6 //changed the table name here
     },
     {
       firstname: 'Sarah',
@@ -151,7 +151,7 @@ exports.seed = async function (knex) {
       sme: true,
       admin: false,
       userverified: false,
-      base_id: '1' //changed the table name here
+      base_id: 6 //changed the table name here
     },
     {
       firstname: 'Anthony',
@@ -169,7 +169,7 @@ exports.seed = async function (knex) {
       sme: true,
       admin: false,
       userverified: false,
-      base_id: '1' //changed the table name here
+      base_id: 7 //changed the table name here
     },
     {
       firstname: 'Emily',
@@ -187,7 +187,7 @@ exports.seed = async function (knex) {
       sme: true,
       admin: false,
       userverified: false,
-      base_id: '1' //changed the table name here
+      base_id: 9 //changed the table name here
     },
     {
       firstname: 'Matthew',
@@ -205,7 +205,7 @@ exports.seed = async function (knex) {
       sme: true,
       admin: false,
       userverified: false,
-      base_id: '1' //changed the table name here
+      base_id: 10 //changed the table name here
     },
 
     {
@@ -225,7 +225,7 @@ exports.seed = async function (knex) {
       sme: true,
       admin: false,
       userverified: false,
-      base_id: 2 //changed the table name here
+      base_id: 11 //changed the table name here
     },
     {
       firstname: 'James',
@@ -243,7 +243,7 @@ exports.seed = async function (knex) {
       sme: true,
       admin: false,
       userverified: false,
-      base_id: '1' //changed the table name here
+      base_id: 12 //changed the table name here
     },
 
     {
@@ -262,7 +262,7 @@ exports.seed = async function (knex) {
       sme: true,
       admin: false,
       userverified: false,
-      base_id: '1' //changed the table name here
+      base_id: 12 //changed the table name here
     },
     {
       firstname: 'Henry',
@@ -280,7 +280,7 @@ exports.seed = async function (knex) {
       sme: true,
       admin: false,
       userverified: false,
-      base_id: '1' //changed the table name here
+      base_id: 13 //changed the table name here
     },
     {
       firstname: 'Olivia',
@@ -298,7 +298,7 @@ exports.seed = async function (knex) {
       sme: true,
       admin: false,
       userverified: false,
-      base_id: '1' //changed the table name here
+      base_id: 14 //changed the table name here
     },
     {
       firstname: 'Daniel',
@@ -316,7 +316,7 @@ exports.seed = async function (knex) {
       sme: true,
       admin: false,
       userverified: false,
-      base_id: '1' //changed the table name here
+      base_id: 14 //changed the table name here
     },
     {
       firstname: 'Sarah',
@@ -334,7 +334,7 @@ exports.seed = async function (knex) {
       sme: true,
       admin: false,
       userverified: false,
-      base_id: '1' //changed the table name here
+      base_id: 9 //changed the table name here
     },
     {
       firstname: 'Anthony',
@@ -352,7 +352,7 @@ exports.seed = async function (knex) {
       sme: true,
       admin: false,
       userverified: false,
-      base_id: '1' //changed the table name here
+      base_id: 7 //changed the table name here
     },
     {
       firstname: 'Emily',
@@ -370,7 +370,7 @@ exports.seed = async function (knex) {
       sme: true,
       admin: false,
       userverified: false,
-      base_id: '1' //changed the table name here
+      base_id: 8 //changed the table name here
     },
     {
       firstname: 'Matthew',
@@ -388,7 +388,7 @@ exports.seed = async function (knex) {
       sme: true,
       admin: false,
       userverified: false,
-      base_id: '1' //changed the table name here
+      base_id: 4 //changed the table name here
     },
 
   ])

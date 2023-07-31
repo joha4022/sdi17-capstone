@@ -20,6 +20,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Navbar from "./Navbar";
 import "./Manage.css";
 import { AppContext } from "../App";
+import FooterBar from "./FooterBar";
 
 const Manage = () => {
   const [SMEs, setSMEs] = useState([]);
@@ -27,6 +28,7 @@ const Manage = () => {
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState("1");
   const [toast, setToast] = useState(false);
+  const [toast2, setToast2] = useState(false)
   const [message, setMessage] = useState("");
   const [dummy, setDummy] = useState(false)
   const { currentUser, setCurrentUser } = useContext(AppContext);
@@ -60,6 +62,7 @@ const Manage = () => {
   const handleClose = () => {
     setOpen(false);
     setToast(false);
+    setToast2(false);
   };
 
   const handleAccept = (e) => {
@@ -70,6 +73,7 @@ const Manage = () => {
     .then((res) => res.json())
     .then((data) => {
       setDummy(!dummy);
+      setToast2(true);
     })
       .catch((error) => console.error("Error:", error));
   }
@@ -159,6 +163,14 @@ const Manage = () => {
                           >
                             Decline
                           </Button>
+                          <div>
+                          <Snackbar
+                              open={toast2}
+                              autoHideDuration={6000}
+                              onClose={handleClose}
+                              message={`User is now verified`}
+                            />
+                          </div>
                         </CardActions>
                       </Card>
                     );
@@ -226,15 +238,6 @@ const Manage = () => {
                             className="manageBut"
                             size="large"
                             variant="contained"
-                            component={Link}
-                            to={`/profile/${e.userid}`}
-                          >
-                            Manage
-                          </Button>
-                          <Button
-                            className="manageBut"
-                            size="large"
-                            variant="contained"
                             onClick={handleOpen}
                           >
                             Delete
@@ -278,6 +281,7 @@ const Manage = () => {
       ) : (
         navigate("/denied")
       )}{" "}
+      <FooterBar />
     </>
   );
 };

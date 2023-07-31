@@ -30,6 +30,7 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import "./Map.css";
 import { AppContext } from "../App";
+import FooterBar from "./FooterBar";
 
 const Network = () => {
   const [SMEs, setSMEs] = useState([]);
@@ -40,6 +41,7 @@ const Network = () => {
   const [onNetwork, setOnNetwork] = useState(false);
   const [view, setView] = useState("module");
   const { currentUser, setCurrentUser } = useContext(AppContext);
+  const [location, setLocation] = useState([{lat: 0, lon: 0}])
 
   const navigate = useNavigate();
 
@@ -66,6 +68,12 @@ const Network = () => {
       .then((res) => res.json())
       .then((data) => setCategoryList(data));
   }, []);
+
+  useEffect(() => {
+    fetch('http://localhost:3001/base')
+      .then(res => res.json())
+      .then(data => setLocation(data))
+  }, [])
 
   const clearHandle = () => {
     setSearchTerm("");
@@ -254,10 +262,10 @@ const Network = () => {
                   {results.map((e, i) => {
                     return (
                       <Marker
-                        //! Need to find
+                        
                         position={[
-                          mapPositions[0] + Math.random() * 10,
-                          mapPositions[1] + i,
+                          location[e.base-1].baselat,
+                          location[e.base-1].baselon
                         ]}
                         icon={myIcon}
                         riseOnHover={true}
@@ -311,6 +319,7 @@ const Network = () => {
       ) : (
         navigate('/denied')
       )}
+      <FooterBar />
     </>
   );
 };

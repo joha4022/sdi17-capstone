@@ -37,6 +37,8 @@ export default function Register() {
   const [baseid, setBaseid] = useState(false);
   const [baseName, setBaseName] = useState(false);
   const [baseCity, setBaseCity] = useState(false);
+  const [baseLat, setBaseLat] = useState(false);
+  const [baseLon, setBaseLon] = useState(false);
   const [baseState, setBaseState] = useState(false);
   const [buttonLabel, setButtonLabel] = useState('Add Base *');
 
@@ -203,7 +205,9 @@ export default function Register() {
           baseid: baseid,
           basename: baseName,
           basecity: baseCity,
-          basestate: baseState
+          basestate: baseState,
+          baselat: baseLat,
+          baselon: baseLon
         })
         const baseOption = {
           method: 'POST',
@@ -232,6 +236,8 @@ export default function Register() {
         setBaseName(currentBases[existingBaseName.baseid - 1].basename);
         setBaseCity(currentBases[existingBaseName.baseid - 1].basecity);
         setBaseState(currentBases[existingBaseName.baseid - 1].basestate);
+        setBaseLat(currentBases[existingBaseName.baseid-1].baselat);
+        setBaseLon(currentBases[existingBaseName.baseid-1].baselon);
         setBaseid(currentBases[existingBaseName.baseid - 1].baseid);
         setBackdrop(true);
         setTimeout(() => {
@@ -471,6 +477,18 @@ export default function Register() {
                                       {state}
                                     </MenuItem>
                                   ))}</TextField>
+                              </td>
+                            </tr>
+                            <tr className='register-row'>
+                              <td>
+                                <div className='register-category'>Latitude</div>
+                                <TextField error={!baseLat ? true : false} required sx={{ width: '28ch' }} id="outlined-basic-baselat" label="Latitude" variant="outlined" defaultValue={baseLat ? baseLat : ''} onKeyUp={(e) => { setBaseLat(e.target.value) }} />
+                              </td>
+                            </tr>
+                            <tr className='register-row'>
+                              <td>
+                                <div className='register-category'>Longitude</div>
+                                <TextField error={!baseLon ? true : false} required sx={{ width: '28ch' }} id="outlined-basic-baselon" label="Longitude" variant="outlined" defaultValue={baseLon ? baseLon : ''} onKeyUp={(e) => { setBaseLon(e.target.value) }} />
                               </td>
                             </tr>
                           </tbody>
