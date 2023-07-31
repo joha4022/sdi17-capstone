@@ -2,11 +2,23 @@ import React, { useState, useContext } from "react";
 import { AppContext } from "../App";
 import Autosuggest from 'react-autosuggest';
 import { debounce } from "lodash";
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material";
+import MuiAlert from "@mui/material/Alert";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Snackbar } from "@mui/material";
+import { StyledAutosuggest } from "../Styled";
+
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 function MeetingFormModal ({ open, handleClose }) {
   const { meetings, setMeetings } = useContext(AppContext);
   const [suggestions, setSuggestions] = useState([]);
+  const [openAlert, setOpenAlert] = useState(false);
+  const [alertSeverity, setAlertSeverity] = useState("success");
+  const [alertPosition, setAlertPosition] = useState({
+    vertical: 'top',
+    horizontal: 'center',
+  });
   const [meetingData, setMeetingData] = useState({
     meetingTitle: "",
     meetingDescription: "",
@@ -53,16 +65,29 @@ function MeetingFormModal ({ open, handleClose }) {
           meetingDate: "",
           attendees: "",
         });
-        handleClose();
+        handleClose();        
+        setOpenAlert(true);
+        setAlertSeverity("success");        
       })
       .catch((error) => {
         console.error("Error:", error);
+        setOpenAlert(true);
+        setAlertSeverity("error");
       });
   };
 
+  const handleCloseAlert = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenAlert(false);
+  };
+
   const getSuggestions = async (value) => {
+    const lastUsername = value.split(',').pop().trim();
+
     try {
-      const response = await fetch(`http://localhost:3001/users/suggest?q=${value}`);
+      const response = await fetch(`http://localhost:3001/users/suggest?q=${lastUsername}`);
       const data = await response.json();
       setSuggestions(data);
     } catch (error) {
@@ -72,8 +97,8 @@ function MeetingFormModal ({ open, handleClose }) {
 
   const debounceGetSuggestions = debounce(getSuggestions, 500);
 
-  const onSuggestionFetchRequested = ( value ) => {
-    debounceGetSuggestions(value.value);
+  const onSuggestionFetchRequested = ({ value }) => {
+    debounceGetSuggestions(value);
   };
 
   const onSuggestionsClearRequested = () => {
@@ -87,7 +112,9 @@ function MeetingFormModal ({ open, handleClose }) {
       {suggestion.username}
     </div>);
 
-
+const NoTransition = (props) => {
+  return props.children;
+};
 
   return (
     <div>
@@ -135,22 +162,33 @@ function MeetingFormModal ({ open, handleClose }) {
             <TextField
               margin="dense"
               name="meetingDate"
-              label="Date"
+              // label="Date"
               type="date"
               fullWidth
               value={meetingData.meetingDate}
               onChange={handleInputChange}
             />
-            <Autosuggest
+            <StyledAutosuggest            
               suggestions={suggestions}
               onSuggestionsFetchRequested={onSuggestionFetchRequested}
               onSuggestionsClearRequested={onSuggestionsClearRequested}
               getSuggestionValue={getSuggestionValue}
               renderSuggestion={renderSuggestion}
+              renderSuggestionsContainer={({ containerProps, children, query }) => (
+                <div {...containerProps} style={{ maxHeight: '200px', overflow: 'auto' }}>
+                  {children}
+                </div>
+              )}
               inputProps={{
                 value: meetingData.attendees,
                 placeholder: "Attendees",
-                onChange: (_, { newValue }) => {
+                onChange: (_, { newValue, method }) => {
+                  if (method ==='click' || method === 'down' || method === 'up' || method === 'enter' ) {
+                    const usernames = meetingData.attendees.split(',');
+                    usernames.pop();
+                    usernames.push(newValue);
+                    newValue = usernames.join(',');
+                  }
                   setMeetingData({ ...meetingData, attendees: newValue });
                 },
                 name: "attendees",
@@ -167,6 +205,17 @@ function MeetingFormModal ({ open, handleClose }) {
           </form>
         </DialogContent>
       </Dialog>
+      <Snackbar
+        anchorOrigin={alertPosition} 
+        open={openAlert}
+        autoHideDuration={6000}
+        onClose={handleCloseAlert}
+        TransitionComponent={NoTransition}
+      >
+          <Alert onClose={handleCloseAlert} severity={alertSeverity} sx={{ width: '100%' }}>
+            {alertSeverity === 'success' ? 'Meeting created successfully! You may need to refresh for the changes to show.' : 'Error creating meeting!'}
+          </Alert>
+      </Snackbar>      
     </div>
   );
 }
