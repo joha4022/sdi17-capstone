@@ -1,5 +1,6 @@
 import {styled} from 'styled-components';
 import { Paper, AppBar as MuiAppBar, Box as MuiBox  } from "@mui/material";
+import Autosuggest from 'react-autosuggest';
 
 const Home = styled.div`
   background-color: #D2C8C8;
@@ -79,6 +80,13 @@ const AvatarAndDetails = styled(MuiBox)`
   flex-basis: 100px;
 `;
 
+const StyledAutosuggest = styled(Autosuggest)`
+  & input {
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+`;
+
 export {
   Home,
   Footer,
@@ -93,4 +101,5 @@ export {
   Notes,
   Meetings,
   AvatarAndDetails,
+  StyledAutosuggest,
 }
