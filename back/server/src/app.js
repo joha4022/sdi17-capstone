@@ -141,26 +141,50 @@ app.post('/createcategory', (req, res) => {
     const { categoryname } = req.body;
     console.log(categoryname);
     knex('category')
-        .select('categoryname')
-        .where('categoryname', categoryname)
-        .then((data) => {
-            console.log('data length: ', data.length)
-            if (data.length > 0) {
-                res.status(404).json({ categoryCreated: false, message: `SME category: *${categoryname}* already exists!` });
-            } else {
-                knex('category')
-                    .insert({
-                        categoryname
+        .then(categories => {
+            knex('category')
+                .select('categoryname')
+                .where('categoryname', categoryname)
+                .then((data) => {
+                    console.log('data length: ', data.length)
+                    if (data.length > 0) {
+                        res.status(404).json({ categoryCreated: false, message: `SME category: *${categoryname}* already exists!` });
+                    } else {
+                        knex('category')
+                            .insert({
+                                categoryname
+                            })
+                            .then(() => res.status(201).json({ baseCreated: true, categoryid: categories.length +1, message: 'Sme category created successfully' }))
+                    }
+                })
+                .catch((err) =>
+                    res.status(500).json({
+                        message: 'An error occurred while creating a new category',
+                        error: err,
                     })
-                    .then(() => res.status(201).json({ baseCreated: true, message: 'Sme category created successfully' }))
-            }
+                );
         })
-        .catch((err) =>
-            res.status(500).json({
-                message: 'An error occurred while creating a new category',
-                error: err,
-            })
-        );
+    // knex('category')
+    //     .select('categoryname')
+    //     .where('categoryname', categoryname)
+    //     .then((data) => {
+    //         console.log('data length: ', data.length)
+    //         if (data.length > 0) {
+    //             res.status(404).json({ categoryCreated: false, message: `SME category: *${categoryname}* already exists!` });
+    //         } else {
+    //             knex('category')
+    //                 .insert({
+    //                     categoryname
+    //                 })
+    //                 .then(() => res.status(201).json({ baseCreated: true, message: 'Sme category created successfully' }))
+    //         }
+    //     })
+    //     .catch((err) =>
+    //         res.status(500).json({
+    //             message: 'An error occurred while creating a new category',
+    //             error: err,
+    //         })
+    //     );
 });
 
 app.patch('/updatecategory', (req, res) => {
@@ -325,7 +349,6 @@ app.post('/smes', (req, res) => {
         .where('user_id', user_id)
         .where('category_id', category_id)
         .then((data) => {
-            console.log('data length: ', data.length)
             if (data.length > 0) {
                 res.status(404).json({ message: `User *${user_id}* already has this SME category!` });
             } else {
@@ -999,7 +1022,7 @@ app.post('/login/', (req, res) => {
     //console.log('req.body: ',req.body)
     console.log('user password:', user, pw)
     knex('users')
-        .select('userid', 'firstname', 'lastname', 'admin', 'sme','userverified')
+        .select('userid', 'firstname', 'lastname', 'admin', 'sme', 'userverified')
         .where('username', user)
         .where('password', pw)
         .then((data) => {
