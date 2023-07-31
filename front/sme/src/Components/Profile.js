@@ -20,7 +20,7 @@ function Profile({ userId }) {
   const [editingNoteText, setEditingNoteText] = useState("");
   const [isMeetingModalOpen, setIsMeetingModalOpen] = useState(false);
   const [meetings, setMeetings] = useState([]);
-  // const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(dayjs());
   // const [highlightedDays, setHighlightedDays] = useState([]);
   // const [isLoading, setIsLoading] = useState(false);
   const [bio, setBio] = useState('');
@@ -57,7 +57,7 @@ function Profile({ userId }) {
     localStorage.setItem('notes', JSON.stringify(notes));
   }, [notes]);
 
-  function updateUserBio(userid,newBio) {
+  function updateUserBio(userid, newBio) {
     fetch(`http://localhost:3001/updateuser`, {
       method: 'PATCH',
       headers: {
@@ -71,7 +71,8 @@ function Profile({ userId }) {
       .then(res => res.json())
       .then(data => {
         console.log('Success:', data);
-      })
+        setUsers({ ...users, bio: newBio });
+        })
       .catch((error) => {
         console.log('Failed to PATCH BIO:', error);
       });
@@ -180,8 +181,8 @@ function Profile({ userId }) {
               >
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DateCalendar
-                    defaultValue={dayjs()}
-                    // loading={isLoading}
+                    defaultValue={selectedDate}
+                    onChange={setSelectedDate}
                     views={["year", "month", "day"]}
                     showDaysOutsideCurrentMonth
                     fixedWeekNumber={6}
@@ -253,7 +254,7 @@ function Profile({ userId }) {
                   variant="contained"
                   color="primary"
                   sx={{ margin: 1, padding: 1 }} >
-                     onClick={() => { denySME(users.userid) }}> 
+                    onClick={() => { denySME(users.userid) }}> 
                   Deny (SME)
                 </Button>
               </>
