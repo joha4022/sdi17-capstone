@@ -22,11 +22,11 @@
   font-weight: bold;
   font-size: 2rem;
   position: relative;
-  top: -9rem;
-  left: 10rem;
+  top: -14rem;
+  left: 15rem;
 }
 .editprofile-main-photo {
-  height: 180px;
+  height: 250px;
 }
 .editprofile-email-display{
   font-size:1.5rem;
@@ -35,6 +35,9 @@
   font-weight: bold;
   font-size: 3rem;
   margin: 30px 0px 40px 0px;
+}
+#image-upload {
+  display: none;
 }
 .side-menu-icon{
   height: 1.5rem;
