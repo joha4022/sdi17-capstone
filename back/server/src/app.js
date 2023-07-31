@@ -28,6 +28,7 @@ app.post("/upload", function (req, res) {
         console.log(uploadedFile);
 
         // Upload path
+
         const uploadPath = process.cwd() + "/photos/" + uploadedFile.name;
         console.log(uploadPath);
 
@@ -140,26 +141,50 @@ app.post('/createcategory', (req, res) => {
     const { categoryname } = req.body;
     console.log(categoryname);
     knex('category')
-        .select('categoryname')
-        .where('categoryname', categoryname)
-        .then((data) => {
-            console.log('data length: ', data.length)
-            if (data.length > 0) {
-                res.status(404).json({ categoryCreated: false, message: `SME category: *${categoryname}* already exists!` });
-            } else {
-                knex('category')
-                    .insert({
-                        categoryname
+        .then(categories => {
+            knex('category')
+                .select('categoryname')
+                .where('categoryname', categoryname)
+                .then((data) => {
+                    console.log('data length: ', data.length)
+                    if (data.length > 0) {
+                        res.status(404).json({ categoryCreated: false, message: `SME category: *${categoryname}* already exists!` });
+                    } else {
+                        knex('category')
+                            .insert({
+                                categoryname
+                            })
+                            .then(() => res.status(201).json({ baseCreated: true, categoryid: categories.length +1, message: 'Sme category created successfully' }))
+                    }
+                })
+                .catch((err) =>
+                    res.status(500).json({
+                        message: 'An error occurred while creating a new category',
+                        error: err,
                     })
-                    .then(() => res.status(201).json({ baseCreated: true, message: 'Sme category created successfully' }))
-            }
+                );
         })
-        .catch((err) =>
-            res.status(500).json({
-                message: 'An error occurred while creating a new category',
-                error: err,
-            })
-        );
+    // knex('category')
+    //     .select('categoryname')
+    //     .where('categoryname', categoryname)
+    //     .then((data) => {
+    //         console.log('data length: ', data.length)
+    //         if (data.length > 0) {
+    //             res.status(404).json({ categoryCreated: false, message: `SME category: *${categoryname}* already exists!` });
+    //         } else {
+    //             knex('category')
+    //                 .insert({
+    //                     categoryname
+    //                 })
+    //                 .then(() => res.status(201).json({ baseCreated: true, message: 'Sme category created successfully' }))
+    //         }
+    //     })
+    //     .catch((err) =>
+    //         res.status(500).json({
+    //             message: 'An error occurred while creating a new category',
+    //             error: err,
+    //         })
+    //     );
 });
 
 app.patch('/updatecategory', (req, res) => {
@@ -324,7 +349,6 @@ app.post('/smes', (req, res) => {
         .where('user_id', user_id)
         .where('category_id', category_id)
         .then((data) => {
-            console.log('data length: ', data.length)
             if (data.length > 0) {
                 res.status(404).json({ message: `User *${user_id}* already has this SME category!` });
             } else {
@@ -844,9 +868,11 @@ app.get('/usermeetings/:userid', function (req, res) {
     knex('meetings')
         .join('usermeetings', 'meetings.meetingid', 'usermeetings.meeting_id')
         .join('users', 'users.userid', 'usermeetings.user_id')
-        .select('users.userid',
+        .select(
+            'users.userid',
             'users.firstname',
             'users.lastname',
+            'meetings.meetingid',
             'meetings.meetingTitle',
             'meetings.meetingDescription',
             'meetings.startTime',
@@ -904,32 +930,44 @@ app.post('/meetings', (req, res) => {
 
 app.delete('/deletemeeting', function (req, res) {
     const { meetingid } = req.body;
+    if (!meetingid) {
+        return res.status(400).json({message: 'Meeting ID is required.'});
+    }
 
     knex('usermeetings')
         .where('meeting_id', meetingid)
         .del()
-        .then((data) => console.log("removed from user meeting", data))
-
-    knex('meetings')
-        .where('meetingid', meetingid)
-        .del()
-        .then((rowCount) => {
-            if (rowCount === 0) {
-                return res.status(404).json({
-                    message: 'This meeting is not found',
-                });
-            }
-            res.status(201).json({
-                message: 'Meeting deleted successfully',
-            });
+        .then((data) => {
+            console.log("removed from user meeting", data);
+            knex('meetings')
+                .where('meetingid', meetingid)
+                .del()
+                .then((rowCount) => {
+                    if (rowCount === 0) {
+                        return res.status(404).json({
+                            message: 'This meeting is not found',
+                        });
+                    }
+                    res.status(201).json({
+                        message: 'Meeting deleted successfully',
+                    });
+                })
+                .catch((err) =>
+                    res.status(500).json({
+                        message: 'An error occurred while deleting meeting',
+                        error: err,
+                    })
+                );
         })
         .catch((err) =>
             res.status(500).json({
-                message: 'An error occurred while deleting meeting',
+                message: 'An error occurred while deleting from user meeting',
                 error: err,
             })
         );
 });
+
+
 
 //=============================================================================================//
 // "usermeetings" Table APIs
@@ -998,7 +1036,7 @@ app.post('/login/', (req, res) => {
     //console.log('req.body: ',req.body)
     console.log('user password:', user, pw)
     knex('users')
-        .select('userid', 'firstname', 'lastname', 'admin', 'sme','userverified')
+        .select('userid', 'firstname', 'lastname', 'admin', 'sme', 'userverified')
         .where('username', user)
         .where('password', pw)
         .then((data) => {

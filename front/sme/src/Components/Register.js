@@ -1,7 +1,7 @@
 import './Register.css'
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FormControlLabel, TextField, IconButton, OutlinedInput, InputLabel, InputAdornment, FormControl, Button, Collapse, Alert, Typography, AlertTitle, Box, Modal, MenuItem, Backdrop, CircularProgress, FormHelperText, Checkbox } from '@mui/material';
+import { AutoComplete, FormControlLabel, TextField, IconButton, OutlinedInput, InputLabel, InputAdornment, FormControl, Button, Collapse, Alert, Typography, AlertTitle, Box, Modal, MenuItem, Backdrop, CircularProgress, FormHelperText, Checkbox, Autocomplete } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
@@ -24,6 +24,8 @@ export default function Register() {
   const [supEmail, setSupEmail] = useState(false);
   const [appEmail, setAppEmail] = useState(false);
   const [sme, setSme] = useState(false);
+  const [categories, setCategories] = useState(false);
+  const [smeCategory, setSmeCategory] = useState(false);
   // alertdisplay
   const [message, setMessage] = useState(false);
   const [alert, setAlert] = useState(false);
@@ -51,7 +53,7 @@ export default function Register() {
     fetch('http://localhost:3001/')
       .then(res => res.json())
       .then(data => {
-        setUserid(data.length + 1);
+        setUserid(Number(data.length + 1));
         const usernames = [...usernameList];
         data.map(user => {
           usernames.push(user.username);
@@ -59,8 +61,14 @@ export default function Register() {
         console.log(usernames);
         setUsernameList(usernames);
       })
+    fetch('http://localhost:3001/categories')
+      .then(res => res.json())
+      .then(data => {
+        const cat = [];
+        data.map(category => cat.push(category.categoryname));
+        setCategories(cat);
+      })
   }, [])
-
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -75,10 +83,13 @@ export default function Register() {
       setAlert(false);
     }, 2500)
   }
+
+  console.log(smeCategory)
+
   const register = () => {
     if (!firstname || !lastname || !username || !email || !password || !password2 || !appEmail || !baseName) {
       alertDisplay('Please complete all the required fields!');
-    } else if (!(/\d/).test(password) || (/\D/).test(password) || password.length > 4) {
+    } else if (!(/\d/).test(password) || !(/[A-Z]/).test(password) || password.length < 5) {
       alertDisplay('Password does not meet the minimum requirement.');
     } else if (password !== password2) {
       alertDisplay('Please make sure the passwords match.');
@@ -105,6 +116,39 @@ export default function Register() {
           'Content-Type': 'application/json'
         },
         body: body
+      }
+      if (categories.includes(smeCategory)) {
+        fetch('http://localhost:3001/smes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_id: userid,
+            category_id: categories.indexOf(smeCategory)+1
+          })
+        })
+      } else {
+        // adds a new category to the sme category table
+        fetch('http://localhost:3001/createcategory', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            categoryname: smeCategory
+          })
+        })
+          .then(res => res.json())
+          .then(data => {
+            // even though the sme is pending the sme is still added to the sme table
+            fetch('http://localhost:3001/smes', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                user_id: userid,
+                category_id: data.categoryid
+              })
+            })
+          })
       }
       // adding a user
       fetch('http://localhost:3001/createuser', option)
@@ -200,7 +244,7 @@ export default function Register() {
   }
   const testString = `Must include at least 5 characters \nMust include at least one number \nMust include one uppercase letter`
 
-  if (currentBases) {
+  if (currentBases && categories) {
     return (
       <>
         <Collapse in={alert} sx={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9999 }}>
@@ -235,9 +279,26 @@ export default function Register() {
                   </td>
                 </tr>
                 <tr className='register-row'>
-                  <div className='register-category'>Account Type</div>
-                  <FormControlLabel control={<Checkbox onClick={(e) => { setSme(e.target.checked) }} />} label="SME" />
-                  <span className='sme-helpertext'>SME account will need to be verified before it can be used.</span>
+                  <td>
+                    <div className='register-category'>Account Type</div>
+                    <FormControlLabel control={<Checkbox onClick={(e) => { setSme(e.target.checked) }} />} label="SME" />
+                    <FormHelperText sx={{ width: '250px' }}>SME account will need to be verified before it can be used.</FormHelperText>
+                  </td>
+                  <td style={{ display: `${!sme ? 'none' : 'block'}` }}>
+                    <div className='register-category'>SME Category</div>
+                    <Autocomplete sx={{ width: '28ch' }}
+                      id="outlined-select-smeCategory"
+                      label="SmeCateogry"
+                      variant="outlined"
+                      defaultValue=''
+                      freeSolo
+                      options={categories}
+                      renderInput={(params) => <TextField {...params} label='SME Category'/>}
+                      onKeyUp={(e) => { setSmeCategory(e.target.value)}}
+                      onClose={(e)=>{ setSmeCategory(e.target.textContent)}}
+                      onKeyDown={(e) => { if (e.key === 'Enter') { setSmeCategory(e.target.dataset.value) } }}>
+                    </Autocomplete>
+                  </td>
                 </tr>
                 <tr className='register-row'>
                   <td>
@@ -261,7 +322,7 @@ export default function Register() {
                     <div className='checkmarks-username'>
                       {!username || usernameList.includes(username) ? <WarningAmberIcon fontSize='small' sx={{ color: 'red' }} /> : <CheckCircleOutlineIcon fontSize='small' sx={{ color: 'green' }} />}
                     </div>
-                    <FormHelperText sx={{margin: '0px 0px 0px 25px'}}>{usernameList.includes(username) || !username ? 'Username not available' : 'Available username'}</FormHelperText>
+                    <FormHelperText sx={{ margin: '0px 0px 0px 25px' }}>{usernameList.includes(username) || !username ? 'Username not available' : 'Available username'}</FormHelperText>
                   </td>
                 </tr>
                 <tr className='register-row'>
