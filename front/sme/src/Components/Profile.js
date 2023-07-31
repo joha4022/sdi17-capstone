@@ -1,7 +1,7 @@
-import React,{ useState, useEffect } from "react";
+import React,{ useState, useEffect, useContext } from "react";
+import { useParams } from "react-router-dom";
 import { Typography, Button, Avatar, Paper, Grid, Box as MuiBox } from "@mui/material";
 import { ProfileDetails, ProfileDetail, Background, Bio, Notes, Meetings, AvatarAndDetails } from "../Styled";
-// import { useParams } from "react-router-dom";
 import Navbar from "./Navbar";
 import { DateCalendar } from "@mui/x-date-pickers";
 import { LocalizationProvider } from '@mui/x-date-pickers';
@@ -10,11 +10,12 @@ import Loader from "./Loader";
 import MeetingFormModal from "./MeetingFormModal";
 import dayjs from "dayjs";
 import TextareaAutosize from '@mui/base/TextareaAutosize';
+import { AppContext } from '../App.js';
 
 
 function Profile({ userId }) {
   const [users, setUsers] = useState(null);
-  const [notes, setNotes] = useState(() => JSON.parse(localStorage.getItem("notes")) || []);
+  const [notes, setNotes] = useState([]);
   const [newNote, setNewNote] = useState("");
   const [editingNoteIndex, setEditingNoteIndex] = useState(null);
   const [editingNoteText, setEditingNoteText] = useState("");
@@ -25,8 +26,9 @@ function Profile({ userId }) {
   // const [isLoading, setIsLoading] = useState(false);
   const [bio, setBio] = useState('');
   // const requestAbortController = useRef(null);
-  // const { id } = useParams();
-  const id = JSON.parse (sessionStorage.getItem('currentUser')).userid;
+  const { id } = useParams();
+  // const id = JSON.parse (sessionStorage.getItem('currentUser')).userid;
+  const { currentUser } = useContext(AppContext);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -44,7 +46,7 @@ function Profile({ userId }) {
       }
     };
     fetchProfile();
-  }, [id]);
+  }, [id, meetings]);
 
   useEffect(() => {
     fetch(`http://localhost:3001/usermeetings/${id}`)
@@ -54,8 +56,11 @@ function Profile({ userId }) {
   }, [id]);
 
   useEffect(() => {
-    localStorage.setItem('notes', JSON.stringify(notes));
-  }, [notes]);
+    if (currentUser) {
+      const currentNotes = JSON.parse(localStorage.getItem(`notes-${currentUser.userid}`)) || [];
+      setNotes(currentNotes);
+    }
+  }, [currentUser]);
 
   function updateUserBio(userid, newBio) {
     fetch(`http://localhost:3001/updateuser`, {
@@ -78,6 +83,31 @@ function Profile({ userId }) {
       });
   }
 
+  const handleDeleteMeeting = (meetingId) => {
+    console.log(`Deleting meeting with ID: ${meetingId}`);
+
+    const confirmDelete = window.confirm('Are you sure you want to delete this meeting?');
+    if (confirmDelete) {
+      fetch('http://localhost:3001/deletemeeting', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify ({
+          meetingid: meetingId,
+        }),
+        })
+        .then ((res) => res.json())
+        .then((data) => {
+          console.log ('Success:', data);
+          setMeetings(meetings.filter((meeting) => meeting.meetingid !== meetingId));
+        })
+        .catch ((error) => {
+          console.log('Failed to Delete Meeting:', error);
+        });
+    }
+    };
+
   if (!users) {
     return <Loader />;
   };
@@ -85,7 +115,7 @@ function Profile({ userId }) {
   const handleAddNote = (e) => {
     e.preventDefault();
 
-    const updatedNotes = [...notes, { text: newNote, checked: false }];
+    const updatedNotes = [...notes, { text: newNote, checked: false, userid: currentUser.userid }];
     setNotes(updatedNotes);
     /* setNotes((prevNotes) => [...prevNotes, { text: newNote, checked: false }]); */
     setNewNote("");
@@ -153,7 +183,9 @@ function Profile({ userId }) {
             </Paper>
             <Paper elevation={2} sx={{ margin: 4, padding: 5 }}>
               <MuiBox>
-              {users.smeStatus === 'approved' && <Typography variant="h6">SME</Typography>}
+                {users.smeStatus === "approved" && (
+                  <Typography variant="h6">SME</Typography>
+                )}
                 <ProfileDetails>
                   <Typography variant="h5">Name:</Typography>
 
@@ -208,8 +240,12 @@ function Profile({ userId }) {
                 maxRows={50}
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
+                disabled={Number(id) !== currentUser.userid}
               />
-              <Button onClick={() => updateUserBio(users.userid, bio)}>
+              <Button
+                onClick={() => updateUserBio(users.userid, bio)}
+                disabled={Number(id) !== currentUser.userid}
+              >
                 Update Bio
               </Button>
             </Bio>
@@ -223,15 +259,50 @@ function Profile({ userId }) {
               <ul>
                 {meetings.map((meeting) => (
                   <li key={meeting.meetingid}>
-                    <Typography>
-                      {meeting.meetingTitle}-{meeting.meetingDescription}-
-                      {meeting.startTime}-{meeting.endTime}-
-                      {meeting.meetingDate}
-                    </Typography>
+                    <Grid container direction="row" alignItems="center">
+                      <Grid item xs={11}>
+                        <Typography>
+                          {meeting.meetingTitle}-{meeting.meetingDescription}-
+                          {meeting.startTime}-{meeting.endTime}-
+                          {meeting.meetingDate}
+                        </Typography>
+                      </Grid>
+                      {Number(id) === currentUser.userid && (
+                        <Grid item xs={1}>
+                          <Button
+                            onClick={() =>
+                              handleDeleteMeeting(meeting.meetingid)}
+                            variant="outlined"
+                            sx={{
+                              float: "right",
+                              width: "65px",
+                              height: "20px",
+                              fontSize: "0.6em",
+                              borderColor: "red",
+                              color: "red",
+                              borderWidth: "2px",
+                              borderRadius: "2px",
+                              padding: 0,
+                              transition: "0.3s",
+                              "&:hover": {
+                                backgroundColor: "red",
+                                color: "white",
+                              },
+                            }}>
+                            Delete
+                          </Button>
+                        </Grid>
+                      )}
+                    </Grid>
                   </li>
                 ))}
               </ul>
-              <Button onClick={openMeetingModal}>Schedule Meeting</Button>
+              <Button
+                onClick={openMeetingModal}
+                disabled={Number(id) !== currentUser.userid}
+              >
+                Schedule Meeting
+              </Button>
               <MeetingFormModal
                 open={isMeetingModalOpen}
                 handleClose={closeMeetingModal}
@@ -260,7 +331,6 @@ function Profile({ userId }) {
               </>
             )}
           </MuiBox> */}
-
           <Paper elevation={1} sx={{ margin: 1, padding: 1 }}>
             <Notes>
               Notes:
@@ -276,56 +346,67 @@ function Profile({ userId }) {
                   rows={3}
                   value={newNote}
                   onChange={(e) => setNewNote(e.target.value)}
+                  disabled={Number(id) !== currentUser.userid}
                 />
-                <button type="submit">Add Note</button>
+                <Button
+                  type="submit"
+                  disabled={Number(id) !== currentUser.userid}
+                >
+                  Add Note
+                </Button>
               </form>
               <ul>
-                {notes.map((note, index) => (
-                  <li key={index}>
-                    {editingNoteIndex === index ? (
-                      <form onSubmit={handleUpdateNote}>
-                        <textarea
-                          style={{
-                            width: "90%",
-                            fontSize: "1.1em",
-                            fontFamily: "Arial",
-                            resize: "none",
-                          }}
-                          rows={3}
-                          value={editingNoteText}
-                          onChange={(e) => setEditingNoteText(e.target.value)}
-                        />
-                        <button type="submit">Update Note</button>
-                      </form>
-                    ) : (
-                      <>
-                        <input
-                          type="checkbox"
-                          checked={note.checked}
-                          onChange={() => handleCheckNote(index)}
-                        />
-                        <span
-                          style={{
-                            textDecoration: note.checked
-                              ? "line-through"
-                              : "none",
-                          }}
-                        >
-                          {note.text}
-                        </span>
-                        <button onClick={() => handleEditNote(index)}>
-                          Edit
-                        </button>
-                        <button
-                          style={{ color: "red" }}
-                          onClick={() => handleDeleteNote(index)}
-                        >
-                          X
-                        </button>
-                      </>
-                    )}
-                  </li>
-                ))}
+                {notes.map(
+                  (note, index) =>
+                    note.userid === currentUser.userid && (
+                      <li key={index}>
+                        {editingNoteIndex === index ? (
+                          <form onSubmit={handleUpdateNote}>
+                            <textarea
+                              style={{
+                                width: "90%",
+                                fontSize: "1.1em",
+                                fontFamily: "Arial",
+                                resize: "none",
+                              }}
+                              rows={3}
+                              value={editingNoteText}
+                              onChange={(e) =>
+                                setEditingNoteText(e.target.value)
+                              }
+                            />
+                            <button type="submit">Update Note</button>
+                          </form>
+                        ) : (
+                          <>
+                            <input
+                              type="checkbox"
+                              checked={note.checked}
+                              onChange={() => handleCheckNote(index)}
+                            />
+                            <span
+                              style={{
+                                textDecoration: note.checked
+                                  ? "line-through"
+                                  : "none",
+                              }}
+                            >
+                              {note.text}
+                            </span>
+                            <button onClick={() => handleEditNote(index)}>
+                              Edit
+                            </button>
+                            <button
+                              style={{ color: "red" }}
+                              onClick={() => handleDeleteNote(index)}
+                            >
+                              X
+                            </button>
+                          </>
+                        )}
+                      </li>
+                    )
+                )}
               </ul>
             </Notes>
           </Paper>
