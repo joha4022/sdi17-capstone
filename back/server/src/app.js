@@ -14,7 +14,13 @@ app.use(express.json());
 app.use(cors());
 app.use(fileUpload());
 
-//send file command?
+
+app.post('/uploadPhoto', (req, res) => {
+    const {name, data} = req.files.pic; //change pic to something else
+    //we need a table to inser this in
+    //insert in users.photo -> insert using a patch
+
+})
 
 //front end needs to send the file path ex './photos/soldier/png'
 app.post('/getphoto', (req, res) => {
@@ -27,13 +33,6 @@ app.post('/getphoto', (req, res) => {
     // res.send()
 
 })
-
-// app.post('/uploadPhoto', (req, res) => {
-//     const {name, data} = req.files.pic; //change pic to something else
-//     //we need a table to inser this in
-//     //insert in users.photo -> insert using a patch
-
-// })
 
 //--------------------------------------------------------------------------------------------------------
 // API returns everything in database - all tables joined
