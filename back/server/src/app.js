@@ -971,7 +971,7 @@ app.post('/login/', (req, res) => {
     //console.log('req.body: ',req.body)
     console.log('user password:', user, pw)
     knex('users')
-        .select('userid', 'firstname', 'lastname', 'admin', 'sme')
+        .select('userid', 'firstname', 'lastname', 'admin', 'sme','userverified')
         .where('username', user)
         .where('password', pw)
         .then((data) => {
