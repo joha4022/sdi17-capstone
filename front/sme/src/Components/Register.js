@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FormControlLabel, TextField, IconButton, OutlinedInput, InputLabel, InputAdornment, FormControl, Button, Collapse, Alert, Typography, AlertTitle, Box, Modal, MenuItem, Backdrop, CircularProgress, FormHelperText, Checkbox } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import FooterBar from './FooterBar';
 import Navbar from './Navbar';
 
@@ -76,6 +78,8 @@ export default function Register() {
   const register = () => {
     if (!firstname || !lastname || !username || !email || !password || !password2 || !appEmail || !baseName) {
       alertDisplay('Please complete all the required fields!');
+    } else if (!(/\d/).test(password) || (/\D/).test(password) || password.length > 4) {
+      alertDisplay('Password does not meet the minimum requirement.');
     } else if (password !== password2) {
       alertDisplay('Please make sure the passwords match.');
     } else if (!email.includes('@') || !appEmail.includes('@')) {
@@ -118,7 +122,7 @@ export default function Register() {
                 navigate(`/register/${data.code}`, { replace: true });
               } else {
                 sessionStorage.setItem('currentUser', JSON.stringify({ userid: userid }));
-                sessionStorage.setItem('loggedInUser', JSON.stringify({ userid: userid, firstname: firstname, lastname: lastname, sme: sme, admin: false}));
+                sessionStorage.setItem('loggedInUser', JSON.stringify({ userid: userid, firstname: firstname, lastname: lastname, sme: sme, admin: false }));
                 navigate(`/profile/${userid}`, { replace: true });
               }
             }, 2500)
@@ -194,7 +198,7 @@ export default function Register() {
       }
     }
   }
-
+  const testString = `Must include at least 5 characters \nMust include at least one number \nMust include one uppercase letter`
 
   if (currentBases) {
     return (
@@ -251,10 +255,13 @@ export default function Register() {
                   <td>
                     <div className='register-category'>Username</div>
                     <TextField error={!username || usernameList.includes(username) ? true : false} required sx={{ width: '28ch' }} id="outlined-basic-username" label="Username" variant="outlined"
-                      helperText={usernameList.includes(username) || !username ? 'Username not available' : 'Available username'}
                       onKeyUp={(e) => {
                         setUsername(e.target.value);
                       }} />
+                    <div className='checkmarks-username'>
+                      {!username || usernameList.includes(username) ? <WarningAmberIcon fontSize='small' sx={{ color: 'red' }} /> : <CheckCircleOutlineIcon fontSize='small' sx={{ color: 'green' }} />}
+                    </div>
+                    <FormHelperText sx={{margin: '0px 0px 0px 25px'}}>{usernameList.includes(username) || !username ? 'Username not available' : 'Available username'}</FormHelperText>
                   </td>
                 </tr>
                 <tr className='register-row'>
@@ -263,7 +270,7 @@ export default function Register() {
                     <FormControl sx={{ width: '28ch' }} variant="outlined">
                       <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
                       <OutlinedInput
-                        error={!(/\d/).test(password) ? true : false}
+                        error={(/\d/).test(password) && (/[A-Z]/).test(password) && password.length > 4 ? false : true}
                         onKeyUp={(e) => { setPassword(e.target.value) }}
                         id="outlined-adornment-password"
                         type={showPassword ? 'text' : 'password'}
@@ -281,10 +288,15 @@ export default function Register() {
                         }
                         label="Password"
                       />
-                      <FormHelperText id="outlined-confirmpassword-helper-text">{(/\d/).test(password) ? 'Password requirement met' : 'Please include at least one number'}</FormHelperText>
+                      <div className='checkmarks'>
+                        {password.length > 4 ? <CheckCircleOutlineIcon fontSize='small' sx={{ color: 'green' }} /> : <WarningAmberIcon fontSize='small' sx={{ color: 'red' }} />}
+                        {(/\d/).test(password) ? <CheckCircleOutlineIcon fontSize='small' sx={{ color: 'green' }} /> : <WarningAmberIcon fontSize='small' sx={{ color: 'red' }} />}
+                        {(/[A-Z]/).test(password) ? <CheckCircleOutlineIcon fontSize='small' sx={{ color: 'green' }} /> : <WarningAmberIcon fontSize='small' sx={{ color: 'red' }} />}
+                      </div>
+                      <FormHelperText sx={{ width: '29ch', margin: '0px 0px 0px 25px' }} id="outlined-confirmpassword-helper-text">{testString}</FormHelperText>
                     </FormControl>
                   </td>
-                  <td>
+                  <td className='special-td'>
                     <div className='register-category'>Confirm Password</div>
                     <FormControl sx={{ width: '28ch' }} variant="outlined">
                       <InputLabel htmlFor="outlined-adornment-password2">Confirm Password</InputLabel>
@@ -307,7 +319,10 @@ export default function Register() {
                         }
                         label="Confirm Password"
                       />
-                      <FormHelperText id="outlined-confirmpassword-helper-text">{password !== password2 || password2 === false ? 'Please cofirm your password' : 'Password match confirmed'}</FormHelperText>
+                      <div className='checkmarks-confirmpassword'>
+                        {password === password2 ? <CheckCircleOutlineIcon fontSize='small' sx={{ color: 'green' }} /> : <WarningAmberIcon fontSize='small' sx={{ color: 'red' }} />}
+                      </div>
+                      <FormHelperText sx={{ width: '29ch', margin: '0px 0px 0px 25px' }} id="outlined-confirmpassword-helper-text">{password !== password2 || password2 === false ? 'Please cofirm your password' : 'Password match confirmed'}</FormHelperText>
                     </FormControl>
                   </td>
                 </tr>
@@ -340,11 +355,11 @@ export default function Register() {
                       size='large'
                       sx={{ width: '28ch', marginRight: '10px' }}
                       id="outlined-disabled"
-                      value={baseName !== false ? `${baseName}, ${baseCity} ${baseState}`: 'Add Base *'}
+                      value={baseName !== false ? `${baseName}, ${baseCity} ${baseState}` : 'Add Base *'}
                     />
                   </td>
                   <td>
-                    <Button sx={{margin: '23px 0px 0px 0px'}}className='loginpage-button' size='large' variant='contained' onClick={handleOpen}>{buttonLabel}</Button>
+                    <Button sx={{ margin: '23px 0px 0px 0px' }} className='loginpage-button' size='large' variant='contained' onClick={handleOpen}>{buttonLabel}</Button>
                     <Modal
                       open={baseForm}
                       onClose={handleClose}
@@ -407,7 +422,7 @@ export default function Register() {
               </tbody>
             </table>
             <div className='register-button-row'>
-              <Button sx={{marginTop: '20px'}}className='loginpage-button' size='large' variant='contained' onClick={() => {
+              <Button sx={{ marginTop: '20px' }} className='loginpage-button' size='large' variant='contained' onClick={() => {
                 register();
               }}>Register</Button>
             </div>

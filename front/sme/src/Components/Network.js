@@ -209,7 +209,7 @@ const Network = () => {
             {view === "module" ? (
               results.map((e, i) => {
                 return (
-                  <Card key={`${i}`} sx={{ maxWidth: "15vw" }}>
+                  <Card key={`${e.userid}`} sx={{ maxWidth: "15vw" }}>
                     <CardActionArea
                       component={Link}
                       to={`/profile/${e.userid}`}

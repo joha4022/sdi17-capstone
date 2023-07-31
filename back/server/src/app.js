@@ -15,15 +15,41 @@ app.use(cors());
 app.use(fileUpload());
 
 
-app.post('/uploadPhoto', async (req, res) => {
-    const { data } = req.files.pic; //change pic to something else
-    if (data) {
-        await knex.insert({ photo: data }).into('users')
-        res.sendStatus(200);
-    } else {
-        res.sendStatus(400);
-    }
-})
+// For handling the upload request
+app.post("/upload", function (req, res) {
+
+    // When a file has been uploaded
+    if (req.files && Object.keys(req.files).length !== 0) {
+
+        // Uploaded path
+        const uploadedFile = req.files.uploadFile;
+
+        // Logging uploading file
+        console.log(uploadedFile);
+
+        // Upload path
+        const uploadPath = "/home/dad/projects/sdi17-capstone/back/server"
+            + "/photos/" + uploadedFile.name;
+
+        // To save the file using mv() function
+        uploadedFile.mv(uploadPath, function (err) {
+            if (err) {
+                console.log(err);
+                res.send("Failed !!");
+            } else res.send("Successfully Uploaded !!");
+        });
+    } else res.send("No file uploaded !!");
+});
+
+// app.post('/download', (req, res) => {
+//     console.log('OUR OUTPUT', req.file.photo)
+//     res.download("/home/dad/projects/sdi17-capstone/back/server/photos/Lady.jpg",
+//         (err) => {
+//             if (err) {
+//                 console.log(err);
+//             }
+//         });
+// });
 
 //front end needs to send the file path ex './photos/soldier/png'
 app.post('/getphoto', (req, res) => {
@@ -34,7 +60,6 @@ app.post('/getphoto', (req, res) => {
     res.download(path.resolve(`${photopath}`))
     //  res.attachment(path.resolve(`${photo}`))
     // res.send()
-
 })
 
 //--------------------------------------------------------------------------------------------------------
@@ -973,7 +998,7 @@ app.post('/login/', (req, res) => {
     //console.log('req.body: ',req.body)
     console.log('user password:', user, pw)
     knex('users')
-        .select('userid', 'firstname', 'lastname', 'admin', 'sme')
+        .select('userid', 'firstname', 'lastname', 'admin', 'sme','userverified')
         .where('username', user)
         .where('password', pw)
         .then((data) => {

@@ -46,7 +46,31 @@ body {
 td {
   padding: 0px 10px 10px 0px;
 }
-
+.special-td{
+  display: flex;
+  flex-direction: column;
+}
+.checkmarks{
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  top: 3.5rem;
+  margin-top: -55px;
+}
+.checkmarks-confirmpassword{
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  top: 1rem;
+  margin-top: -15px;
+}
+.checkmarks-username{
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  top: 1rem;
+  margin-top: -15px;
+}
 .register-title {
   display: flex;
   flex-direction: row;
