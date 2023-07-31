@@ -28,8 +28,8 @@ app.post("/upload", function (req, res) {
         console.log(uploadedFile);
 
         // Upload path
-        const uploadPath = "/home/dad/projects/sdi17-capstone/back/server"
-            + "/photos/" + uploadedFile.name;
+        const uploadPath = process.cwd() + "/photos/" + uploadedFile.name;
+        console.log(uploadPath);
 
         // To save the file using mv() function
         uploadedFile.mv(uploadPath, function (err) {
