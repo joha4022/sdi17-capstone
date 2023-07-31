@@ -68,7 +68,7 @@ export default function LoginPage() {
           alertDisplay(data.message)
         } else if(data.length === 1) {
           if(data[0].userverified === false && data[0].sme === true) {
-            return(alertDisplay('Your account is not verified. Please contact your approver for approval.'))
+            return (alertDisplay('Your account is not verified. Please contact your approver for approval.'))
           }
           sessionStorage.setItem('currentUser', JSON.stringify({userid: data[0].userid}));
           sessionStorage.setItem('loggedInUser', JSON.stringify(data[0]));
