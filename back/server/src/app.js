@@ -17,7 +17,6 @@ app.use(fileUpload());
 
 // For handling the upload request
 app.post("/upload", function (req, res) {
-
     // When a file has been uploaded
     if (req.files && Object.keys(req.files).length !== 0) {
 
@@ -876,9 +875,11 @@ app.get('/usermeetings/:userid', function (req, res) {
     knex('meetings')
         .join('usermeetings', 'meetings.meetingid', 'usermeetings.meeting_id')
         .join('users', 'users.userid', 'usermeetings.user_id')
-        .select('users.userid',
+        .select(
+            'users.userid',
             'users.firstname',
             'users.lastname',
+            'meetings.meetingid',
             'meetings.meetingTitle',
             'meetings.meetingDescription',
             'meetings.startTime',
@@ -936,32 +937,44 @@ app.post('/meetings', (req, res) => {
 
 app.delete('/deletemeeting', function (req, res) {
     const { meetingid } = req.body;
+    if (!meetingid) {
+        return res.status(400).json({message: 'Meeting ID is required.'});
+    }
 
     knex('usermeetings')
         .where('meeting_id', meetingid)
         .del()
-        .then((data) => console.log("removed from user meeting", data))
-
-    knex('meetings')
-        .where('meetingid', meetingid)
-        .del()
-        .then((rowCount) => {
-            if (rowCount === 0) {
-                return res.status(404).json({
-                    message: 'This meeting is not found',
-                });
-            }
-            res.status(201).json({
-                message: 'Meeting deleted successfully',
-            });
+        .then((data) => {
+            console.log("removed from user meeting", data);
+            knex('meetings')
+                .where('meetingid', meetingid)
+                .del()
+                .then((rowCount) => {
+                    if (rowCount === 0) {
+                        return res.status(404).json({
+                            message: 'This meeting is not found',
+                        });
+                    }
+                    res.status(201).json({
+                        message: 'Meeting deleted successfully',
+                    });
+                })
+                .catch((err) =>
+                    res.status(500).json({
+                        message: 'An error occurred while deleting meeting',
+                        error: err,
+                    })
+                );
         })
         .catch((err) =>
             res.status(500).json({
-                message: 'An error occurred while deleting meeting',
+                message: 'An error occurred while deleting from user meeting',
                 error: err,
             })
         );
 });
+
+
 
 //=============================================================================================//
 // "usermeetings" Table APIs
