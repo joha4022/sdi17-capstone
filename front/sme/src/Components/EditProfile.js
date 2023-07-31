@@ -6,11 +6,15 @@ import { ExpandMore, ExpandLess, Visibility, VisibilityOff } from '@mui/icons-ma
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faBriefcase, faNewspaper, faGear, faUserXmark } from '@fortawesome/free-solid-svg-icons';
 import { useEffect, useContext, useState } from 'react';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import { useNavigate } from 'react-router-dom';
 import { AppContext } from '../App';
 
 
 export default function EditProfile() {
+  const testString = `Must include at least 5 characters \nMust include at least one number \nMust include one uppercase letter`
+
   const { currentUser, setCurrentUser } = useContext(AppContext);
   const [showPassword, setShowPassword] = useState(false);
   const [deleteForm, setDeleteForm] = useState(false);
@@ -77,6 +81,9 @@ export default function EditProfile() {
         return alertDisplay('Your new password cannot be same as your current password!');
       }
     }
+    if(username === '') {
+      return alertDisplay('Your username cannot be blank!')
+    }
     row();
     const body = JSON.stringify({
       userid: userid,
@@ -129,8 +136,8 @@ export default function EditProfile() {
         },
         body: deleteBody
       }
-      fetch(`http://localhost:3001/deleteuser/${userid}`,deleteOption)
-      .then()
+      fetch(`http://localhost:3001/deleteuser/${userid}`, deleteOption)
+        .then()
       setBackdrop(true);
       setDeleteForm(false);
       alertDisplay2('Your account has been deleted and you will be redirected to the login page.');
@@ -524,7 +531,6 @@ export default function EditProfile() {
                               <td>
                                 <div className='dropdown-category'>Username</div>
                                 <TextField
-                                  helperText={usernameList.includes(username) || !username ? 'Username not available' : 'Available username'}
                                   error={usernameList.includes(username) || !username ? true : false}
                                   required
                                   defaultValue={username}
@@ -534,10 +540,14 @@ export default function EditProfile() {
                                   label="Username"
                                   variant="outlined"
                                   onKeyUp={(e) => { setUsername(e.target.value) }} />
+                                <div className='checkmarks-username'>
+                                  {!username || usernameList.includes(username) ? <WarningAmberIcon fontSize='small' sx={{ color: 'red' }} /> : <CheckCircleOutlineIcon fontSize='small' sx={{ color: 'green' }} />}
+                                </div>
+                                <FormHelperText sx={{ margin: '0px 0px 0px 25px' }}>{usernameList.includes(username) || !username ? 'Username not available' : 'Available username'}</FormHelperText>
                               </td>
                             </tr>
                             <tr className='register-row'>
-                              <td>
+                              <td className='special-td'>
                                 <div className='register-category'>Current Password</div>
                                 <FormControl sx={{ width: '26ch' }} size='small' variant="outlined">
                                   <InputLabel htmlFor="outlined-adornment-password">Current Password</InputLabel>
@@ -569,7 +579,7 @@ export default function EditProfile() {
                                 <FormControl sx={{ width: '26ch' }} size='small' variant="outlined">
                                   <InputLabel htmlFor="outlined-adornment-password2">New Password</InputLabel>
                                   <OutlinedInput
-                                    error={!(/\d/).test(newPassword) ? true : false}
+                                    error={(/\d/).test(newPassword) && (/[A-Z]/).test(newPassword) && newPassword.length > 4 ? false : true}
                                     onKeyUp={(e) => { setNewPassword(e.target.value) }}
                                     id="outlined-adornment-password2"
                                     type={showPassword ? 'text' : 'password'}
@@ -587,10 +597,15 @@ export default function EditProfile() {
                                     }
                                     label="New Password"
                                   />
-                                  <FormHelperText id="outlined-confirmpassword-helper-text">{(/\d/).test(newPassword) ? 'Password requirement met' : 'Please include at least one number'}</FormHelperText>
+                                  <div className='checkmarks'>
+                                    {newPassword.length > 4 ? <CheckCircleOutlineIcon fontSize='small' sx={{ color: 'green' }} /> : <WarningAmberIcon fontSize='small' sx={{ color: 'red' }} />}
+                                    {(/\d/).test(newPassword) ? <CheckCircleOutlineIcon fontSize='small' sx={{ color: 'green' }} /> : <WarningAmberIcon fontSize='small' sx={{ color: 'red' }} />}
+                                    {(/[A-Z]/).test(newPassword) ? <CheckCircleOutlineIcon fontSize='small' sx={{ color: 'green' }} /> : <WarningAmberIcon fontSize='small' sx={{ color: 'red' }} />}
+                                  </div>
+                                  <FormHelperText sx={{ width: '29ch', margin: '0px 0px 0px 25px' }} id="outlined-confirmpassword-helper-text">{testString}</FormHelperText>
                                 </FormControl>
                               </td>
-                              <td>
+                              <td className='special-td'>
                                 <div className='register-category'>Confirm New Password</div>
                                 <FormControl sx={{ width: '26ch' }} size='small' variant="outlined">
                                   <InputLabel htmlFor="outlined-adornment-password2">Confirm New Password</InputLabel>
@@ -613,7 +628,10 @@ export default function EditProfile() {
                                     }
                                     label="Confirm New Password"
                                   />
-                                  <FormHelperText id="outlined-confirmpassword-helper-text">{newPassword !== newPassword2 || newPassword2 === false ? 'Please cofirm your password' : 'Password match confirmed'}</FormHelperText>
+                                  <div className='checkmarks-confirmpassword'>
+                                    {newPassword === newPassword2 && newPassword2 !== false? <CheckCircleOutlineIcon fontSize='small' sx={{ color: 'green' }} /> : <WarningAmberIcon fontSize='small' sx={{ color: 'red' }} />}
+                                  </div>
+                                  <FormHelperText sx={{ width: '29ch', margin: '0px 0px 0px 25px' }} id="outlined-confirmpassword-helper-text">{newPassword !== newPassword2 || newPassword2 === false ? 'Please cofirm your password' : 'Password match confirmed'}</FormHelperText>
                                 </FormControl>
                               </td>
                             </tr>
