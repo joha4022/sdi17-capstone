@@ -15,17 +15,20 @@ app.use(cors());
 app.use(fileUpload());
 
 
-app.post('/uploadPhoto', (req, res) => {
-    const {name, data} = req.files.pic; //change pic to something else
-    //we need a table to inser this in
-    //insert in users.photo -> insert using a patch
-
+app.post('/uploadPhoto', async (req, res) => {
+    const { data } = req.files.pic; //change pic to something else
+    if (data) {
+        await knex.insert({ photo: data }).into('users')
+        res.sendStatus(200);
+    } else {
+        res.sendStatus(400);
+    }
 })
 
 //front end needs to send the file path ex './photos/soldier/png'
 app.post('/getphoto', (req, res) => {
-   const {photopath} = req.body;
-   console.log(photopath);
+    const { photopath } = req.body;
+    console.log(photopath);
     //const photo = './photos/soldier.png';
     //res.download(path.resolve('./photos/Lady.jpg'))
     res.download(path.resolve(`${photopath}`))
