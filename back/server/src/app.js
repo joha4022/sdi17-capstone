@@ -426,6 +426,7 @@ app.delete('/deletesme', function (req, res) {
                 });
             }
             res.status(200).json({
+                code: 200,
                 message: 'User category relationship deleted successfully',
             });
         })
@@ -610,7 +611,7 @@ app.patch('/updateuser', (req, res) => {
             approveremail: approveremail,
             phonenumber: phonenumber,
             password: password,
-            hashedpassword: get_hash(password), ////just added, can be deleted if giving issues
+            // hashedpassword: get_hash(password), ////just added, can be deleted if giving issues
             worklocation: worklocation,
             bio: bio,
             photo: photo,
