@@ -1,7 +1,7 @@
 import './EditProfile.css';
 import FooterBar from './FooterBar';
 import Navbar from './Navbar';
-import { Alert, AlertTitle, Backdrop, CircularProgress, Typography, Modal, Box, FormControl, InputLabel, OutlinedInput, InputAdornment, IconButton, FormHelperText, Button, MenuItem, TextField, Collapse, Avatar, List, ListItemText, ListItemButton } from '@mui/material';
+import { Autocomplete, Alert, AlertTitle, Backdrop, CircularProgress, Typography, Modal, Box, FormControl, InputLabel, OutlinedInput, InputAdornment, IconButton, FormHelperText, Button, MenuItem, TextField, Collapse, Avatar, List, ListItemText, ListItemButton } from '@mui/material';
 import { ExpandMore, ExpandLess, Visibility, VisibilityOff } from '@mui/icons-material';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faBriefcase, faNewspaper, faGear, faUserXmark } from '@fortawesome/free-solid-svg-icons';
@@ -41,6 +41,8 @@ export default function EditProfile() {
   const [bio, setBio] = useState(false);
   const [photo, setPhoto] = useState(false);
   const [changePhoto, setChangePhoto] = useState(false);
+  const [categories, setCategories] = useState(false);
+  const [smeCategory, setSmeCategory] = useState(false);
   // baseForm
   const [baseForm, setBaseForm] = useState(false);
   const [currentBases, setCurrentBases] = useState(false);
@@ -156,6 +158,14 @@ export default function EditProfile() {
   useEffect(() => {
     if (sessionStorage.getItem('currentUser') !== null) {
       const userid = JSON.parse(sessionStorage.getItem('currentUser')).userid;
+      // fetch sme categories
+      fetch('http://localhost:3001/categories')
+      .then(res => res.json())
+      .then(data => {
+        const cat = [];
+        data.map(category => cat.push(category.categoryname));
+        setCategories(cat);
+      })
       // fetch the existing user
       fetch('http://localhost:3001/')
         .then(res => res.json())
@@ -359,18 +369,18 @@ export default function EditProfile() {
             <div className='editprofile-main-menus'>
               <div className='main-menu-title'>Edit Profile</div>
               <div className='editprofile-main-photo'>
-                <Avatar sx={{ width: 200, height: 200 }} className='editprofile-avatar' alt="Remy Sharp" 
-                src={changePhoto ? changePhoto : photo} 
-                onClick={()=>{document.querySelector('#image-upload').click()}}
+                <Avatar sx={{ width: 200, height: 200 }} className='editprofile-avatar' alt="Remy Sharp"
+                  src={changePhoto ? changePhoto : photo}
+                  onClick={() => { document.querySelector('#image-upload').click() }}
                 />
-                  {/* File to be uploaded:  */}
-                  <input type="file"
-                    name="uploadFile"
-                    id='image-upload'
-                    onChange={(e) => {
-                      setPhoto(e.target.files[0]);
-                      setChangePhoto(URL.createObjectURL(e.target.files[0]));
-                    }} />
+                {/* File to be uploaded:  */}
+                <input type="file"
+                  name="uploadFile"
+                  id='image-upload'
+                  onChange={(e) => {
+                    setPhoto(e.target.files[0]);
+                    setChangePhoto(URL.createObjectURL(e.target.files[0]));
+                  }} />
                 <div className='editprofile-username-display'>{username}
                   <div className='editprofile-email-display'>{email}</div>
                   <div className='editprofile-user-type'>{currentUser.admin ? 'Admin' : ''} {currentUser.sme ? 'SME' : ''}</div>
@@ -379,7 +389,7 @@ export default function EditProfile() {
                       marginTop: '2.5rem',
                       display: `${changePhoto ? 'block' : 'none'}`,
                     }}
-                    onClick={()=>{changeProfilePic()}}
+                    onClick={() => { changeProfilePic() }}
                     variant='contained'
                     type='submit'>Save</Button>
                 </div>
@@ -567,6 +577,24 @@ export default function EditProfile() {
                                 <TextField error={!appEmail || !appEmail.includes('@') ? true : false} required defaultValue={appEmail} sx={{ width: '28ch' }} size='small' id="outlined-basic-appEmail" label="Approver Email" variant="outlined" onKeyUp={(e) => { setAppEmail(e.target.value) }} />
                               </td>
                             </tr>
+                            {/* {currentUser.sme ?
+                              <tr>
+                                <td>
+                                  <div className='dropdown-category'>SME Category</div>
+                                  <Autocomplete sx={{ width: '28ch' }}
+                                    id="outlined-select-smeCategory"
+                                    label="SmeCateogry"
+                                    variant="outlined"
+                                    defaultValue={}
+                                    freeSolo
+                                    options={categories}
+                                    renderInput={(params) => <TextField {...params} label='SME Category' />}
+                                    onKeyUp={(e) => { setSmeCategory(e.target.value) }}
+                                    onClose={(e) => { setSmeCategory(e.target.textContent) }}
+                                    onKeyDown={(e) => { if (e.key === 'Enter') { setSmeCategory(e.target.dataset.value) } }}>
+                                  </Autocomplete>
+                                </td>
+                              </tr> : <></>} */}
                             <Button className='loginpage-button' size='medium' variant='contained' onClick={() => { save(handleRow3) }}>Save</Button>
                           </tbody>
                         </table>
