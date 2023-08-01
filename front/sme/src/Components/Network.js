@@ -111,7 +111,7 @@ const Network = () => {
   let results = SMEs.map((e,i) => ({...e, image: photoList[i]}))
 
   results = results.filter(
-    (e) => e.userid != currentUser.userid && e.userverified
+    (e) => e.userid !== currentUser.userid && e.userverified === 'verified'
   );
   if (searchTerm.length > 0) {
     results = results.filter(word => {
