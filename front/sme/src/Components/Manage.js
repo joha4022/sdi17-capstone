@@ -20,6 +20,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Navbar from "./Navbar";
 import "./Manage.css";
 import { AppContext } from "../App";
+import FooterBar from "./FooterBar";
 
 const Manage = () => {
   const [SMEs, setSMEs] = useState([]);
@@ -27,8 +28,10 @@ const Manage = () => {
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState("1");
   const [toast, setToast] = useState(false);
+  const [toast2, setToast2] = useState(false)
   const [message, setMessage] = useState("");
   const [dummy, setDummy] = useState(false)
+  const [photoList, setPhotoList] = useState([]);
   const { currentUser, setCurrentUser } = useContext(AppContext);
 
   const navigate = useNavigate();
@@ -39,16 +42,45 @@ const Manage = () => {
       .then((data) => setSMEs(data));
   }, [open, dummy]);
 
+  useEffect(() => {
+    const fetchImages = async () => {
+      const promises = SMEs.map((e) => fetchImage(e));
+      const images = await Promise.all(promises);
+      setPhotoList(images);
+    };
+    fetchImages();
+  }, [SMEs]); // Fetch images whenever SMEs changes
+
+  const fetchImage = async (e) => {
+    const body = JSON.stringify({
+      photopath: e.photo,
+    });
+    const option = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: body,
+    };
+    const res = await fetch(`http://localhost:3001/getphoto`, option);
+    const imageBlob = await res.blob();
+    const imageObjectURL = URL.createObjectURL(imageBlob);
+    // console.log(e.userid, imageObjectURL);
+    return imageObjectURL;
+  };
+
   let results = [];
   if (tab === "2") {
     if (searchTerm.length > 0) {
-      results = SMEs.filter((word) => {
+      results = SMEs.map((e,i) => ({...e, image: photoList[i]}))
+      results = results.filter((word) => {
         let name = [word.firstname, word.lastname].join(" ");
         return name.toUpperCase().includes(searchTerm.toUpperCase());
       });
     }
   } else if (tab === "1") {
-    results = SMEs.filter((element) => {
+    results = SMEs.map((e,i) => ({...e, image: photoList[i]}))
+    results = results.filter((element) => {
       return !element.userverified;
     });
   }
@@ -60,6 +92,7 @@ const Manage = () => {
   const handleClose = () => {
     setOpen(false);
     setToast(false);
+    setToast2(false);
   };
 
   const handleAccept = (e) => {
@@ -70,6 +103,7 @@ const Manage = () => {
     .then((res) => res.json())
     .then((data) => {
       setDummy(!dummy);
+      setToast2(true);
     })
       .catch((error) => console.error("Error:", error));
   }
@@ -126,10 +160,10 @@ const Manage = () => {
                     return (
                       <Card key={`${i}`} sx={{ maxWidth: "15vw" }}>
                         <CardMedia
-                          component="img"
-                          src={"/default.png"}
-                          alt="User Profile Picture"
-                        />
+                        component="img"
+                        src={e.image || "/default.png"} // Use a placeholder image while loading
+                        alt="User Profile Picture"
+                      />
                         {/* {console.log(`../../../../${e.photo}`)} */}
                         <CardContent>
                           <Typography variant="h5">
@@ -159,6 +193,14 @@ const Manage = () => {
                           >
                             Decline
                           </Button>
+                          <div>
+                          <Snackbar
+                              open={toast2}
+                              autoHideDuration={6000}
+                              onClose={handleClose}
+                              message={`User is now verified`}
+                            />
+                          </div>
                         </CardActions>
                       </Card>
                     );
@@ -205,10 +247,10 @@ const Manage = () => {
                     return (
                       <Card key={`${i}`} sx={{ maxWidth: "15vw" }}>
                         <CardMedia
-                          component="img"
-                          src={"/default.png"}
-                          alt="User Profile Picture"
-                        />
+                        component="img"
+                        src={e.image || "/default.png"} // Use a placeholder image while loading
+                        alt="User Profile Picture"
+                      />
                         {/* {console.log(`../../../../${e.photo}`)} */}
                         <CardContent>
                           <Typography variant="h5">
@@ -222,15 +264,6 @@ const Manage = () => {
                           </Typography>
                         </CardContent>
                         <CardActions>
-                          <Button
-                            className="manageBut"
-                            size="large"
-                            variant="contained"
-                            component={Link}
-                            to={`/profile/${e.userid}`}
-                          >
-                            Manage
-                          </Button>
                           <Button
                             className="manageBut"
                             size="large"
@@ -278,6 +311,7 @@ const Manage = () => {
       ) : (
         navigate("/denied")
       )}{" "}
+      <FooterBar />
     </>
   );
 };

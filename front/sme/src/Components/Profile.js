@@ -1,6 +1,6 @@
 import React,{ useState, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
-import { Typography, Button, Avatar, Paper, Grid, Box as MuiBox } from "@mui/material";
+import { Typography, Button, Avatar, Paper, Grid, Badge, Box as MuiBox } from "@mui/material";
 import { ProfileDetails, ProfileDetail, Background, Bio, Notes, Meetings, AvatarAndDetails } from "../Styled";
 import Navbar from "./Navbar";
 import { DateCalendar } from "@mui/x-date-pickers";
@@ -10,7 +10,9 @@ import Loader from "./Loader";
 import MeetingFormModal from "./MeetingFormModal";
 import dayjs from "dayjs";
 import TextareaAutosize from '@mui/base/TextareaAutosize';
+import FooterBar from "./FooterBar";
 import { AppContext } from '../App.js';
+import { set } from "lodash";
 
 
 function Profile({ userId }) {
@@ -22,13 +24,20 @@ function Profile({ userId }) {
   const [isMeetingModalOpen, setIsMeetingModalOpen] = useState(false);
   const [meetings, setMeetings] = useState([]);
   const [selectedDate, setSelectedDate] = useState(dayjs());
-  // const [highlightedDays, setHighlightedDays] = useState([]);
-  // const [isLoading, setIsLoading] = useState(false);
   const [bio, setBio] = useState('');
-  // const requestAbortController = useRef(null);
+  const [smeCategories, setSMECategories] = useState(['']);
+  const [badgePosition, setBadgePosition] = useState({
+    vertical: 'bottom',
+    horizontal: 'right',
+  });
   const { id } = useParams();
-  // const id = JSON.parse (sessionStorage.getItem('currentUser')).userid;
   const { currentUser } = useContext(AppContext);
+  const [photo, setPhoto] = useState();
+  // const [highlightedDays, setHighlightedDays] = useState([]);
+  // const [isLoading, setIsLoading] = useState(false); 
+  // const requestAbortController = useRef(null); 
+  // const id = JSON.parse (sessionStorage.getItem('currentUser')).userid;
+
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -36,14 +45,32 @@ function Profile({ userId }) {
         const res = await fetch(`http://localhost:3001/profile/${id}`);
         if (!res.ok) {
           throw new Error(`HTTP error! status: ${res.status}`);
-        }else {
+        } else {
         const data = await res.json();
         setUsers(data[0]);
         setBio(data[0].bio);
+
+        if (data[0] && data[0].userverified) {
+          const resSME = await fetch(`http://localhost:3001/smes/${id}`);
+          if (!resSME.ok){
+          throw new Error(`HTTP error! status: ${resSME.status}`);
+        } else {
+          const smeData = await resSME.json();
+          console.log('SME Data: ', smeData);
+          setSMECategories(smeData.map(sme => sme.categories).flat());
         }
-      } catch (error) {
-        console.error("Failed to fetch Profile Data: ", error);
       }
+        fetch('http://localhost:3001/getphoto', {
+            method: 'POST',
+            headers: { 'Content-type': 'application/json' },
+            body: JSON.stringify({ photopath: users.photo })
+          })
+            .then(res => res.blob())
+            .then(data => setPhoto(URL.createObjectURL(data)))
+    }
+  } catch (error) {
+    console.error("Failed to fetch Profile Data: ", error);
+    }
     };
     fetchProfile();
   }, [id, meetings]);
@@ -61,6 +88,12 @@ function Profile({ userId }) {
       setNotes(currentNotes);
     }
   }, [currentUser]);
+
+  useEffect(() => {
+    if (currentUser) {
+      localStorage.setItem(`notes-${currentUser.userid}`, JSON.stringify(notes));
+    }
+  }, [currentUser, notes]);
 
   function updateUserBio(userid, newBio) {
     fetch(`http://localhost:3001/updateuser`, {
@@ -86,7 +119,7 @@ function Profile({ userId }) {
   const handleDeleteMeeting = (meetingId) => {
     console.log(`Deleting meeting with ID: ${meetingId}`);
 
-    const confirmDelete = window.confirm('Are you sure you want to delete this meeting?');
+  const confirmDelete = window.confirm('Are you sure you want to delete this meeting?');
     if (confirmDelete) {
       fetch('http://localhost:3001/deletemeeting', {
         method: 'DELETE',
@@ -170,29 +203,41 @@ function Profile({ userId }) {
                 padding: 6,
                 display: "flex",
                 justifyContent: "center",
-              }}
-            >
-              <Avatar
-                src={
-                  users && users.photo
-                    ? users.photo
-                    : "/images/Blank_Avatar.jpg"
-                }
+              }}>
+                <Badge
+                overlap='circular'
+                anchorOrigin={badgePosition}
+                badgeContent={users.userverified ? 
+                  <MuiBox sx={{ textAlign: 'center' }}>
+                  <img src="/images/Verified.png" alt="SME ICON" style={{width: '50%'}}/>
+                </MuiBox>
+                : null }>
+              <Avatar 
+                src={photo || "/default.png"} // Use a placeholder image while loading
+                alt="User Profile Picture"
                 sx={{ width: 200, height: 200 }}
               />
+              </Badge>
             </Paper>
             <Paper elevation={2} sx={{ margin: 4, padding: 5 }}>
               <MuiBox>
-                {users.smeStatus === "approved" && (
+                {/* {users.userverified && (
                   <Typography variant="h6">SME</Typography>
-                )}
+                )} */}
                 <ProfileDetails>
                   <Typography variant="h5">Name:</Typography>
-
                   <ProfileDetail>
                     {users && `${users.firstname} ${users.lastname}`}
                   </ProfileDetail>
                 </ProfileDetails>
+                {users.userverified ? (
+                <ProfileDetails>                 
+                  <Typography variant="h5">SME Categories:</Typography>
+                  <ProfileDetail>
+                    {smeCategories ? smeCategories.join(', ') : 'No Categories'}
+                  </ProfileDetail>
+                </ProfileDetails>
+                  ) : ( null )}
                 <ProfileDetails>
                   <Typography variant="h5">Location:</Typography>
                   <ProfileDetail> {users && users.basename}</ProfileDetail>
@@ -358,7 +403,7 @@ function Profile({ userId }) {
               <ul>
                 {notes.map(
                   (note, index) =>
-                    note.userid === currentUser.userid && (
+                    note.userid === currentUser.userid && Number(id) === currentUser.userid && (
                       <li key={index}>
                         {editingNoteIndex === index ? (
                           <form onSubmit={handleUpdateNote}>
@@ -412,7 +457,9 @@ function Profile({ userId }) {
           </Paper>
         </Grid>
       </Grid>
+      <FooterBar />
     </Background>
+    
   );
 }
 

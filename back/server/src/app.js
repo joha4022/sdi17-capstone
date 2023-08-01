@@ -8,30 +8,45 @@ const cors = require('cors');
 const path = require('path');
 const PORT = process.env.PORT || 3001;
 const knex = require('knex')(require('../knexfile.js')[process.env.NODE_ENV || 'development']);
+const Crypto = require('crypto')
 
 
 app.use(express.json());
 app.use(cors());
 app.use(fileUpload());
 
+const salt = '100'
+hashed_password = Crypto.pbkdf2Sync('password1', salt, 10000, 64, 'sha1').toString('base64')
+password = 'password2'
+
+const get_hash = (password) => {
+    hashed_password = Crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha1').toString('base64')
+    console.log('HASHED PW FROM LINE 24:', hashed_password)
+    return hashed_password
+}
+
+const verify_pw = (password) => {
+    if (hashed_password === get_hash(password)) {
+        console.log("Hashes Equal")
+        return true
+    } else { return false }
+}
+console.log('password verified: ', verify_pw(password))
+
 
 // For handling the upload request
 app.post("/upload", function (req, res) {
     // When a file has been uploaded
     if (req.files && Object.keys(req.files).length !== 0) {
-
         // Uploaded path
         const uploadedFile = req.files.uploadFile;
-
         // Logging uploading file
         console.log(uploadedFile);
-
         // Upload path
-
         const uploadPath = process.cwd() + "/photos/" + uploadedFile.name;
         console.log(uploadPath);
-
         // To save the file using mv() function
+
         uploadedFile.mv(uploadPath, function (err) {
             if (err) {
                 console.log(err);
@@ -54,7 +69,7 @@ app.post("/upload", function (req, res) {
 //front end needs to send the file path ex './photos/soldier/png'
 app.post('/getphoto', (req, res) => {
     const { photopath } = req.body;
-    console.log(photopath);
+    // console.log(photopath);
     //const photo = './photos/soldier.png';
     //res.download(path.resolve('./photos/Lady.jpg'))
     res.download(path.resolve(`${photopath}`))
@@ -153,7 +168,7 @@ app.post('/createcategory', (req, res) => {
                             .insert({
                                 categoryname
                             })
-                            .then(() => res.status(201).json({ baseCreated: true, categoryid: categories.length +1, message: 'Sme category created successfully' }))
+                            .then(() => res.status(201).json({ baseCreated: true, categoryid: categories.length + 1, message: 'Sme category created successfully' }))
                     }
                 })
                 .catch((err) =>
@@ -254,7 +269,8 @@ app.get("/smes", (req, res) => {
             "users.phonenumber",
             "users.photo",
             "users.branch",
-            "base.basename AS base",
+            "base.baseid AS base",
+            "users.userverified",
             knex.raw("ARRAY_AGG(category.categoryname) AS categories")
         )
         .groupBy(
@@ -265,7 +281,8 @@ app.get("/smes", (req, res) => {
             "users.phonenumber",
             "users.photo",
             "users.branch",
-            "base.basename",
+            "base.baseid",
+            "users.userverified"
         )
         .orderBy(
             'users.userid'
@@ -304,7 +321,8 @@ app.get("/smes/:id", (req, res) => {
             "users.phonenumber",
             "users.photo",
             "users.branch",
-            "base.basename AS base",
+            "base.baseid AS base",
+            "users.userverified",
             knex.raw("ARRAY_AGG(category.categoryname) AS categories")
         )
         .where("network.user_id", userid)
@@ -316,7 +334,8 @@ app.get("/smes/:id", (req, res) => {
             "users.phonenumber",
             "users.photo",
             "users.branch",
-            "base.basename",
+            "base.baseid",
+            "users.userverified"
         )
         .orderBy(
             'users.userid'
@@ -444,9 +463,9 @@ app.get('/getusers', function (req, res) {
 
 app.get('/profile/:userid', function (req, res) {
     const userid = req.params.userid;
-    console.log('userid: ', userid)
+    // console.log('userid: ', userid)
     knex('users')
-        .join('base', 'users.base_id', 'base.baseid') //added from jacobs comment
+        .join('base', 'users.base_id', 'base.baseid')
         .select(
             'users.userid',
             'users.firstname',
@@ -476,6 +495,7 @@ app.get('/profile/:userid', function (req, res) {
 });
 
 app.post('/createuser', (req, res) => {
+    //hashedpw = get_hash(pw)
     const {
         userid,
         firstname,
@@ -510,6 +530,7 @@ app.post('/createuser', (req, res) => {
                         lastname,
                         username,
                         password,
+                        hashedpassword: get_hash(password), //just added, can be deleted if giving issues
                         email,
                         supervisoremail,
                         approveremail,
@@ -566,6 +587,7 @@ app.patch('/updateuser', (req, res) => {
             approveremail: approveremail,
             phonenumber: phonenumber,
             password: password,
+            hashedpassword: get_hash(password), ////just added, can be deleted if giving issues
             worklocation: worklocation,
             bio: bio,
             photo: photo,
@@ -634,7 +656,6 @@ app.delete('/deleteuser/:userid', function (req, res) {
                                 .where('user_id', userid)
                                 .del()
                                 .then(() => console.log('5'))
-                                //.then(()=> {return res.json({message: 'first user deleted!'})})
                                 .then(() => {
                                     knex('users')
                                         .where('userid', userid)
@@ -668,7 +689,9 @@ app.get('/base', function (req, res) {
 app.post('/createbase', (req, res) => {
     const { basename,
         basecity,
-        basestate
+        basestate,
+        baselat,
+        baselon
     } = req.body;
     console.log(basename, basecity, basestate);
     knex('base')
@@ -683,7 +706,9 @@ app.post('/createbase', (req, res) => {
                     .insert({
                         basename,
                         basecity,
-                        basestate
+                        basestate,
+                        baselat,
+                        baselon
                     })
                     .then(() => res.status(201).json({ baseCreated: true, message: 'Base created successfully' }))
             }
@@ -702,7 +727,9 @@ app.patch('/updatebase', (req, res) => {
             baseid,
             basename,
             basecity,
-            basestate
+            basestate,
+            baselat,
+            baselon
         } = req.body
 
     knex('base')
@@ -710,8 +737,10 @@ app.patch('/updatebase', (req, res) => {
         .update({
             basename: basename,
             basecity: basecity,
-            basestate: basestate
-        }, ['basename', 'basecity', 'basestate'])
+            basestate: basestate,
+            baselat: baselat,
+            baselon: baselon
+        }, ['basename', 'basecity', 'basestate', 'baselat', 'baselon'])
         .then((data) => res.status(201).json(data))
         .catch((err) => res.status(500).json({
             message: 'Error updating base information',
@@ -931,7 +960,7 @@ app.post('/meetings', (req, res) => {
 app.delete('/deletemeeting', function (req, res) {
     const { meetingid } = req.body;
     if (!meetingid) {
-        return res.status(400).json({message: 'Meeting ID is required.'});
+        return res.status(400).json({ message: 'Meeting ID is required.' });
     }
 
     knex('usermeetings')
@@ -967,8 +996,6 @@ app.delete('/deletemeeting', function (req, res) {
         );
 });
 
-
-
 //=============================================================================================//
 // "usermeetings" Table APIs
 //this post would post meetingid and userid
@@ -998,7 +1025,6 @@ app.post('/attendmeeting', (req, res) => {
                 error: err,
             })
         );
-
 });
 
 app.delete('/deleteuserfrommeeting', function (req, res) {
@@ -1029,16 +1055,17 @@ app.delete('/deleteuserfrommeeting', function (req, res) {
 });
 
 //===================================================================================================
-// Login 
+// Login
 // Check user name and password against database
 app.post('/login/', (req, res) => {
     const { user, pw } = req.body;
-    //console.log('req.body: ',req.body)
-    console.log('user password:', user, pw)
+    hashedpw = get_hash(pw) //user input
+
     knex('users')
         .select('userid', 'firstname', 'lastname', 'admin', 'sme', 'userverified')
         .where('username', user)
-        .where('password', pw)
+        //changed from 'password' to 'hashedpassword'
+        .where('hashedpassword', get_hash(pw))
         .then((data) => {
             if (data.length === 0) {
                 return res.status(404).json({
@@ -1059,9 +1086,7 @@ app.post('/login/', (req, res) => {
 
 
 ////----------------------------------------------------------//
-// All CRUD for categories
 
 app.listen(PORT, () => {
     console.log(`The server is running on ${PORT} `);
 });
-

@@ -30,6 +30,7 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import "./Map.css";
 import { AppContext } from "../App";
+import FooterBar from "./FooterBar";
 
 const Network = () => {
   const [SMEs, setSMEs] = useState([]);
@@ -40,6 +41,8 @@ const Network = () => {
   const [onNetwork, setOnNetwork] = useState(false);
   const [view, setView] = useState("module");
   const { currentUser, setCurrentUser } = useContext(AppContext);
+  const [location, setLocation] = useState([{ lat: 0, lon: 0 }]);
+  const [photoList, setPhotoList] = useState([]);
 
   const navigate = useNavigate();
 
@@ -50,15 +53,13 @@ const Network = () => {
   });
 
   useEffect(() => {
-    (!onNetwork) ? (
-    fetch("http://localhost:3001/smes")
-      .then((res) => res.json())
-      .then((data) => setSMEs(data))
-    ) : (
-      fetch(`http://localhost:3001/smes/${currentUser.userid}`)
-      .then((res) => res.json())
-      .then((data) => setSMEs(data))
-    )
+    !onNetwork
+      ? fetch("http://localhost:3001/smes")
+          .then((res) => res.json())
+          .then((data) => setSMEs(data))
+      : fetch(`http://localhost:3001/smes/${currentUser.userid}`)
+          .then((res) => res.json())
+          .then((data) => setSMEs(data));
   }, [onNetwork]);
 
   useEffect(() => {
@@ -67,17 +68,53 @@ const Network = () => {
       .then((data) => setCategoryList(data));
   }, []);
 
+  useEffect(() => {
+    fetch("http://localhost:3001/base")
+      .then((res) => res.json())
+      .then((data) => setLocation(data));
+  }, []);
+
+  useEffect(() => {
+    const fetchImages = async () => {
+      const promises = SMEs.map((e) => fetchImage(e));
+      const images = await Promise.all(promises);
+      setPhotoList(images);
+    };
+    fetchImages();
+  }, [SMEs]); // Fetch images whenever SMEs changes
+
+  const fetchImage = async (e) => {
+    const body = JSON.stringify({
+      photopath: e.photo,
+    });
+    const option = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: body,
+    };
+    const res = await fetch(`http://localhost:3001/getphoto`, option);
+    const imageBlob = await res.blob();
+    const imageObjectURL = URL.createObjectURL(imageBlob);
+    // console.log(e.userid, imageObjectURL);
+    return imageObjectURL;
+  };
+
   const clearHandle = () => {
     setSearchTerm("");
     setCategory("");
     setBranch("");
   };
 
-  let results = SMEs;
-  
-  results = SMEs.filter((e) => e.userid != currentUser.userid)
+ 
+  let results = SMEs.map((e,i) => ({...e, image: photoList[i]}))
+
+  results = results.filter(
+    (e) => e.userid != currentUser.userid && e.userverified
+  );
   if (searchTerm.length > 0) {
-    results = results.filter((word) => {
+    results = results.filter(word => {
       let name = [word.firstname, word.lastname].join(" ");
       return name.toUpperCase().includes(searchTerm.toUpperCase());
     });
@@ -214,9 +251,9 @@ const Network = () => {
                       component={Link}
                       to={`/profile/${e.userid}`}
                     >
-                      <CardMedia
+                       <CardMedia
                         component="img"
-                        src={"/default.png"}
+                        src={e.image || "/default.png"} // Use a placeholder image while loading
                         alt="User Profile Picture"
                       />
                       {/* {console.log(`../../../../${e.photo}`)} */}
@@ -254,10 +291,9 @@ const Network = () => {
                   {results.map((e, i) => {
                     return (
                       <Marker
-                        //! Need to find
                         position={[
-                          mapPositions[0] + Math.random() * 10,
-                          mapPositions[1] + i,
+                          location[e.base - 1].baselat,
+                          location[e.base - 1].baselon,
                         ]}
                         icon={myIcon}
                         riseOnHover={true}
@@ -309,8 +345,9 @@ const Network = () => {
           </section>
         </>
       ) : (
-        navigate('/denied')
+        navigate("/denied")
       )}
+      <FooterBar />
     </>
   );
 };
