@@ -17,11 +17,11 @@ app.use(fileUpload());
 
 const salt = '100'
 hashed_password = Crypto.pbkdf2Sync('password1', salt, 10000, 64, 'sha1').toString('base64')
-password = 'password1'
+password = 'password2'
 
 const get_hash = (password) => {
     hashed_password = Crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha1').toString('base64')
-    console.log(hashed_password)
+    console.log('HASHED PW FROM LINE 24:', hashed_password)
     return hashed_password
 }
 
@@ -1055,9 +1055,6 @@ app.delete('/deleteuserfrommeeting', function (req, res) {
 app.post('/login/', (req, res) => {
     const { user, pw } = req.body;
     hashedpw = get_hash(pw) //user input
-    //we want to compare hashed pw that are stored
-    //vs what is entered by the user
-    console.log('user password:', user, pw)
 
     knex('users')
         .select('userid', 'firstname', 'lastname', 'admin', 'sme', 'userverified')
