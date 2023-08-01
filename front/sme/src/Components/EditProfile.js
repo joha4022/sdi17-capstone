@@ -165,6 +165,17 @@ export default function EditProfile() {
           data.map(category => cat.push(category.categoryname));
           setCategories(cat);
         })
+      if (JSON.parse(sessionStorage.getItem('loggedInUser')).sme === true) {
+        fetch(`http://localhost:3001/smes`)
+          .then(res => res.json())
+          .then(data => {
+            data.map(sme => {
+              if (sme.userid === userid) {
+                setCurrentSmeCategories(sme.categories)
+              }
+            })
+          })
+      }
       // fetch the existing user
       fetch('http://localhost:3001/')
         .then(res => res.json())
@@ -218,20 +229,9 @@ export default function EditProfile() {
               // setBaseCity(data[user.base_id - 1].basecity);
               // setBaseState(data[user.base_id - 1].basestate);
             })
-          if (JSON.parse(sessionStorage.getItem('loggedInUser')).sme === true) {
-            fetch(`http://localhost:3001/smes`)
-              .then(res => res.json())
-              .then(data => {
-                data.map(sme => {
-                  if (sme.userid === userid) {
-                    setCurrentSmeCategories(sme.categories)
-                  }
-                })
-              })
-          }
         })
     }
-  }, [])
+  }, [snackbar])
 
   const handleOpen = () => setBaseForm(true);
   const handleClose = () => setBaseForm(false);
@@ -297,6 +297,13 @@ export default function EditProfile() {
     }
   }
 
+  const snackbarDisplay = () => {
+    setSnackBar(true);
+    setTimeout(() => {
+      setSnackBar(false);
+    }, 2000)
+  }
+
   const alertDisplay = (message) => {
     setMessage(message);
     setAlert(true);
@@ -359,10 +366,73 @@ export default function EditProfile() {
       })
   }
 
-  const deleteSme = () => {
-
+  const deleteSme = (selectedCategory) => {
+    // fetch('http://localhost:3001/categories')
+    // .then(res=>res.json())
+    // .then(smeCat=>{
+    //   smeCat.map(cat=>{
+    //     if(cat.categoryname === selectedCategory){
+    //       fetch('http://localhost:3001/deletesme',{
+    //         method: 'DELETE',
+    //         headers: {'Content-Type': 'application/json'},
+    //         body: JSON.stringify({
+    //           user_id: userid,
+    //           category_id: cat.categoryid
+    //         })
+    //       })
+    //       .then(res=>res.json())
+    //       .then(data=>{
+    //         if(data.code === 200) {
+    //           setSnackBar(true);
+    //         }
+    //       })
+    //     } 
+    //   })
+    // })
   }
 
+  const addCategory = () => {
+    console.log(categories, smeCategory)
+    if (categories.includes(smeCategory)) {
+      fetch('http://localhost:3001/smes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: userid,
+          category_id: categories.indexOf(smeCategory)+1
+        })
+      })
+      snackbarDisplay();
+    } else {
+      console.log('category does not exist')
+      // adds a new category to the sme category table
+      fetch('http://localhost:3001/createcategory', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          categoryname: smeCategory
+        })
+      })
+        .then(res => res.json())
+        .then(data => {
+          // even though the sme is pending the sme is still added to the sme table
+          fetch('http://localhost:3001/smes', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              user_id: userid,
+              category_id: data.categoryid
+            })
+          })
+          snackbarDisplay();
+        })
+    }
+  }
+//------------------------------------------------CONSOLE LOGS------------------------------------------------//
+console.log(smeCategory);
+//------------------------------------------------RENDER------------------------------------------------//
   if (currentUser && currentBases) {
     return (
       <>
@@ -449,7 +519,7 @@ export default function EditProfile() {
                   </ListItemButton>
                   <Collapse in={row1} timeout="auto" unmountOnExit>
                     <List component="div" disablePadding>
-                      <ListItemButton sx={{ pl: 4 }}>
+                      <ListItemButton sx={{ pl: 4, ":hover": {background: 'none', cursor: 'default'}}} >
                         <table>
                           <tbody>
                             <tr className='register-row'>
@@ -499,7 +569,7 @@ export default function EditProfile() {
                   </ListItemButton>
                   <Collapse in={row2} timeout="auto" unmountOnExit>
                     <List component="div" disablePadding>
-                      <ListItemButton sx={{ pl: 4 }}>
+                      <ListItemButton sx={{ pl: 4 , ":hover": {background: 'none', cursor: 'default'}}}>
                         <table>
                           <tbody>
                             <tr>
@@ -534,7 +604,7 @@ export default function EditProfile() {
                   </ListItemButton>
                   <Collapse in={row3} timeout="auto" unmountOnExit>
                     <List component="div" disablePadding>
-                      <ListItemButton sx={{ pl: 4 }}>
+                      <ListItemButton sx={{ pl: 4, ":hover": {background: 'none', cursor: 'default'} }} >
                         <table>
                           <tbody>
                             <tr>
@@ -631,7 +701,7 @@ export default function EditProfile() {
                                         <TextField size='small' disabled defaultValue={cat} />
                                       </td>
                                       <td>
-                                        <Button id={i} color='error' className='loginpage-button' size='small' variant='contained'>Delete</Button>
+                                        <Button id={cat} color='error' className='loginpage-button' size='small' variant='contained' onClick={(e)=>{deleteSme(e.target.id)}}>Delete</Button>
                                       </td>
                                     </tr>)
                                 })}
@@ -647,12 +717,12 @@ export default function EditProfile() {
                                       options={categories}
                                       renderInput={(params) => <TextField {...params} label='SME Category' />}
                                       onKeyUp={(e) => { setSmeCategory(e.target.value) }}
-                                      onClose={(e) => { setSmeCategory(e.target.textContent) }}
+                                      onClose={() => { setSmeCategory(document.querySelector('#outlined-select-smeCategory').value) }}
                                       onKeyDown={(e) => { if (e.key === 'Enter') { setSmeCategory(e.target.dataset.value) } }}>
                                     </Autocomplete>
                                   </td>
                                   <td>
-                                    <Button sx={{ marginBottom: '10px' }} className='loginpage-button' size='small' variant='contained'>Add</Button>
+                                    <Button sx={{ marginBottom: '10px' }} className='loginpage-button' size='small' variant='contained' onClick={()=>{addCategory()}}>Add</Button>
                                   </td>
                                 </tr>
                                 <Button sx={{ marginBottom: '10px' }} className='loginpage-button' size='small' variant='contained' onClick={() => { displaySmeCategory() }}>Add SME Category</Button>
@@ -674,7 +744,7 @@ export default function EditProfile() {
                   </ListItemButton>
                   <Collapse in={row4} timeout="auto" unmountOnExit>
                     <List component="div" disablePadding>
-                      <ListItemButton sx={{ pl: 4 }}>
+                      <ListItemButton sx={{ pl: 4 , ":hover": {background: 'none', cursor: 'default'}}}>
                         <table>
                           <tbody>
                             <tr>
@@ -797,7 +867,7 @@ export default function EditProfile() {
                 <div className='editprofile-category'><FontAwesomeIcon className='side-menu-icon' icon={faUserXmark} />Delete Account</div>
                 <List>
                   <List component="div" disablePadding>
-                    <ListItemButton sx={{ pl: 4 }}>
+                    <ListItemButton sx={{ pl: 4 , ":hover": {background: 'none', cursor: 'default'}}}>
                       <Button color='error' className='loginpage-button' size='medium' variant='contained' onClick={openDeleteForm}>Delete</Button>
                     </ListItemButton>
                   </List>
@@ -838,7 +908,6 @@ export default function EditProfile() {
         </div >
         <Snackbar
           open={snackbar}
-          autoHideDuration={4000}
         >
           <Alert severity="success" sx={{ width: '100%' }}>
             SME category updated!

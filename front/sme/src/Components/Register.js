@@ -287,7 +287,9 @@ export default function Register() {
                 <tr className='register-row'>
                   <td>
                     <div className='register-category'>Account Type</div>
-                    <FormControlLabel control={<Checkbox onClick={(e) => { setSme(e.target.checked) }} />} label="SME" />
+                    <FormControlLabel control={<Checkbox onClick={(e) => { if(e.target.checked === true) {
+                      setSme('pending')
+                    } else { setSme('verified') }}} />} label="SME" />
                     <FormHelperText sx={{ width: '250px' }}>SME account will need to be verified before it can be used.</FormHelperText>
                   </td>
                   <td style={{ display: `${!sme ? 'none' : 'block'}` }}>
