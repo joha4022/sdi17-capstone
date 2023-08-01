@@ -17,11 +17,11 @@ app.use(fileUpload());
 
 const salt = '100'
 hashed_password = Crypto.pbkdf2Sync('password1', salt, 10000, 64, 'sha1').toString('base64')
-password = 'password1'
+password = 'password2'
 
 const get_hash = (password) => {
     hashed_password = Crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha1').toString('base64')
-    console.log(hashed_password)
+    console.log('HASHED PW FROM LINE 24:', hashed_password)
     return hashed_password
 }
 
@@ -464,7 +464,7 @@ app.get('/profile/:userid', function (req, res) {
     const userid = req.params.userid;
     console.log('userid: ', userid)
     knex('users')
-        .join('base', 'userss.base_id', 'base.baseid') //added from jacobs comment
+        .join('base', 'users.base_id', 'base.baseid')
         .select(
             'users.userid',
             'users.firstname',
@@ -494,6 +494,7 @@ app.get('/profile/:userid', function (req, res) {
 });
 
 app.post('/createuser', (req, res) => {
+    //hashedpw = get_hash(pw)
     const {
         userid,
         firstname,
@@ -528,6 +529,7 @@ app.post('/createuser', (req, res) => {
                         lastname,
                         username,
                         password,
+                        hashedpassword: get_hash(password), //just added, can be deleted if giving issues
                         email,
                         supervisoremail,
                         approveremail,
@@ -584,6 +586,7 @@ app.patch('/updateuser', (req, res) => {
             approveremail: approveremail,
             phonenumber: phonenumber,
             password: password,
+            hashedpassword: get_hash(password), ////just added, can be deleted if giving issues
             worklocation: worklocation,
             bio: bio,
             photo: photo,
@@ -652,7 +655,6 @@ app.delete('/deleteuser/:userid', function (req, res) {
                                 .where('user_id', userid)
                                 .del()
                                 .then(() => console.log('5'))
-                                //.then(()=> {return res.json({message: 'first user deleted!'})})
                                 .then(() => {
                                     knex('users')
                                         .where('userid', userid)
@@ -736,7 +738,7 @@ app.patch('/updatebase', (req, res) => {
             basecity: basecity,
             basestate: basestate,
             baselat: baselat,
-            baselon: baselon   
+            baselon: baselon
         }, ['basename', 'basecity', 'basestate', 'baselat', 'baselon'])
         .then((data) => res.status(201).json(data))
         .catch((err) => res.status(500).json({
@@ -993,8 +995,6 @@ app.delete('/deletemeeting', function (req, res) {
         );
 });
 
-
-
 //=============================================================================================//
 // "usermeetings" Table APIs
 //this post would post meetingid and userid
@@ -1024,7 +1024,6 @@ app.post('/attendmeeting', (req, res) => {
                 error: err,
             })
         );
-
 });
 
 app.delete('/deleteuserfrommeeting', function (req, res) {
@@ -1059,17 +1058,13 @@ app.delete('/deleteuserfrommeeting', function (req, res) {
 // Check user name and password against database
 app.post('/login/', (req, res) => {
     const { user, pw } = req.body;
-    hashedpw =get_hash(pw)
-    //console.log('req.body: ',req.body)
-    console.log('user password:', user, pw)
+    hashedpw = get_hash(pw) //user input
+
     knex('users')
         .select('userid', 'firstname', 'lastname', 'admin', 'sme', 'userverified')
         .where('username', user)
-        .where('password', pw)
-        // .then(
-        //     knex('table')
-        //     .insert()
-        // )
+        //changed from 'password' to 'hashedpassword'
+        .where('hashedpassword', get_hash(pw))
         .then((data) => {
             if (data.length === 0) {
                 return res.status(404).json({
@@ -1077,7 +1072,6 @@ app.post('/login/', (req, res) => {
                     message: 'Username and/or password are incorrect',
                 });
             }
-
             res.status(200).json(data);
         })
         .catch((err) =>
