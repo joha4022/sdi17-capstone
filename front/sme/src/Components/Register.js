@@ -1,7 +1,7 @@
 import './Register.css'
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AutoComplete, FormControlLabel, TextField, IconButton, OutlinedInput, InputLabel, InputAdornment, FormControl, Button, Collapse, Alert, Typography, AlertTitle, Box, Modal, MenuItem, Backdrop, CircularProgress, FormHelperText, Checkbox, Autocomplete } from '@mui/material';
+import { FormControlLabel, TextField, IconButton, OutlinedInput, InputLabel, InputAdornment, FormControl, Button, Collapse, Alert, Typography, AlertTitle, Box, Modal, MenuItem, Backdrop, CircularProgress, FormHelperText, Checkbox, Autocomplete } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
@@ -23,7 +23,7 @@ export default function Register() {
   const [phoneNumber, setPhoneNumber] = useState(false);
   const [supEmail, setSupEmail] = useState(false);
   const [appEmail, setAppEmail] = useState('admin@sme.com');
-  const [sme, setSme] = useState(false);
+  const [sme, setSme] = useState('verified');
   const [categories, setCategories] = useState(false);
   const [smeCategory, setSmeCategory] = useState(false);
   // alertdisplay
@@ -86,7 +86,7 @@ export default function Register() {
     }, 2500)
   }
 
-  console.log(smeCategory)
+  console.log(sme)
 
   const register = () => {
     if (!firstname || !lastname || !username || !email || !supEmail || !password || !password2 || !baseName) {
@@ -292,7 +292,7 @@ export default function Register() {
                     } else { setSme('verified') }}} />} label="SME" />
                     <FormHelperText sx={{ width: '250px' }}>SME account will need to be verified before it can be used.</FormHelperText>
                   </td>
-                  <td style={{ display: `${!sme ? 'none' : 'block'}` }}>
+                  <td style={{ display: `${sme==='verified' ? 'none' : 'block'}` }}>
                     <div className='register-category'>SME Category</div>
                     <Autocomplete sx={{ width: '28ch' }}
                       id="outlined-select-smeCategory"
