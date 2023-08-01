@@ -383,6 +383,7 @@ app.delete('/deletesme', function (req, res) {
                 });
             }
             res.status(200).json({
+                code: 200,
                 message: 'User category relationship deleted successfully',
             });
         })

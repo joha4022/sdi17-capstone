@@ -22,7 +22,7 @@ export default function Register() {
   const [password2, setPassword2] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState(false);
   const [supEmail, setSupEmail] = useState(false);
-  const [appEmail, setAppEmail] = useState(false);
+  const [appEmail, setAppEmail] = useState('admin@sme.com');
   const [sme, setSme] = useState(false);
   const [categories, setCategories] = useState(false);
   const [smeCategory, setSmeCategory] = useState(false);
@@ -87,13 +87,13 @@ export default function Register() {
   console.log(smeCategory)
 
   const register = () => {
-    if (!firstname || !lastname || !username || !email || !password || !password2 || !appEmail || !baseName) {
+    if (!firstname || !lastname || !username || !email || !supEmail || !password || !password2 || !baseName) {
       alertDisplay('Please complete all the required fields!');
     } else if (!(/\d/).test(password) || !(/[A-Z]/).test(password) || password.length < 5) {
       alertDisplay('Password does not meet the minimum requirement.');
     } else if (password !== password2) {
       alertDisplay('Please make sure the passwords match.');
-    } else if (!email.includes('@') || !appEmail.includes('@')) {
+    } else if (!email.includes('@') || !supEmail.includes('@')) {
       alertDisplay('Please include @ and type in an approriate email.')
     } else {
       const body = JSON.stringify({
@@ -400,12 +400,12 @@ export default function Register() {
                 <tr className='register-row'>
                   <td>
                     <div className='register-category'>Supervisor's E-mail</div>
-                    <TextField id="outlined-basic-supemail" sx={{ width: '28ch' }} label="Supervisor's E-mail" variant="outlined" onKeyUp={(e) => { setSupEmail(e.target.value) }} />
+                    <TextField error={!supEmail || !supEmail.includes('@') ? true : false} id="outlined-basic-supemail" sx={{ width: '28ch' }} required label="Supervisor's E-mail" variant="outlined" onKeyUp={(e) => { setSupEmail(e.target.value) }} />
                   </td>
-                  <td>
+                  {/* <td>
                     <div className='register-category'>Approver's E-mail</div>
                     <TextField error={!appEmail || !appEmail.includes('@') ? true : false} required id="outlined-basic-appemail" sx={{ width: '28ch' }} label="Approver's E-mail" variant="outlined" onKeyUp={(e) => { setAppEmail(e.target.value) }} />
-                  </td>
+                  </td> */}
                 </tr>
                 <tr className='register-row'>
                   {/* list out bases from the database */}

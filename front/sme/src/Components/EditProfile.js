@@ -1,12 +1,13 @@
 import './EditProfile.css';
 import FooterBar from './FooterBar';
 import Navbar from './Navbar';
-import { Autocomplete, Alert, AlertTitle, Backdrop, CircularProgress, Typography, Modal, Box, FormControl, InputLabel, OutlinedInput, InputAdornment, IconButton, FormHelperText, Button, MenuItem, TextField, Collapse, Avatar, List, ListItemText, ListItemButton } from '@mui/material';
+import { Snackbar, Autocomplete, Alert, AlertTitle, Backdrop, CircularProgress, Typography, Modal, Box, FormControl, InputLabel, OutlinedInput, InputAdornment, IconButton, FormHelperText, Button, MenuItem, TextField, Collapse, Avatar, List, ListItemText, ListItemButton } from '@mui/material';
 import { ExpandMore, ExpandLess, Visibility, VisibilityOff } from '@mui/icons-material';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faBriefcase, faNewspaper, faGear, faUserXmark } from '@fortawesome/free-solid-svg-icons';
 import { useEffect, useContext, useState } from 'react';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import EditIcon from '@mui/icons-material/Edit';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import { useNavigate } from 'react-router-dom';
 import { AppContext } from '../App';
@@ -22,6 +23,7 @@ export default function EditProfile() {
   const [row2, setRow2] = useState(false);
   const [row3, setRow3] = useState(false);
   const [row4, setRow4] = useState(false);
+  const [snackbar, setSnackBar] = useState(false);
   // required options
   const [userid, setUserid] = useState(false);
   const [firstname, setFirstname] = useState(false);
@@ -36,11 +38,11 @@ export default function EditProfile() {
   const [newPassword2, setNewPassword2] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState(false);
   const [supEmail, setSupEmail] = useState(false);
-  const [appEmail, setAppEmail] = useState(false);
   const [worklocation, setWorklocation] = useState(false);
   const [bio, setBio] = useState(false);
   const [photo, setPhoto] = useState(false);
   const [changePhoto, setChangePhoto] = useState(false);
+  const [currentSmeCategories, setCurrentSmeCategories] = useState(false);
   const [categories, setCategories] = useState(false);
   const [smeCategory, setSmeCategory] = useState(false);
   // baseForm
@@ -58,8 +60,6 @@ export default function EditProfile() {
   const [alert, setAlert] = useState(false);
   const [alert2, setAlert2] = useState(false);
   const [backdrop, setBackdrop] = useState(false);
-  // profile image
-  const [image, setImage] = useState(false);
 
   const navigate = useNavigate();
 
@@ -97,7 +97,6 @@ export default function EditProfile() {
       password: `${newPassword ? newPassword : password}`,
       email: email,
       supervisoremail: supEmail,
-      approveremail: appEmail,
       phonenumber: phoneNumber,
       branch: branch,
       base_id: baseid,
@@ -160,12 +159,12 @@ export default function EditProfile() {
       const userid = JSON.parse(sessionStorage.getItem('currentUser')).userid;
       // fetch sme categories
       fetch('http://localhost:3001/categories')
-      .then(res => res.json())
-      .then(data => {
-        const cat = [];
-        data.map(category => cat.push(category.categoryname));
-        setCategories(cat);
-      })
+        .then(res => res.json())
+        .then(data => {
+          const cat = [];
+          data.map(category => cat.push(category.categoryname));
+          setCategories(cat);
+        })
       // fetch the existing user
       fetch('http://localhost:3001/')
         .then(res => res.json())
@@ -187,7 +186,6 @@ export default function EditProfile() {
           setPassword(user.password);
           setPhoneNumber(user.phonenumber);
           setSupEmail(user.supervisoremail);
-          setAppEmail(user.approveremail);
           setWorklocation(user.worklocation);
           setBio(user.bio);
           setBaseid(user.base_id);
@@ -220,6 +218,17 @@ export default function EditProfile() {
               // setBaseCity(data[user.base_id - 1].basecity);
               // setBaseState(data[user.base_id - 1].basestate);
             })
+          if (JSON.parse(sessionStorage.getItem('loggedInUser')).sme === true) {
+            fetch(`http://localhost:3001/smes`)
+              .then(res => res.json())
+              .then(data => {
+                data.map(sme => {
+                  if (sme.userid === userid) {
+                    setCurrentSmeCategories(sme.categories)
+                  }
+                })
+              })
+          }
         })
     }
   }, [])
@@ -304,6 +313,14 @@ export default function EditProfile() {
     }, 2500)
   }
 
+  const displaySmeCategory = () => {
+    if (document.querySelector('.adding-new-sme-category').style.display === 'block') {
+      document.querySelector('.adding-new-sme-category').style.display = 'none';
+    } else {
+      document.querySelector('.adding-new-sme-category').style.display = 'block';
+    }
+  }
+
   const changeProfilePic = () => {
     const formData = new FormData();
     formData.append("uploadFile", photo, photo.name)
@@ -342,6 +359,10 @@ export default function EditProfile() {
       })
   }
 
+  const deleteSme = () => {
+
+  }
+
   if (currentUser && currentBases) {
     return (
       <>
@@ -369,10 +390,28 @@ export default function EditProfile() {
             <div className='editprofile-main-menus'>
               <div className='main-menu-title'>Edit Profile</div>
               <div className='editprofile-main-photo'>
+                <EditIcon fontSize='large' className='edit-icon'
+                  sx={{
+                    position: "relative",
+                    top: '14rem',
+                    left: '1.25rem',
+                    zIndex: '9',
+                    opacity: '0%',
+                    padding: '82.5px',
+                    borderRadius: '50%',
+                    background: 'gray',
+                    marginTop: '-50rem',
+                    '&:hover': {
+                      opacity: '100%',
+                      cursor: 'pointer',
+                      opacity: '40%'
+                    }
+                  }}
+                  onClick={() => { document.querySelector('#image-upload').click() }}
+                ></EditIcon>
                 <Avatar sx={{ width: 200, height: 200 }} className='editprofile-avatar' alt="Remy Sharp"
                   src={changePhoto ? changePhoto : photo}
-                  onClick={() => { document.querySelector('#image-upload').click() }}
-                />
+                ></Avatar>
                 {/* File to be uploaded:  */}
                 <input type="file"
                   name="uploadFile"
@@ -383,7 +422,14 @@ export default function EditProfile() {
                   }} />
                 <div className='editprofile-username-display'>{username}
                   <div className='editprofile-email-display'>{email}</div>
-                  <div className='editprofile-user-type'>{currentUser.admin ? 'Admin' : ''} {currentUser.sme ? 'SME' : ''}</div>
+                  <div className='editprofile-user-type'>{currentUser.admin ? 'Admin' : ''} {currentUser.sme ? '/ SME' : ''}</div>
+                  {currentSmeCategories ?
+                    <>
+                      {currentSmeCategories.map((cat, i) => {
+                        return (<div className='sme-category-span' key={i}>{cat}</div>)
+                      })}
+                    </>
+                    : ''}
                   <Button className='loginpage-button' size='large'
                     sx={{
                       marginTop: '2.5rem',
@@ -483,7 +529,7 @@ export default function EditProfile() {
                 <div className='editprofile-category'><FontAwesomeIcon className='side-menu-icon' icon={faBriefcase} />Work</div>
                 <List>
                   <ListItemButton onClick={handleRow3}>
-                    <ListItemText primary='Edit work location, base, supervisor email, and approver email'></ListItemText>
+                    <ListItemText >{JSON.parse(sessionStorage.getItem('loggedInUser')).sme === true ? 'Edit work location, base, supervisor email, and SME category' : 'Edit work location, base, and supervisor email'}</ListItemText>
                     {row3 ? <ExpandLess /> : <ExpandMore />}
                   </ListItemButton>
                   <Collapse in={row3} timeout="auto" unmountOnExit>
@@ -494,19 +540,24 @@ export default function EditProfile() {
                             <tr>
                               <td>
                                 <div className='dropdown-category'>Work Location</div>
-                                <TextField defaultValue={worklocation} sx={{ width: '28ch' }} size='small' id="outlined-basic-worklocation" label="Work Location" variant="outlined" onKeyUp={(e) => { setWorklocation(e.target.value) }} />
+                                <TextField defaultValue={worklocation} sx={{ width: '32ch' }} size='small' id="outlined-basic-worklocation" label="Work Location" variant="outlined" onKeyUp={(e) => { setWorklocation(e.target.value) }} />
                               </td>
+                              <td>
+                                <div className='dropdown-category'>Supervisor Email</div>
+                                <TextField required error={!supEmail || !supEmail.includes('@') ? true : false} defaultValue={supEmail} sx={{ width: '28ch' }} size='small' id="outlined-basic-suppEmail" label="Supervisor Email" variant="outlined" onKeyUp={(e) => { setSupEmail(e.target.value) }} />
+                              </td>
+                            </tr>
+                            <tr>
                               <td>
                                 <div className='register-category'>Base</div>
                                 <TextField
                                   disabled
                                   size='small'
-                                  sx={{ width: '28ch', marginRight: '10px' }}
+                                  sx={{ width: '32ch', marginRight: '10px' }}
                                   id="outlined-disabled"
                                   label="Base"
                                   value={existingBaseName.name !== '+ Add a new base' ? existingBaseName.name : baseName}
                                 />
-                                <Button className='loginpage-button' size='medium' variant='contained' onClick={handleOpen}>Change Base</Button>
                                 <Modal
                                   open={baseForm}
                                   onClose={handleClose}
@@ -566,35 +617,46 @@ export default function EditProfile() {
                                   </Box>
                                 </Modal>
                               </td>
-                            </tr>
-                            <tr>
                               <td>
-                                <div className='dropdown-category'>Supervisor Email</div>
-                                <TextField defaultValue={supEmail} sx={{ width: '28ch' }} size='small' id="outlined-basic-suppEmail" label="Supervisor Email" variant="outlined" onKeyUp={(e) => { setSupEmail(e.target.value) }} />
-                              </td>
-                              <td>
-                                <div className='dropdown-category'>Approver Email</div>
-                                <TextField error={!appEmail || !appEmail.includes('@') ? true : false} required defaultValue={appEmail} sx={{ width: '28ch' }} size='small' id="outlined-basic-appEmail" label="Approver Email" variant="outlined" onKeyUp={(e) => { setAppEmail(e.target.value) }} />
+                                <Button sx={{ marginTop: '1.25rem' }} className='loginpage-button' size='medium' variant='contained' onClick={handleOpen}>Change Base</Button>
                               </td>
                             </tr>
-                            {/* {currentUser.sme ?
+                            {JSON.parse(sessionStorage.getItem('loggedInUser')).sme === true ?
                               <tr>
-                                <td>
-                                  <div className='dropdown-category'>SME Category</div>
-                                  <Autocomplete sx={{ width: '28ch' }}
-                                    id="outlined-select-smeCategory"
-                                    label="SmeCateogry"
-                                    variant="outlined"
-                                    defaultValue={}
-                                    freeSolo
-                                    options={categories}
-                                    renderInput={(params) => <TextField {...params} label='SME Category' />}
-                                    onKeyUp={(e) => { setSmeCategory(e.target.value) }}
-                                    onClose={(e) => { setSmeCategory(e.target.textContent) }}
-                                    onKeyDown={(e) => { if (e.key === 'Enter') { setSmeCategory(e.target.dataset.value) } }}>
-                                  </Autocomplete>
-                                </td>
-                              </tr> : <></>} */}
+                                <div className='dropdown-category'>SME Category</div>
+                                {currentSmeCategories.map((cat, i) => {
+                                  return (
+                                    <tr key={i}>
+                                      <td>
+                                        <TextField size='small' disabled defaultValue={cat} />
+                                      </td>
+                                      <td>
+                                        <Button id={i} color='error' className='loginpage-button' size='small' variant='contained'>Delete</Button>
+                                      </td>
+                                    </tr>)
+                                })}
+                                <tr className='adding-new-sme-category'>
+                                  <td>
+                                    <Autocomplete sx={{ width: '22ch', marginBottom: '10px' }}
+                                      id="outlined-select-smeCategory"
+                                      label="SmeCateogry"
+                                      variant="outlined"
+                                      size='small'
+                                      defaultValue=''
+                                      freeSolo
+                                      options={categories}
+                                      renderInput={(params) => <TextField {...params} label='SME Category' />}
+                                      onKeyUp={(e) => { setSmeCategory(e.target.value) }}
+                                      onClose={(e) => { setSmeCategory(e.target.textContent) }}
+                                      onKeyDown={(e) => { if (e.key === 'Enter') { setSmeCategory(e.target.dataset.value) } }}>
+                                    </Autocomplete>
+                                  </td>
+                                  <td>
+                                    <Button sx={{ marginBottom: '10px' }} className='loginpage-button' size='small' variant='contained'>Add</Button>
+                                  </td>
+                                </tr>
+                                <Button sx={{ marginBottom: '10px' }} className='loginpage-button' size='small' variant='contained' onClick={() => { displaySmeCategory() }}>Add SME Category</Button>
+                              </tr> : <></>}
                             <Button className='loginpage-button' size='medium' variant='contained' onClick={() => { save(handleRow3) }}>Save</Button>
                           </tbody>
                         </table>
@@ -773,7 +835,15 @@ export default function EditProfile() {
               </div>
             </div>
           </div>
-        </div>
+        </div >
+        <Snackbar
+          open={snackbar}
+          autoHideDuration={4000}
+        >
+          <Alert severity="success" sx={{ width: '100%' }}>
+            SME category updated!
+          </Alert>
+        </Snackbar>
         <FooterBar />
       </>
     )
