@@ -15,7 +15,7 @@ exports.seed = async function (knex) {
       approveremail: 'approver1@gmail.com',
       phonenumber: '123-456-0001',
       password: 'password1',
-      hashedpassword: '',
+      hashedpassword: 'uknBN5aRYXdqC9wCdFLWduuuD4CxkLUURGffd8rMewMK+Nub1v69u/l2HYwwQXe9R0yQH59GI0Ou8DCXtS7xZg==',
       worklocation: 'BLDG 272 RM 1',
       bio: 'Active Duty Space Force , 1 ',
       photo: './photos/soldier.png', //'./photos/soldier.png',
