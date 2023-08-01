@@ -390,6 +390,8 @@ app.post('/smes', (req, res) => {
 app.delete('/deletesme', function (req, res) {
     const { user_id, category_id } = req.body;
 
+    
+
     knex('sme')
         .where('user_id', user_id)
         .where('category_id', category_id)
