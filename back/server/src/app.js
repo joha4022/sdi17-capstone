@@ -8,30 +8,45 @@ const cors = require('cors');
 const path = require('path');
 const PORT = process.env.PORT || 3001;
 const knex = require('knex')(require('../knexfile.js')[process.env.NODE_ENV || 'development']);
+const Crypto = require('crypto')
 
 
 app.use(express.json());
 app.use(cors());
 app.use(fileUpload());
 
+const salt = '100'
+hashed_password = Crypto.pbkdf2Sync('password1', salt, 10000, 64, 'sha1').toString('base64')
+password = 'password1'
+
+const get_hash = (password) => {
+    hashed_password = Crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha1').toString('base64')
+    console.log(hashed_password)
+    return hashed_password
+}
+
+const verify_pw = (password) => {
+    if (hashed_password === get_hash(password)) {
+        console.log("Hashes Equal")
+        return true
+    } else { return false }
+}
+console.log('password verified: ', verify_pw(password))
+
 
 // For handling the upload request
 app.post("/upload", function (req, res) {
     // When a file has been uploaded
     if (req.files && Object.keys(req.files).length !== 0) {
-
         // Uploaded path
         const uploadedFile = req.files.uploadFile;
-
         // Logging uploading file
         console.log(uploadedFile);
-
         // Upload path
-
         const uploadPath = process.cwd() + "/photos/" + uploadedFile.name;
         console.log(uploadPath);
-
         // To save the file using mv() function
+
         uploadedFile.mv(uploadPath, function (err) {
             if (err) {
                 console.log(err);
@@ -153,7 +168,7 @@ app.post('/createcategory', (req, res) => {
                             .insert({
                                 categoryname
                             })
-                            .then(() => res.status(201).json({ baseCreated: true, categoryid: categories.length +1, message: 'Sme category created successfully' }))
+                            .then(() => res.status(201).json({ baseCreated: true, categoryid: categories.length + 1, message: 'Sme category created successfully' }))
                     }
                 })
                 .catch((err) =>
@@ -445,7 +460,7 @@ app.get('/profile/:userid', function (req, res) {
     const userid = req.params.userid;
     console.log('userid: ', userid)
     knex('users')
-        .join('base', 'users.base_id', 'base.baseid') //added from jacobs comment
+        .join('base', 'userss.base_id', 'base.baseid') //added from jacobs comment
         .select(
             'users.userid',
             'users.firstname',
@@ -930,7 +945,7 @@ app.post('/meetings', (req, res) => {
 app.delete('/deletemeeting', function (req, res) {
     const { meetingid } = req.body;
     if (!meetingid) {
-        return res.status(400).json({message: 'Meeting ID is required.'});
+        return res.status(400).json({ message: 'Meeting ID is required.' });
     }
 
     knex('usermeetings')
@@ -1028,16 +1043,21 @@ app.delete('/deleteuserfrommeeting', function (req, res) {
 });
 
 //===================================================================================================
-// Login 
+// Login
 // Check user name and password against database
 app.post('/login/', (req, res) => {
     const { user, pw } = req.body;
+    hashedpw =get_hash(pw)
     //console.log('req.body: ',req.body)
     console.log('user password:', user, pw)
     knex('users')
         .select('userid', 'firstname', 'lastname', 'admin', 'sme', 'userverified')
         .where('username', user)
         .where('password', pw)
+        // .then(
+        //     knex('table')
+        //     .insert()
+        // )
         .then((data) => {
             if (data.length === 0) {
                 return res.status(404).json({
@@ -1045,6 +1065,7 @@ app.post('/login/', (req, res) => {
                     message: 'Username and/or password are incorrect',
                 });
             }
+
             res.status(200).json(data);
         })
         .catch((err) =>
@@ -1058,9 +1079,7 @@ app.post('/login/', (req, res) => {
 
 
 ////----------------------------------------------------------//
-// All CRUD for categories
 
 app.listen(PORT, () => {
     console.log(`The server is running on ${PORT} `);
 });
-
