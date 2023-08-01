@@ -464,7 +464,7 @@ app.get('/getusers', function (req, res) {
 
 app.get('/profile/:userid', function (req, res) {
     const userid = req.params.userid;
-    console.log('userid: ', userid)
+    // console.log('userid: ', userid)
     knex('users')
         .join('base', 'users.base_id', 'base.baseid')
         .select(
