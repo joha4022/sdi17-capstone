@@ -69,7 +69,7 @@ app.post("/upload", function (req, res) {
 //front end needs to send the file path ex './photos/soldier/png'
 app.post('/getphoto', (req, res) => {
     const { photopath } = req.body;
-    console.log(photopath);
+    // console.log(photopath);
     //const photo = './photos/soldier.png';
     //res.download(path.resolve('./photos/Lady.jpg'))
     res.download(path.resolve(`${photopath}`))
@@ -270,6 +270,7 @@ app.get("/smes", (req, res) => {
             "users.photo",
             "users.branch",
             "base.baseid AS base",
+            "users.userverified",
             knex.raw("ARRAY_AGG(category.categoryname) AS categories")
         )
         .groupBy(
@@ -281,6 +282,7 @@ app.get("/smes", (req, res) => {
             "users.photo",
             "users.branch",
             "base.baseid",
+            "users.userverified"
         )
         .orderBy(
             'users.userid'
@@ -320,6 +322,7 @@ app.get("/smes/:id", (req, res) => {
             "users.photo",
             "users.branch",
             "base.baseid AS base",
+            "users.userverified",
             knex.raw("ARRAY_AGG(category.categoryname) AS categories")
         )
         .where("network.user_id", userid)
@@ -332,6 +335,7 @@ app.get("/smes/:id", (req, res) => {
             "users.photo",
             "users.branch",
             "base.baseid",
+            "users.userverified"
         )
         .orderBy(
             'users.userid'
