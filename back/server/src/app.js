@@ -216,7 +216,7 @@ app.patch('/updatecategory', (req, res) => {
         }, ['categoryid', 'categoryname'])
         .then((data) => res.status(201).json(data))
         .catch((err) => res.status(500).json({
-            message: 'Error updating catagory information',
+            message: 'Error updating category information',
             error: err
         }))
 })
@@ -224,33 +224,52 @@ app.patch('/updatecategory', (req, res) => {
 app.delete('/deletecategory', function (req, res) {
     const { categoryid } = req.body;
 
-    knex('sme')
-        .where('meeting_id', meetingid)
-        .del()
-        .then((rowCount) => console.log("removed from user meeting", rowCount))
-
     knex('category')
-        .where('categoryid', categoryid)
-        .del()
-        .then((rowCount) => {
-            console.log("here")
-            if (rowCount === 0) {
-                return res.status(404).json({
-                    message: 'This base is not found',
-                });
-            }
-            res.status(200).json({
-                message: 'base deleted successfully',
-            });
+        .join('sme', 'category.categoryid', 'sme.category_id')
+        .join('network', 'sme.smeid', 'network.sme_id')
+        .select('network.networkid')
+        .where('category.categoryid', categoryid)
+        .then((output) => {
+            output.map((elem, index) => {
+                console.log(index + 2)
+                knex('network')
+                    //.then(() => console.log('entering first'))
+                    .where('network.networkid', elem.networkid)
+                    .del()
+                    .then(() => console.log('leaving 1st'))
+            })//of map
         })
-        .catch((err) =>
-            res.status(500).json({
-                message: 'An error occurred while deleting base',
-                error: err,
-            })
-        );
+        .then(() => {
+            knex('sme')
+                .where('category_id', categoryid)
+                .del()
+                .then((data) => console.log("removed from sme table", data))
+                .then(() => {
+                    knex('category')
+                        .where('categoryid', categoryid)
+                        .del()
+                        .then((rowCount) => {
+                            console.log("here")
+                            if (rowCount === 0) {
+                                return res.status(404).json({
+                                    message: 'This category is not found',
+                                });
+                            }
+                            res.status(200).json({
+                                message: 'category deleted successfully',
+                            });
+                        })
+                        .catch((err) =>
+                            res.status(500).json({
+                                message: 'An error occurred while deleting category',
+                                error: err,
+                            }));
+                })
+        });
 });
 
+//cant delete category because associated with sme, and sme associated with network
+//join and then pull out smeid and networkid and categoryid?
 
 //=============================================================================================//
 // "sme" Table APIs. GET, POST, and DELETE
@@ -389,6 +408,11 @@ app.post('/smes', (req, res) => {
 
 app.delete('/deletesme', function (req, res) {
     const { user_id, category_id } = req.body;
+
+    //delete the smeid in the network table
+    knex('network')
+        .where('user_id', user_id)
+        .del()
 
     knex('sme')
         .where('user_id', user_id)

@@ -3,6 +3,7 @@ import { useEffect, useState, useContext } from "react";
 import {
   Card,
   CardContent,
+  CardActionArea,
   CardMedia,
   Typography,
   InputAdornment,
@@ -14,7 +15,7 @@ import {
   Tab,
   Snackbar,
 } from "@mui/material";
-import { TabList, TabPanel, TabContext } from "@mui/lab";
+import { TabList, TabPanel, TabContext, useTabContext } from "@mui/lab";
 import { Search as SearchIcon } from "@mui/icons-material";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "./Navbar";
@@ -26,12 +27,14 @@ const Manage = () => {
   const [SMEs, setSMEs] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [open, setOpen] = useState(false);
+  const [open2, setOpen2] = useState(false);
   const [tab, setTab] = useState("1");
   const [toast, setToast] = useState(false);
-  const [toast2, setToast2] = useState(false)
+  const [toast2, setToast2] = useState(false);
   const [message, setMessage] = useState("");
-  const [dummy, setDummy] = useState(false)
+  const [dummy, setDummy] = useState(false);
   const [photoList, setPhotoList] = useState([]);
+  const [targetUser, setTargetUser] = useState({});
   const { currentUser, setCurrentUser } = useContext(AppContext);
 
   const navigate = useNavigate();
@@ -72,43 +75,83 @@ const Manage = () => {
   let results = [];
   if (tab === "2") {
     if (searchTerm.length > 0) {
-      results = SMEs.map((e,i) => ({...e, image: photoList[i]}))
+      results = SMEs.map((e, i) => ({ ...e, image: photoList[i] }));
       results = results.filter((word) => {
         let name = [word.firstname, word.lastname].join(" ");
         return name.toUpperCase().includes(searchTerm.toUpperCase());
       });
     }
   } else if (tab === "1") {
-    results = SMEs.map((e,i) => ({...e, image: photoList[i]}))
+    results = SMEs.map((e, i) => ({ ...e, image: photoList[i] }));
     results = results.filter((element) => {
-      return !element.userverified;
+      return element.userverified === "pending";
+    });
+  } else if (tab === "3") {
+    results = SMEs.map((e, i) => ({ ...e, image: photoList[i] }));
+    results = results.filter((element) => {
+      return element.userverified === "declined";
     });
   }
 
-  const handleOpen = () => {
+  const handleOpen = (e) => {
     setOpen(true);
+    setTargetUser(e);
+  };
+
+  const handleOpen2 = (e) => {
+    setOpen2(true);
+    setTargetUser(e);
   };
 
   const handleClose = () => {
     setOpen(false);
     setToast(false);
+  };
+
+  const handleClose2 = () => {
+    setOpen2(false);
     setToast2(false);
   };
 
   const handleAccept = (e) => {
-    let resBody = e
-    e.userverified = true
+    let resBody = e;
+    e.userverified = "verified";
 
-    fetch(`http://localhost:3001/updateuser`, { method: "PATCH", headers: {'Content-Type': 'application/json'}, body: JSON.stringify(resBody)})
-    .then((res) => res.json())
-    .then((data) => {
-      setDummy(!dummy);
-      setToast2(true);
+    fetch(`http://localhost:3001/updateuser`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(resBody),
     })
+      .then((res) => res.json())
+      .then((data) => {
+        setDummy(!dummy);
+        setToast2(true);
+        setMessage("User verified");
+      })
       .catch((error) => console.error("Error:", error));
-  }
+  };
 
-  const handleDelete = (id) => {
+  const handleDecline = () => {
+    let resBody = targetUser;
+    targetUser.userverified = "declined";
+    fetch(`http://localhost:3001/updateuser`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(resBody),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setDummy(!dummy);
+        setToast2(true);
+        setOpen2(false);
+        setMessage("User verification declined");
+      })
+      .catch((error) => console.error("Error:", error));
+  };
+
+  const handleDelete = () => {
+    const id = targetUser.userid;
+    console.log(id);
     fetch(`http://localhost:3001/deleteuser/${id}`, { method: "DELETE" })
       .then((res) => res.json())
       .then((data) => {
@@ -149,63 +192,91 @@ const Manage = () => {
                   textColor="secondary"
                   indicatorColor="secondary"
                 >
-                  <Tab label="Pending SME Requests" value="1" />
                   <Tab label="Mangage Existing Users" value="2" />
+                  <Tab label="Pending SME Requests" value="1" />
+                  <Tab label="Declined SME Requests" value="3" />
                 </TabList>
               </Box>
               <TabPanel value="1">
                 <section className="results">
-                  {(results.length != 0) ? (
+                  {results.length != 0 ? (
                     results.map((e, i) => {
-                    return (
-                      <Card key={`${i}`} sx={{ maxWidth: "15vw" }}>
-                        <CardMedia
-                        component="img"
-                        src={e.image || "/default.png"} // Use a placeholder image while loading
-                        alt="User Profile Picture"
-                      />
-                        {/* {console.log(`../../../../${e.photo}`)} */}
-                        <CardContent>
-                          <Typography variant="h5">
-                            {`${e.firstname} ${e.lastname}`}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            {`User: ${e.email}`}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            {`Supervisor: ${e.supervisoremail}`}
-                          </Typography>
-                        </CardContent>
-                        <CardActions>
-                          <Button
-                            className="manageBut"
-                            size="large"
-                            variant="contained"
-                            onClick={() => handleAccept(e)}
+                      return (
+                        <Card key={`${i}`} sx={{ maxWidth: "15vw" }}>
+                          <CardActionArea
+                            component={Link}
+                            to={`/profile/${e.userid}`}
                           >
-                            Accept
-                          </Button>
-                          <Button
-                            className="manageBut"
-                            size="large"
-                            variant="contained"
-                            // onClick={handleOpen}
-                          >
-                            Decline
-                          </Button>
-                          <div>
-                          <Snackbar
-                              open={toast2}
-                              autoHideDuration={6000}
-                              onClose={handleClose}
-                              message={`User is now verified`}
+                            <CardMedia
+                              component="img"
+                              src={e.image || "/default.png"} // Use a placeholder image while loading
+                              alt="User Profile Picture"
                             />
-                          </div>
-                        </CardActions>
-                      </Card>
-                    );
-                  })) : (<p>No requests pending</p>)
-                }
+                            {/* {console.log(`../../../../${e.photo}`)} */}
+                            <CardContent>
+                              <Typography variant="h5">
+                                {`${e.firstname} ${e.lastname}`}
+                              </Typography>
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                              >
+                                {`User: ${e.email}`}
+                              </Typography>
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                              >
+                                {`Supervisor: ${e.supervisoremail}`}
+                              </Typography>
+                            </CardContent>
+                          </CardActionArea>
+                          <CardActions>
+                            <Button
+                              className="manageBut"
+                              size="large"
+                              variant="contained"
+                              onClick={() => handleAccept(e)}
+                            >
+                              Accept
+                            </Button>
+                            <Button
+                              className="manageBut"
+                              size="large"
+                              variant="contained"
+                              onClick={() => handleOpen2(e)}
+                            >
+                              Decline
+                            </Button>
+                            <Modal
+                              open={open2}
+                              onClose={handleClose2}
+                              aria-labelledby="child-modal-title"
+                              aria-describedby="child-modal-description"
+                            >
+                              <Box sx={{ ...style, width: 200 }}>
+                                <h2 id="child-modal-title">
+                                  Are you sure you want to decline this user?
+                                </h2>
+                                <Button onClick={handleDecline}>Yes</Button>
+                                <Button onClick={handleClose2}>No</Button>
+                              </Box>
+                            </Modal>
+                            <div>
+                              <Snackbar
+                                open={toast2}
+                                autoHideDuration={6000}
+                                onClose={handleClose}
+                                message={message}
+                              />
+                            </div>
+                          </CardActions>
+                        </Card>
+                      );
+                    })
+                  ) : (
+                    <p>No requests pending</p>
+                  )}
                 </section>
               </TabPanel>
               <TabPanel value="2">
@@ -246,29 +317,34 @@ const Manage = () => {
                   {results.map((e, i) => {
                     return (
                       <Card key={`${i}`} sx={{ maxWidth: "15vw" }}>
-                        <CardMedia
-                        component="img"
-                        src={e.image || "/default.png"} // Use a placeholder image while loading
-                        alt="User Profile Picture"
-                      />
-                        {/* {console.log(`../../../../${e.photo}`)} */}
-                        <CardContent>
-                          <Typography variant="h5">
-                            {`${e.firstname} ${e.lastname}`}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            {`User: ${e.email}`}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            {`Supervisor: ${e.supervisoremail}`}
-                          </Typography>
-                        </CardContent>
+                        <CardActionArea
+                          component={Link}
+                          to={`/profile/${e.userid}`}
+                        >
+                          <CardMedia
+                            component="img"
+                            src={e.image || "/default.png"} // Use a placeholder image while loading
+                            alt="User Profile Picture"
+                          />
+                          {/* {console.log(`../../../../${e.photo}`)} */}
+                          <CardContent>
+                            <Typography variant="h5">
+                              {`${e.firstname} ${e.lastname}`}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              {`User: ${e.email}`}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              {`Supervisor: ${e.supervisoremail}`}
+                            </Typography>
+                          </CardContent>
+                        </CardActionArea>
                         <CardActions>
                           <Button
                             className="manageBut"
                             size="large"
                             variant="contained"
-                            onClick={handleOpen}
+                            onClick={() => handleOpen(e)}
                           >
                             Delete
                           </Button>
@@ -285,9 +361,7 @@ const Manage = () => {
                               <p id="child-modal-description">
                                 This action cannot be undone
                               </p>
-                              <Button onClick={() => handleDelete(e.userid)}>
-                                Yes
-                              </Button>
+                              <Button onClick={handleDelete}>Yes</Button>
                               <Button onClick={handleClose}>No</Button>
                             </Box>
                           </Modal>
@@ -303,6 +377,66 @@ const Manage = () => {
                       </Card>
                     );
                   })}
+                </section>
+              </TabPanel>
+              <TabPanel value="3">
+                <section className="results">
+                  {results.length != 0 ? (
+                    results.map((e, i) => {
+                      return (
+                        <Card key={`${i}`} sx={{ maxWidth: "15vw" }}>
+                          <CardActionArea
+                            component={Link}
+                            to={`/profile/${e.userid}`}
+                          >
+                            <CardMedia
+                              component="img"
+                              src={e.image || "/default.png"} // Use a placeholder image while loading
+                              alt="User Profile Picture"
+                            />
+                            {/* {console.log(`../../../../${e.photo}`)} */}
+                            <CardContent>
+                              <Typography variant="h5">
+                                {`${e.firstname} ${e.lastname}`}
+                              </Typography>
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                              >
+                                {`User: ${e.email}`}
+                              </Typography>
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                              >
+                                {`Supervisor: ${e.supervisoremail}`}
+                              </Typography>
+                            </CardContent>
+                          </CardActionArea>
+                          <CardActions>
+                            <Button
+                              className="manageBut"
+                              size="large"
+                              variant="contained"
+                              onClick={() => handleAccept(e)}
+                            >
+                              Accept after Review
+                            </Button>
+                            <div>
+                              <Snackbar
+                                open={toast2}
+                                autoHideDuration={6000}
+                                onClose={handleClose}
+                                message={message}
+                              />
+                            </div>
+                          </CardActions>
+                        </Card>
+                      );
+                    })
+                  ) : (
+                    <p>No requests pending</p>
+                  )}
                 </section>
               </TabPanel>
             </TabContext>
