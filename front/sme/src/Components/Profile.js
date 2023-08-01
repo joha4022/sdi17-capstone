@@ -30,6 +30,7 @@ function Profile({ userId }) {
   const { id } = useParams();
   // const id = JSON.parse (sessionStorage.getItem('currentUser')).userid;
   const { currentUser } = useContext(AppContext);
+  const [photo, setPhoto] = useState()
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -41,6 +42,13 @@ function Profile({ userId }) {
         const data = await res.json();
         setUsers(data[0]);
         setBio(data[0].bio);
+        fetch('http://localhost:3001/getphoto', {
+            method: 'POST',
+            headers: { 'Content-type': 'application/json' },
+            body: JSON.stringify({ photopath: users.photo })
+          })
+            .then(res => res.blob())
+            .then(data => setPhoto(URL.createObjectURL(data)))
         }
       } catch (error) {
         console.error("Failed to fetch Profile Data: ", error);
@@ -62,6 +70,7 @@ function Profile({ userId }) {
       setNotes(currentNotes);
     }
   }, [currentUser]);
+
 
   function updateUserBio(userid, newBio) {
     fetch(`http://localhost:3001/updateuser`, {
@@ -173,12 +182,9 @@ function Profile({ userId }) {
                 justifyContent: "center",
               }}
             >
-              <Avatar
-                src={
-                  users && users.photo
-                    ? users.photo
-                    : "/images/Blank_Avatar.jpg"
-                }
+              <Avatar 
+                src={photo || "/default.png"} // Use a placeholder image while loading
+                alt="User Profile Picture"
                 sx={{ width: 200, height: 200 }}
               />
             </Paper>
