@@ -31,6 +31,7 @@ const Manage = () => {
   const [toast2, setToast2] = useState(false)
   const [message, setMessage] = useState("");
   const [dummy, setDummy] = useState(false)
+  const [photoList, setPhotoList] = useState([]);
   const { currentUser, setCurrentUser } = useContext(AppContext);
 
   const navigate = useNavigate();
@@ -41,16 +42,45 @@ const Manage = () => {
       .then((data) => setSMEs(data));
   }, [open, dummy]);
 
+  useEffect(() => {
+    const fetchImages = async () => {
+      const promises = SMEs.map((e) => fetchImage(e));
+      const images = await Promise.all(promises);
+      setPhotoList(images);
+    };
+    fetchImages();
+  }, [SMEs]); // Fetch images whenever SMEs changes
+
+  const fetchImage = async (e) => {
+    const body = JSON.stringify({
+      photopath: e.photo,
+    });
+    const option = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: body,
+    };
+    const res = await fetch(`http://localhost:3001/getphoto`, option);
+    const imageBlob = await res.blob();
+    const imageObjectURL = URL.createObjectURL(imageBlob);
+    // console.log(e.userid, imageObjectURL);
+    return imageObjectURL;
+  };
+
   let results = [];
   if (tab === "2") {
     if (searchTerm.length > 0) {
-      results = SMEs.filter((word) => {
+      results = SMEs.map((e,i) => ({...e, image: photoList[i]}))
+      results = results.filter((word) => {
         let name = [word.firstname, word.lastname].join(" ");
         return name.toUpperCase().includes(searchTerm.toUpperCase());
       });
     }
   } else if (tab === "1") {
-    results = SMEs.filter((element) => {
+    results = SMEs.map((e,i) => ({...e, image: photoList[i]}))
+    results = results.filter((element) => {
       return !element.userverified;
     });
   }
@@ -130,10 +160,10 @@ const Manage = () => {
                     return (
                       <Card key={`${i}`} sx={{ maxWidth: "15vw" }}>
                         <CardMedia
-                          component="img"
-                          src={"/default.png"}
-                          alt="User Profile Picture"
-                        />
+                        component="img"
+                        src={e.image || "/default.png"} // Use a placeholder image while loading
+                        alt="User Profile Picture"
+                      />
                         {/* {console.log(`../../../../${e.photo}`)} */}
                         <CardContent>
                           <Typography variant="h5">
@@ -217,10 +247,10 @@ const Manage = () => {
                     return (
                       <Card key={`${i}`} sx={{ maxWidth: "15vw" }}>
                         <CardMedia
-                          component="img"
-                          src={"/default.png"}
-                          alt="User Profile Picture"
-                        />
+                        component="img"
+                        src={e.image || "/default.png"} // Use a placeholder image while loading
+                        alt="User Profile Picture"
+                      />
                         {/* {console.log(`../../../../${e.photo}`)} */}
                         <CardContent>
                           <Typography variant="h5">

@@ -32,10 +32,12 @@ function Profile({ userId }) {
   });
   const { id } = useParams();
   const { currentUser } = useContext(AppContext);
+  const [photo, setPhoto] = useState();
   // const [highlightedDays, setHighlightedDays] = useState([]);
   // const [isLoading, setIsLoading] = useState(false); 
   // const requestAbortController = useRef(null); 
   // const id = JSON.parse (sessionStorage.getItem('currentUser')).userid;
+
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -58,6 +60,13 @@ function Profile({ userId }) {
           setSMECategories(smeData.map(sme => sme.categories).flat());
         }
       }
+        fetch('http://localhost:3001/getphoto', {
+            method: 'POST',
+            headers: { 'Content-type': 'application/json' },
+            body: JSON.stringify({ photopath: users.photo })
+          })
+            .then(res => res.blob())
+            .then(data => setPhoto(URL.createObjectURL(data)))
     }
   } catch (error) {
     console.error("Failed to fetch Profile Data: ", error);
@@ -203,12 +212,9 @@ function Profile({ userId }) {
                   <img src="/images/Verified.png" alt="SME ICON" style={{width: '50%'}}/>
                 </MuiBox>
                 : null }>
-              <Avatar
-                src={
-                  users && users.photo
-                    ? users.photo
-                    : "/images/Blank_Avatar.jpg"
-                }
+              <Avatar 
+                src={photo || "/default.png"} // Use a placeholder image while loading
+                alt="User Profile Picture"
                 sx={{ width: 200, height: 200 }}
               />
               </Badge>
