@@ -10,6 +10,7 @@ import Loader from "./Loader";
 import MeetingFormModal from "./MeetingFormModal";
 import dayjs from "dayjs";
 import TextareaAutosize from '@mui/base/TextareaAutosize';
+import FooterBar from "./FooterBar";
 import { AppContext } from '../App.js';
 
 
@@ -412,7 +413,9 @@ function Profile({ userId }) {
           </Paper>
         </Grid>
       </Grid>
+      <FooterBar />
     </Background>
+    
   );
 }
 

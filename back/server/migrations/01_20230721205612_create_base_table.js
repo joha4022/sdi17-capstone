@@ -8,6 +8,8 @@ exports.up = function(knex) {
         table.string('basename')
         table.string('basecity')
         table.string('basestate')
+        table.double('baselat')
+        table.double('baselon')
 
     })
     .catch(err => console.log(err));
