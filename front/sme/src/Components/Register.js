@@ -23,9 +23,10 @@ export default function Register() {
   const [phoneNumber, setPhoneNumber] = useState(false);
   const [supEmail, setSupEmail] = useState(false);
   const [appEmail, setAppEmail] = useState('admin@sme.com');
-  const [sme, setSme] = useState('verified');
+  const [sme, setSme] = useState(false);
   const [categories, setCategories] = useState(false);
   const [smeCategory, setSmeCategory] = useState(false);
+  const [userverified, setUserverified] = useState('verified');
   // alertdisplay
   const [message, setMessage] = useState(false);
   const [alert, setAlert] = useState(false);
@@ -110,7 +111,8 @@ export default function Register() {
         phonenumber: phoneNumber,
         branch: branch,
         sme: sme,
-        base_id: baseid
+        base_id: baseid,
+        userverified: userverified
       })
       const option = {
         method: 'POST',
@@ -250,6 +252,16 @@ export default function Register() {
   }
   const testString = `Must include at least 5 characters \nMust include at least one number \nMust include one uppercase letter`
 
+  const smeHandler = (smeState) => {
+    if(smeState === true) {
+      setSme(true);
+      setUserverified('pending');
+    } else {
+      setSme(false);
+      setUserverified('verified');
+    }
+  }
+
   if (currentBases && categories) {
     return (
       <>
@@ -287,12 +299,10 @@ export default function Register() {
                 <tr className='register-row'>
                   <td>
                     <div className='register-category'>Account Type</div>
-                    <FormControlLabel control={<Checkbox onClick={(e) => { if(e.target.checked === true) {
-                      setSme('pending')
-                    } else { setSme('verified') }}} />} label="SME" />
+                    <FormControlLabel control={<Checkbox onClick={(e) => {smeHandler(e.target.checked) }} />} label="SME" />
                     <FormHelperText sx={{ width: '250px' }}>SME account will need to be verified before it can be used.</FormHelperText>
                   </td>
-                  <td style={{ display: `${sme==='verified' ? 'none' : 'block'}` }}>
+                  <td style={{ display: `${!sme ? 'none' : 'block'}` }}>
                     <div className='register-category'>SME Category</div>
                     <Autocomplete sx={{ width: '28ch' }}
                       id="outlined-select-smeCategory"

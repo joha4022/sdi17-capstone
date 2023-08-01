@@ -340,7 +340,8 @@ export default function EditProfile() {
       .then(data => {
         const body = JSON.stringify({
           userid: userid,
-          photo: `./photos/${photo.name}`
+          photo: `./photos/${photo.name}`,
+          password: `${newPassword ? newPassword : password}`,
         })
         const option = {
           method: 'PATCH',
@@ -431,7 +432,7 @@ export default function EditProfile() {
     }
   }
 //------------------------------------------------CONSOLE LOGS------------------------------------------------//
-console.log(smeCategory);
+
 //------------------------------------------------RENDER------------------------------------------------//
   if (currentUser && currentBases) {
     return (
@@ -492,7 +493,7 @@ console.log(smeCategory);
                   }} />
                 <div className='editprofile-username-display'>{username}
                   <div className='editprofile-email-display'>{email}</div>
-                  <div className='editprofile-user-type'>{currentUser.admin ? 'Admin' : ''} {currentUser.sme ? '/ SME' : ''}</div>
+                  <div className='editprofile-user-type'>{currentUser.admin ? 'Admin' : ''} {currentUser.sme ? '/ SME' : ''} {currentUser.sme === false && currentUser.admin === false ? `${currentUser.branch}` :''}</div>
                   {currentSmeCategories ?
                     <>
                       {currentSmeCategories.map((cat, i) => {
