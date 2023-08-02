@@ -470,7 +470,7 @@ export default function EditProfile() {
       })
   }
   //------------------------------------------------CONSOLE LOGS------------------------------------------------//
-  console.log(smeCategory)
+  // console.log(smeCategory)
   //------------------------------------------------RENDER------------------------------------------------//
   if (currentUser && currentBases && currentSmeCategories) {
     return (
