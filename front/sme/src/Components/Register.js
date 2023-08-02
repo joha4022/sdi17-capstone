@@ -27,7 +27,7 @@ export default function Register() {
   const [categories, setCategories] = useState(false);
   const [smeCategory, setSmeCategory] = useState('');
   const [userverified, setUserverified] = useState('verified');
-  // const [photo, setPhoto] = useState('./photos/default.png')
+  const [supName, setSupName] = useState(false);
   // alertdisplay
   const [message, setMessage] = useState(false);
   const [alert, setAlert] = useState(false);
@@ -264,6 +264,13 @@ export default function Register() {
     }
   }
 
+  const supEmailHandler = (supervisorEmail) => {
+    
+  }
+
+  console.log(smeCategory);
+
+
   if (currentBases && categories) {
     return (
       <>
@@ -315,7 +322,7 @@ export default function Register() {
                       options={categories}
                       renderInput={(params) => <TextField {...params} label='SME Category' />}
                       onKeyUp={(e) => { setSmeCategory(e.target.value) }}
-                      onClose={(e) => { setSmeCategory(e.target.textContent) }}
+                      onClose={(e) => { setSmeCategory(e.target.textContent); setSmeCategory(document.querySelector('#outlined-select-smeCategory').value);  }}
                       onKeyDown={(e) => { if (e.key === 'Enter') { setSmeCategory(e.target.dataset.value) } }}>
                     </Autocomplete>
                   </td>

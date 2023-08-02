@@ -734,7 +734,7 @@ console.log(smeCategory)
                                       options={categories}
                                       renderInput={(params) => <TextField {...params} label='SME Category' />}
                                       onKeyUp={(e) => { setSmeCategory(e.target.value) }}                                     
-                                      onClose={(e) => { setSmeCategory(document.querySelector('#outlined-select-smeCategory').value); setSmeCategory(e.target.textContent); }}
+                                      onClose={(e) => { setSmeCategory(e.target.textContent); setSmeCategory(document.querySelector('#outlined-select-smeCategory').value); }}
                                       onKeyDown={(e) => { if (e.key === 'Enter') { setSmeCategory(e.target.dataset.value) } }}>
                                     </Autocomplete>
                                   </td>
