@@ -290,7 +290,7 @@ exports.seed = async function (knex) {
       hashedpassword: 'kWCWRyA7BBWqV27Es+KUDruzGK/9oQ1EzIqEEngPN5oTWMFjzpOkgXVc3r/IBur/8yzvjSgoiN2QhLRBwxcIBw==',
       worklocation: 'BLDG 271 RM 15',
       bio:'10 year Air Force veteran, 15 ',
-      photo: './photos/default.png',
+      photo: './photos/Blank_Avatar.jpg',
       branch: 'Air Force',
       sme: true,
       admin: false,

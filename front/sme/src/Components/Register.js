@@ -25,8 +25,9 @@ export default function Register() {
   const [appEmail, setAppEmail] = useState('admin@sme.com');
   const [sme, setSme] = useState(false);
   const [categories, setCategories] = useState(false);
-  const [smeCategory, setSmeCategory] = useState(false);
+  const [smeCategory, setSmeCategory] = useState('');
   const [userverified, setUserverified] = useState('verified');
+  // const [photo, setPhoto] = useState('./photos/default.png')
   // alertdisplay
   const [message, setMessage] = useState(false);
   const [alert, setAlert] = useState(false);
@@ -56,7 +57,7 @@ export default function Register() {
     fetch('http://localhost:3001/')
       .then(res => res.json())
       .then(data => {
-        setUserid(Number(data.length + 1));
+        setUserid(data[data.length-1].userid + 1);
         const usernames = [...usernameList];
         data.map(user => {
           usernames.push(user.username);
@@ -111,8 +112,10 @@ export default function Register() {
         phonenumber: phoneNumber,
         branch: branch,
         sme: sme,
+        photo: './photos/Blank_Avatar.jpg',
         base_id: baseid,
-        userverified: userverified
+        userverified: userverified,
+        // photo: photo
       })
       const option = {
         method: 'POST',
@@ -140,7 +143,7 @@ export default function Register() {
                 sessionStorage.setItem('loggedInUser', JSON.stringify({ userid: userid, firstname: firstname, lastname: lastname, sme: sme, admin: false }));
                 navigate(`/profile/${userid}`, { replace: true });
               }
-              if (categories.includes(smeCategory)) {
+              if (categories.includes(smeCategory) && sme === true) {
                 fetch('http://localhost:3001/smes', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
@@ -149,7 +152,7 @@ export default function Register() {
                     category_id: categories.indexOf(smeCategory) + 1
                   })
                 })
-              } else {
+              } else if(sme === true && !categories.includes(smeCategory)) {
                 // adds a new category to the sme category table
                 fetch('http://localhost:3001/createcategory', {
                   method: 'POST',
@@ -434,7 +437,7 @@ export default function Register() {
                       size='large'
                       sx={{ width: '28ch', marginRight: '10px' }}
                       id="outlined-disabled"
-                      value={baseName !== false ? `${baseName}, ${baseCity} ${baseState}` : 'Add Base *'}
+                      value={baseName !== false ? `${baseName === 'Not Selected'? baseName : baseName + ','} ${baseCity === false ? '' : baseCity} ${baseState === false ? '' : baseState}` : 'Add Base *'}
                     />
                   </td>
                   <td>

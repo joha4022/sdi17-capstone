@@ -211,6 +211,7 @@ const Manage = () => {
                               component="img"
                               src={e.image || "/default.png"} // Use a placeholder image while loading
                               alt="User Profile Picture"
+                              
                             />
                             {/* {console.log(`../../../../${e.photo}`)} */}
                             <CardContent>
@@ -266,7 +267,7 @@ const Manage = () => {
                               <Snackbar
                                 open={toast2}
                                 autoHideDuration={6000}
-                                onClose={handleClose}
+                                onClose={handleClose2}
                                 message={message}
                               />
                             </div>
@@ -422,20 +423,12 @@ const Manage = () => {
                             >
                               Accept after Review
                             </Button>
-                            <div>
-                              <Snackbar
-                                open={toast2}
-                                autoHideDuration={6000}
-                                onClose={handleClose}
-                                message={message}
-                              />
-                            </div>
                           </CardActions>
                         </Card>
                       );
                     })
                   ) : (
-                    <p>No requests pending</p>
+                    <p>No denied requests to display</p>
                   )}
                 </section>
               </TabPanel>
