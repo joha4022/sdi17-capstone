@@ -112,7 +112,7 @@ useEffect(() => {
     })
     .then(res => res.json())
       .then(data => {
-        console.log('Success:', data)
+        // console.log('Success:', data)
         setInNetwork(true)
         if(data.message === "SME is already in your network !") {
           const alert = window.alert('User is already in network');
@@ -136,7 +136,7 @@ useEffect(() => {
     })
     .then(res => res.json())
       .then(data => {
-        console.log('Success:', data)
+        // console.log('Success:', data)
         setInNetwork(false)
         })
       .catch((error) => {
