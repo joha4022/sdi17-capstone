@@ -32,7 +32,7 @@ const verify_pw = (password) => {
 }
 console.log('password verified: ', verify_pw(password))
 
-
+// '/upload' & 'getphoto' no errors
 // For handling the upload request
 app.post("/upload", function (req, res) {
     // When a file has been uploaded
@@ -95,7 +95,7 @@ app.get('/all', function (req, res) {
         );
 });
 
-
+// UPDATED: commented out the base portion of the select. base table was updated awhile back.
 app.get('/all2', function (req, res) {
     knex('users')
 
@@ -117,11 +117,11 @@ app.get('/all2', function (req, res) {
             'users.branch',
             'users.sme',
             'users.admin',
-            'user.userverified',
-            'base.basename',
-            'base.branch',
-            'base.city',
-            'base.state',
+            'users.userverified',
+            //'base.basename',
+            // 'base.branch',
+            // 'base.city',
+            // 'base.state',
             //'category.name'
 
         )
@@ -129,7 +129,8 @@ app.get('/all2', function (req, res) {
         .catch(err =>
             res.status(404).json({
                 message:
-                    'The data you are looking for could not be found. Please try again'
+                    'The data you are looking for could not be found. Please try again',
+                error: err
             })
         );
 });
@@ -603,7 +604,7 @@ app.post('/createuser', (req, res) => {
         })
         .catch((err) =>
             res.status(500).json({
-                message: 'An error occurred while fetching the login',
+                message: 'An error occurred while creating user',
                 error: err,
             })
         );
