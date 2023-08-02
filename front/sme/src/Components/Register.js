@@ -1,7 +1,7 @@
 import './Register.css'
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AutoComplete, FormControlLabel, TextField, IconButton, OutlinedInput, InputLabel, InputAdornment, FormControl, Button, Collapse, Alert, Typography, AlertTitle, Box, Modal, MenuItem, Backdrop, CircularProgress, FormHelperText, Checkbox, Autocomplete } from '@mui/material';
+import { FormControlLabel, TextField, IconButton, OutlinedInput, InputLabel, InputAdornment, FormControl, Button, Collapse, Alert, Typography, AlertTitle, Box, Modal, MenuItem, Backdrop, CircularProgress, FormHelperText, Checkbox, Autocomplete } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
@@ -22,10 +22,11 @@ export default function Register() {
   const [password2, setPassword2] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState(false);
   const [supEmail, setSupEmail] = useState(false);
-  const [appEmail, setAppEmail] = useState(false);
+  const [appEmail, setAppEmail] = useState('admin@sme.com');
   const [sme, setSme] = useState(false);
   const [categories, setCategories] = useState(false);
   const [smeCategory, setSmeCategory] = useState(false);
+  const [userverified, setUserverified] = useState('verified');
   // alertdisplay
   const [message, setMessage] = useState(false);
   const [alert, setAlert] = useState(false);
@@ -86,16 +87,16 @@ export default function Register() {
     }, 2500)
   }
 
-  console.log(smeCategory)
+  console.log(sme)
 
   const register = () => {
-    if (!firstname || !lastname || !username || !email || !password || !password2 || !appEmail || !baseName) {
+    if (!firstname || !lastname || !username || !email || !supEmail || !password || !password2 || !baseName) {
       alertDisplay('Please complete all the required fields!');
     } else if (!(/\d/).test(password) || !(/[A-Z]/).test(password) || password.length < 5) {
       alertDisplay('Password does not meet the minimum requirement.');
     } else if (password !== password2) {
       alertDisplay('Please make sure the passwords match.');
-    } else if (!email.includes('@') || !appEmail.includes('@')) {
+    } else if (!email.includes('@') || !supEmail.includes('@')) {
       alertDisplay('Please include @ and type in an approriate email.')
     } else {
       const body = JSON.stringify({
@@ -110,7 +111,8 @@ export default function Register() {
         phonenumber: phoneNumber,
         branch: branch,
         sme: sme,
-        base_id: baseid
+        base_id: baseid,
+        userverified: userverified
       })
       const option = {
         method: 'POST',
@@ -250,6 +252,16 @@ export default function Register() {
   }
   const testString = `Must include at least 5 characters \nMust include at least one number \nMust include one uppercase letter`
 
+  const smeHandler = (smeState) => {
+    if(smeState === true) {
+      setSme(true);
+      setUserverified('pending');
+    } else {
+      setSme(false);
+      setUserverified('verified');
+    }
+  }
+
   if (currentBases && categories) {
     return (
       <>
@@ -287,7 +299,7 @@ export default function Register() {
                 <tr className='register-row'>
                   <td>
                     <div className='register-category'>Account Type</div>
-                    <FormControlLabel control={<Checkbox onClick={(e) => { setSme(e.target.checked) }} />} label="SME" />
+                    <FormControlLabel control={<Checkbox onClick={(e) => {smeHandler(e.target.checked) }} />} label="SME" />
                     <FormHelperText sx={{ width: '250px' }}>SME account will need to be verified before it can be used.</FormHelperText>
                   </td>
                   <td style={{ display: `${!sme ? 'none' : 'block'}` }}>
@@ -406,12 +418,12 @@ export default function Register() {
                 <tr className='register-row'>
                   <td>
                     <div className='register-category'>Supervisor's E-mail</div>
-                    <TextField id="outlined-basic-supemail" sx={{ width: '28ch' }} label="Supervisor's E-mail" variant="outlined" onKeyUp={(e) => { setSupEmail(e.target.value) }} />
+                    <TextField error={!supEmail || !supEmail.includes('@') ? true : false} id="outlined-basic-supemail" sx={{ width: '28ch' }} required label="Supervisor's E-mail" variant="outlined" onKeyUp={(e) => { setSupEmail(e.target.value) }} />
                   </td>
-                  <td>
+                  {/* <td>
                     <div className='register-category'>Approver's E-mail</div>
                     <TextField error={!appEmail || !appEmail.includes('@') ? true : false} required id="outlined-basic-appemail" sx={{ width: '28ch' }} label="Approver's E-mail" variant="outlined" onKeyUp={(e) => { setAppEmail(e.target.value) }} />
-                  </td>
+                  </td> */}
                 </tr>
                 <tr className='register-row'>
                   {/* list out bases from the database */}

@@ -22,7 +22,7 @@ exports.seed = async function (knex) {
       branch: 'Space Force',
       sme: true,
       admin: true,
-      userverified: true,
+      userverified: 'verified',
       base_id: 1 //changed the table name here
     },
 
@@ -43,7 +43,7 @@ exports.seed = async function (knex) {
       branch: 'Air Force',
       sme: true,
       admin: false,
-      userverified: true,
+      userverified: 'verified',
       base_id: 2 //changed the table name here
     },
     {
@@ -62,7 +62,7 @@ exports.seed = async function (knex) {
       branch: 'Air Force',
       sme: true,
       admin: false,
-      userverified: true,
+      userverified: 'verified',
       base_id: 3 //changed the table name here
     },
 
@@ -82,7 +82,7 @@ exports.seed = async function (knex) {
       branch: 'Air Force',
       sme: true,
       admin: false,
-      userverified: true,
+      userverified: 'verified',
       base_id: 4 //changed the table name here
     },
     {
@@ -101,7 +101,7 @@ exports.seed = async function (knex) {
       branch: 'Air Force',
       sme: true,
       admin: false,
-      userverified: true,
+      userverified: 'verified',
       base_id: 5 //changed the table name here
     },
     {
@@ -120,7 +120,7 @@ exports.seed = async function (knex) {
       branch: 'Air Force',
       sme: true,
       admin: false,
-      userverified: true,
+      userverified: 'verified',
       base_id: 5 //changed the table name here
     },
     {
@@ -139,7 +139,7 @@ exports.seed = async function (knex) {
       branch: 'Air Force',
       sme: true,
       admin: false,
-      userverified: true,
+      userverified: 'verified',
       base_id: 6 //changed the table name here
     },
     {
@@ -158,7 +158,7 @@ exports.seed = async function (knex) {
       branch: 'Air Force',
       sme: true,
       admin: false,
-      userverified: true,
+      userverified: 'verified',
       base_id: 6 //changed the table name here
     },
     {
@@ -177,7 +177,7 @@ exports.seed = async function (knex) {
       branch: 'Air Force',
       sme: true,
       admin: false,
-      userverified: true,
+      userverified: 'verified',
       base_id: 7 //changed the table name here
     },
     {
@@ -196,7 +196,7 @@ exports.seed = async function (knex) {
       branch: 'Air Force',
       sme: true,
       admin: false,
-      userverified: true,
+      userverified: 'verified',
       base_id: 9 //changed the table name here
     },
     {
@@ -215,7 +215,7 @@ exports.seed = async function (knex) {
       branch: 'Air Force',
       sme: true,
       admin: false,
-      userverified: true,
+      userverified: 'verified',
       base_id: 10 //changed the table name here
     },
 
@@ -236,7 +236,7 @@ exports.seed = async function (knex) {
       branch: 'Air Force',
       sme: true,
       admin: false,
-      userverified: true,
+      userverified: 'verified',
       base_id: 11 //changed the table name here
     },
     {
@@ -255,7 +255,7 @@ exports.seed = async function (knex) {
       branch: 'Air Force',
       sme: true,
       admin: false,
-      userverified: true,
+      userverified: 'verified',
       base_id: 12 //changed the table name here
     },
 
@@ -275,7 +275,7 @@ exports.seed = async function (knex) {
       branch: 'Air Force',
       sme: false,
       admin: false,
-      userverified: false,
+      userverified: 'pending',
       base_id: 12 //changed the table name here
     },
     {
@@ -294,7 +294,7 @@ exports.seed = async function (knex) {
       branch: 'Air Force',
       sme: true,
       admin: false,
-      userverified: true,
+      userverified: 'pending',
       base_id: 13 //changed the table name here
     },
     {
@@ -313,7 +313,7 @@ exports.seed = async function (knex) {
       branch: 'Air Force',
       sme: true,
       admin: false,
-      userverified: false,
+      userverified: 'pending',
       base_id: 14 //changed the table name here
     },
     {
@@ -332,7 +332,7 @@ exports.seed = async function (knex) {
       branch: 'Air Force',
       sme: true,
       admin: false,
-      userverified: true,
+      userverified: 'verified',
       base_id: 14 //changed the table name here
     },
     {
@@ -351,7 +351,7 @@ exports.seed = async function (knex) {
       branch: 'Air Force',
       sme: true,
       admin: false,
-      userverified: false,
+      userverified: 'pending',
       base_id: 9 //changed the table name here
     },
     {
@@ -370,7 +370,7 @@ exports.seed = async function (knex) {
       branch: 'Air Force',
       sme: true,
       admin: false,
-      userverified: true,
+      userverified: 'verified',
       base_id: 7 //changed the table name here
     },
     {
@@ -389,7 +389,7 @@ exports.seed = async function (knex) {
       branch: 'Air Force',
       sme: true,
       admin: false,
-      userverified: false,
+      userverified: 'pending',
       base_id: 8 //changed the table name here
     },
     {
@@ -408,7 +408,7 @@ exports.seed = async function (knex) {
       branch: 'Air Force',
       sme: true,
       admin: false,
-      userverified: true,
+      userverified: 'verified',
       base_id: 4 //changed the table name here
     },
 

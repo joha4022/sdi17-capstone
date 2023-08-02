@@ -14,9 +14,10 @@
 }
 .editprofile-user-type {
   font-size: 1.3rem;
-  font-weight: normal;
+  font-weight: bold;
   position: relative;
   top: 1.5rem;
+  color: #0A065D;
 }
 .editprofile-username-display{
   font-weight: bold;
@@ -26,7 +27,7 @@
   left: 15rem;
 }
 .editprofile-main-photo {
-  height: 250px;
+  height: 300px;
 }
 .editprofile-email-display{
   font-size:1.5rem;
@@ -34,7 +35,7 @@
 .main-menu-title{
   font-weight: bold;
   font-size: 3rem;
-  margin: 30px 0px 40px 0px;
+  margin: 30px 0px 10px 0px;
 }
 #image-upload {
   display: none;
@@ -45,10 +46,6 @@
 }
 .editprofile-avatar{
   margin: 20px 0px 30px 20px;
-}
-.editprofile-avatar:hover{
-  cursor: pointer;
-  opacity: 80%;
 }
 .editprofile-main-menu-bar{
   background: white;
@@ -75,5 +72,12 @@
 .delete-statement{
   margin: 10px 0px 10px 0px;
   font-size: 0.9rem;
-
+}
+.sme-category-span {
+  font-size: 1rem;
+  position: relative;
+  top: 2rem;
+}
+.adding-new-sme-category {
+  display: none;
 }

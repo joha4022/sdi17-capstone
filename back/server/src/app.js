@@ -672,6 +672,7 @@ app.patch('/updateuser', (req, res) => {
             'approveremail',
             'phonenumber',
             'password',
+            'hashedpassword',
             'worklocation',
             'bio',
             'photo',
@@ -1129,7 +1130,7 @@ app.post('/login/', (req, res) => {
     hashedpw = get_hash(pw) //user input
 
     knex('users')
-        .select('userid', 'firstname', 'lastname', 'admin', 'sme', 'userverified')
+        .select('userid', 'firstname', 'lastname', 'admin', 'sme', 'userverified', 'branch')
         .where('username', user)
         //changed from 'password' to 'hashedpassword'
         .where('hashedpassword', get_hash(pw))

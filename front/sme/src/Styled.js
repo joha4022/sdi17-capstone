@@ -1,5 +1,5 @@
 import {styled} from 'styled-components';
-import { Paper, AppBar as MuiAppBar, Box as MuiBox  } from "@mui/material";
+import { Card, CardContent, Paper, AppBar as MuiAppBar, Box as MuiBox  } from "@mui/material";
 import Autosuggest from 'react-autosuggest';
 
 const Home = styled.div`
@@ -68,13 +68,6 @@ const FooterGit = styled.img`
   margin-left: 10px;
 `;
 
-const Meetings = styled(Paper)`
-  flex-grow: 3;
-  overflow: auto;
-  margin: 20px;
-  padding: 20px;
-`;
-
 const AvatarAndDetails = styled(MuiBox)`
   flex-shrink: 0;
   flex-basis: 100px;
@@ -86,6 +79,49 @@ const StyledAutosuggest = styled(Autosuggest)`
     box-sizing: border-box !important;
   }
 `;
+
+const Meetings = styled(Paper)`
+  flex-grow: 3;
+  overflow: auto;
+  margin: 20px;
+  padding: 20px;
+
+  .MuiCard-root {
+    margin-bottom: 10px;
+  }
+
+  .MuiCardContent-root {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    alignitems: center;
+    padding: 16px;
+  }
+
+  .MuiTypography-root {
+    margin-bottom:5px;
+  }
+
+  .MuiButton-root {
+    float: "right";
+    width: "65px";
+    height: "20px";
+    fontSize: "0.6em";
+    borderColor: "red";
+    color: "red";
+    borderWidth: "2px";
+    borderRadius: "2px";
+    padding: 0;
+    transition: "0.3s";
+
+    "&:hover": {
+      backgroundColor: "red";
+      color: "white";
+    }
+  }
+`;
+
+
 
 export {
   Home,
