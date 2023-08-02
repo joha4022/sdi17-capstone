@@ -111,7 +111,7 @@ export default function Register() {
         phonenumber: phoneNumber,
         branch: branch,
         sme: sme,
-        photo: './photos/default.png',
+        photo: './photos/Blank_Avatar.jpg',
         base_id: baseid,
         userverified: userverified
       })
