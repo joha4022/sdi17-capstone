@@ -21,7 +21,7 @@ exports.up = function (knex) {
         table.varchar('img_url', 255)
         table.boolean('sme').defaultTo(false)
         table.boolean('admin').defaultTo(false)
-        table.boolean('userverified').defaultTo(false)
+        table.string('userverified').defaultTo('pending')
         table.integer('base_id')
         table.foreign('base_id').references('base.baseid')
 

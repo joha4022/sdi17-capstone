@@ -414,7 +414,7 @@ app.post('/smes', (req, res) => {
         .where('category_id', category_id)
         .then((data) => {
             if (data.length > 0) {
-                res.status(404).json({ message: `User *${user_id}* already has this SME category!` });
+                res.status(404).json({ code:404, message: `User *${user_id}* already has this SME category!` });
             } else {
                 knex('sme')
                     .insert({
@@ -660,6 +660,7 @@ app.patch('/updateuser', (req, res) => {
             'approveremail',
             'phonenumber',
             'password',
+            'hashedpassword',
             'worklocation',
             'bio',
             'photo',
@@ -1154,7 +1155,7 @@ app.post('/login/', (req, res) => {
     hashedpw = get_hash(pw) //user input
 
     knex('users')
-        .select('userid', 'firstname', 'lastname', 'admin', 'sme', 'userverified')
+        .select('userid', 'firstname', 'lastname', 'admin', 'sme', 'userverified', 'branch')
         .where('username', user)
         //changed from 'password' to 'hashedpassword'
         .where('hashedpassword', get_hash(pw))
