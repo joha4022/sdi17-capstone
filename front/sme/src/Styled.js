@@ -1,5 +1,5 @@
 import {styled} from 'styled-components';
-import { Card, CardContent, Paper, AppBar as MuiAppBar, Box as MuiBox  } from "@mui/material";
+import { Paper, AppBar as MuiAppBar, Box as MuiBox  } from "@mui/material";
 import Autosuggest from 'react-autosuggest';
 
 const Home = styled.div`
@@ -82,7 +82,8 @@ const StyledAutosuggest = styled(Autosuggest)`
 
 const Meetings = styled(Paper)`
   flex-grow: 3;
-  overflow: auto;
+  overflow-y: auto;
+  max-height: 40vh;
   margin: 20px;
   padding: 20px;
 
@@ -94,29 +95,29 @@ const Meetings = styled(Paper)`
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    alignitems: center;
+    align-items: center;
     padding: 16px;
   }
 
   .MuiTypography-root {
-    margin-bottom:5px;
+    margin-bottom: 5px;
   }
 
   .MuiButton-root {
-    float: "right";
-    width: "65px";
-    height: "20px";
-    fontSize: "0.6em";
-    borderColor: "red";
-    color: "red";
-    borderWidth: "2px";
-    borderRadius: "2px";
+    float: right;
+    width: 65px;
+    height: 20px;
+    font-size: 0.8em;
+    border-color: red;
+    color: red;
+    border-width: 2px;
+    border-radius: 2px;
     padding: 0;
-    transition: "0.3s";
+    transition: 0.3s;
 
-    "&:hover": {
-      backgroundColor: "red";
-      color: "white";
+    &:hover {
+      background-color: red;
+      color: white;
     }
   }
 `;
