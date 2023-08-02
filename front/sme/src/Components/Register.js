@@ -1,5 +1,5 @@
 import './Register.css'
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FormControlLabel, TextField, IconButton, OutlinedInput, InputLabel, InputAdornment, FormControl, Button, Collapse, Alert, Typography, AlertTitle, Box, Modal, MenuItem, Backdrop, CircularProgress, FormHelperText, Checkbox, Autocomplete } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
@@ -7,8 +7,10 @@ import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import FooterBar from './FooterBar';
 import Navbar from './Navbar';
+import { AppContext } from '../App';
 
 export default function Register() {
+  const {setCurrentUser} = useContext(AppContext);
   const [showPassword, setShowPassword] = useState(false);
   const [usernameList, setUsernameList] = useState([]);
   // required options
@@ -27,7 +29,7 @@ export default function Register() {
   const [categories, setCategories] = useState(false);
   const [smeCategory, setSmeCategory] = useState('');
   const [userverified, setUserverified] = useState('verified');
-  // const [photo, setPhoto] = useState('./photos/default.png')
+  const [supName, setSupName] = useState(false);
   // alertdisplay
   const [message, setMessage] = useState(false);
   const [alert, setAlert] = useState(false);
@@ -57,12 +59,17 @@ export default function Register() {
     fetch('http://localhost:3001/')
       .then(res => res.json())
       .then(data => {
-        setUserid(data[data.length-1].userid + 1);
+        const lastuser = [];
+        data.map(user=>{
+          lastuser.push(user.userid);
+        })
+        // console.log(lastuser.sort((a,b)=>{return a-b})[lastuser.length-1]+1)
+        setUserid(lastuser.sort((a,b)=>{return a-b})[lastuser.length-1]+1);
         const usernames = [...usernameList];
         data.map(user => {
           usernames.push(user.username);
         })
-        console.log(usernames);
+        // console.log(usernames);
         setUsernameList(usernames);
       })
     fetch('http://localhost:3001/categories')
@@ -88,7 +95,7 @@ export default function Register() {
     }, 2500)
   }
 
-  console.log(sme)
+  // console.log(sme)
 
   const register = () => {
     if (!firstname || !lastname || !username || !email || !supEmail || !password || !password2 || !baseName) {
@@ -115,7 +122,7 @@ export default function Register() {
         photo: './photos/Blank_Avatar.jpg',
         base_id: baseid,
         userverified: userverified,
-        // photo: photo
+        photo: './photos/Blank_Avatar.jpg'
       })
       const option = {
         method: 'POST',
@@ -139,6 +146,20 @@ export default function Register() {
               if (sme) {
                 navigate(`/register/${data.code}`, { replace: true });
               } else {
+                setCurrentUser({userid: userid,
+                  firstname: firstname,
+                  lastname: lastname,
+                  username: username,
+                  password: password,
+                  email: email,
+                  supervisoremail: supEmail,
+                  approveremail: appEmail,
+                  phonenumber: phoneNumber,
+                  branch: branch,
+                  sme: sme,
+                  base_id: baseid,
+                  userverified: userverified,
+                  photo: './photos/Blank_Avatar.jpg'});
                 sessionStorage.setItem('currentUser', JSON.stringify({ userid: userid }));
                 sessionStorage.setItem('loggedInUser', JSON.stringify({ userid: userid, firstname: firstname, lastname: lastname, sme: sme, admin: false }));
                 navigate(`/profile/${userid}`, { replace: true });
@@ -152,7 +173,7 @@ export default function Register() {
                     category_id: categories.indexOf(smeCategory) + 1
                   })
                 })
-              } else if(sme === true && !categories.includes(smeCategory)) {
+              } else if (sme === true && !categories.includes(smeCategory)) {
                 // adds a new category to the sme category table
                 fetch('http://localhost:3001/createcategory', {
                   method: 'POST',
@@ -265,6 +286,21 @@ export default function Register() {
     }
   }
 
+  const supEmailHandler = (supervisorEmail) => {
+    fetch('http://localhost:3001')
+      .then(res => res.json())
+      .then(data => {
+        data.map(user => {
+          if (user.email === supervisorEmail) {
+            setSupName(user.lastname + ', ' + user.firstname);
+          }
+        })
+      })
+  }
+
+  // console.log(smeCategory);
+
+
   if (currentBases && categories) {
     return (
       <>
@@ -316,7 +352,8 @@ export default function Register() {
                       options={categories}
                       renderInput={(params) => <TextField {...params} label='SME Category' />}
                       onKeyUp={(e) => { setSmeCategory(e.target.value) }}
-                      onClose={(e) => { setSmeCategory(e.target.textContent) }}
+                      // onClose={(e) => { setSmeCategory(e.target.textContent); setSmeCategory(document.querySelector('#outlined-select-smeCategory').value); }}
+                      onChange={(e)=> { setSmeCategory(document.querySelector('#outlined-select-smeCategory').value); setSmeCategory(e.target.textContent)}}
                       onKeyDown={(e) => { if (e.key === 'Enter') { setSmeCategory(e.target.dataset.value) } }}>
                     </Autocomplete>
                   </td>
@@ -421,12 +458,16 @@ export default function Register() {
                 <tr className='register-row'>
                   <td>
                     <div className='register-category'>Supervisor's E-mail</div>
-                    <TextField error={!supEmail || !supEmail.includes('@') ? true : false} id="outlined-basic-supemail" sx={{ width: '28ch' }} required label="Supervisor's E-mail" variant="outlined" onKeyUp={(e) => { setSupEmail(e.target.value) }} />
+                    <TextField error={!supName ? true : false} id="outlined-basic-supemail" sx={{ width: '28ch' }} required label="Supervisor's E-mail" variant="outlined"
+                      onKeyUp={(e) => {
+                        if (e.key === 'Backspace') {
+                          setSupName(false);
+                        } else { setSupEmail(e.target.value); supEmailHandler(e.target.value) }
+                      }} />
                   </td>
-                  {/* <td>
-                    <div className='register-category'>Approver's E-mail</div>
-                    <TextField error={!appEmail || !appEmail.includes('@') ? true : false} required id="outlined-basic-appemail" sx={{ width: '28ch' }} label="Approver's E-mail" variant="outlined" onKeyUp={(e) => { setAppEmail(e.target.value) }} />
-                  </td> */}
+                  <td>
+                    <FormHelperText sx={{ width: '28ch' }} >{supName ? 'Supervisor : ' + supName : 'Supervisor not found.'}</FormHelperText>
+                  </td>
                 </tr>
                 <tr className='register-row'>
                   {/* list out bases from the database */}
@@ -437,7 +478,7 @@ export default function Register() {
                       size='large'
                       sx={{ width: '28ch', marginRight: '10px' }}
                       id="outlined-disabled"
-                      value={baseName !== false ? `${baseName === 'Not Selected'? baseName : baseName + ','} ${baseCity === false ? '' : baseCity} ${baseState === false ? '' : baseState}` : 'Add Base *'}
+                      value={baseName !== false ? `${baseName === 'Not Selected' ? baseName : baseName + ','} ${baseCity === false ? '' : baseCity} ${baseState === false ? '' : baseState}` : 'Add Base *'}
                     />
                   </td>
                   <td>

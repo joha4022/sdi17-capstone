@@ -1,6 +1,6 @@
 import React,{ useState, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
-import { Typography, Button, Avatar, Paper, Grid, Badge, Box as MuiBox, Alert } from "@mui/material";
+import { Typography, Button, Avatar, Paper, Grid, Badge, Card, CardContent, Box as MuiBox, Snackbar, Alert } from "@mui/material";
 import { ProfileDetails, ProfileDetail, Background, Bio, Notes, Meetings, AvatarAndDetails } from "../Styled";
 import Navbar from "./Navbar";
 import { DateCalendar } from "@mui/x-date-pickers";
@@ -25,6 +25,9 @@ function Profile({ userId }) {
   const [bio, setBio] = useState('');
   const [inNetwork, setInNetwork] = useState(false)
   const [smeCategories, setSMECategories] = useState(['']);
+  const [openAlert, setOpenAlert] = useState(false);
+  const [alertSeverity, setAlertSeverity] = useState("success");
+  const [alertMessage, setAlertMessage] = useState('');
   const [badgePosition, setBadgePosition] = useState({
     vertical: 'bottom',
     horizontal: 'right',
@@ -55,10 +58,11 @@ function Profile({ userId }) {
           throw new Error(`HTTP error! status: ${resSME.status}`);
         } else {
           const smeData = await resSME.json();
-          // console.log('SME Data: ', smeData);
+
           setSMECategories(smeData.map(sme => sme.categories).flat());
         }
       }
+
     }
   } catch (error) {
     console.error("Failed to fetch Profile Data: ", error);
@@ -67,22 +71,27 @@ function Profile({ userId }) {
     fetchProfile();
   }, [id, meetings]);
 
-useEffect(() => {
-  if (users) {
-    fetch('http://localhost:3001/getphoto', {
-      method: 'POST',
-      headers: { 'Content-type' : 'application/json' },
-      body: JSON.stringify({ photopath: users.photo })
-    })
-    .then(res => res.blob())
-    .then(data => setPhoto(URL.createObjectURL(data)))
-  }
+  useEffect(() => {
+    if (users) {
+      fetch('http://localhost:3001/getphoto', {
+        method: 'POST',
+        headers: { 'Content-type' : 'application/json' },
+        body: JSON.stringify({ photopath: users.photo })
+      })
+      .then(res => res.blob())
+      .then(data => setPhoto(URL.createObjectURL(data)))
+    }
 }, [users]);
 
   useEffect(() => {
     fetch(`http://localhost:3001/usermeetings/${id}`)
       .then(res => res.json())
-      .then(data => setMeetings(data))
+      .then(data => {
+        const sortedMeetings = data.sort((a, b) => {
+          return new Date(b.meetingDate) - new Date(a.meetingDate);
+        });
+        setMeetings(sortedMeetings);
+      })
       .catch(err => console.log('Error:', err))
   }, [id]);
 
@@ -159,9 +168,15 @@ useEffect(() => {
       .then(data => {
         console.log('Success:', data);
         setUsers({ ...users, bio: newBio });
+        setOpenAlert(true);
+        setAlertSeverity("success");
+        setAlertMessage("Bio updated successfully!");
         })
       .catch((error) => {
         console.log('Failed to PATCH BIO:', error);
+        setOpenAlert(true);
+        setAlertSeverity("error");
+        setAlertMessage("Failed to update bio!");
       });
   }
 
@@ -252,41 +267,48 @@ useEffect(() => {
                 padding: 6,
                 display: "flex",
                 justifyContent: "center",
-              }}>
-                <Badge
-                overlap='circular'
+              }}
+            >
+              <Badge
+                overlap="circular"
                 anchorOrigin={badgePosition}
-                badgeContent={users.sme === true ? 
-                  <MuiBox sx={{ textAlign: 'center' }}>
-                  <img src="/images/Verified.png" alt="SME ICON" style={{width: '50%'}}/>
-                </MuiBox>
-                : null }>
-              <Avatar 
-                src={photo || "/default.png"} // Use a placeholder image while loading
-                alt="User Profile Picture"
-                sx={{ width: 200, height: 200 }}
-              />
+                badgeContent={
+                  users.sme === true ? (
+                    <MuiBox sx={{ textAlign: "center" }}>
+                      <img
+                        src="/images/Verified.png"
+                        alt="SME ICON"
+                        style={{ width: "50%" }}
+                      />
+                    </MuiBox>
+                  ) : null
+                }
+              >
+                <Avatar
+                  src={photo || "/default.png"} // Use a placeholder image while loading
+                  alt="User Profile Picture"
+                  sx={{ width: 200, height: 200 }}
+                />
               </Badge>
             </Paper>
             <Paper elevation={2} sx={{ margin: 4, padding: 5 }}>
               <MuiBox>
-                {/* {users.userverified && (
-                  <Typography variant="h6">SME</Typography>
-                )} */}
                 <ProfileDetails>
                   <Typography variant="h5">Name:</Typography>
                   <ProfileDetail>
                     {users && `${users.firstname} ${users.lastname}`}
                   </ProfileDetail>
                 </ProfileDetails>
-                {users.sme === 'true' ? (
-                <ProfileDetails>                 
-                  <Typography variant="h5">SME Categories:</Typography>
-                  <ProfileDetail>
-                    {smeCategories ? smeCategories.join(', ') : 'No Categories'}
-                  </ProfileDetail>
-                </ProfileDetails>
-                  ) : ( null )}
+                {users.sme === true ? (
+                  <ProfileDetails>
+                    <Typography variant="h5">SME Categories:</Typography>
+                    <ProfileDetail>
+                      {smeCategories
+                        ? smeCategories.join(", ")
+                        : "No Categories"}
+                    </ProfileDetail>
+                  </ProfileDetails>
+                ) : null}
                 <ProfileDetails>
                   <Typography variant="h5">Location:</Typography>
                   <ProfileDetail> {users && users.basename}</ProfileDetail>
@@ -347,58 +369,41 @@ useEffect(() => {
         </Grid>
         <Grid item xs={12} sm={4}>
           <Paper elevation={1} sx={{ margin: 1, padding: 1 }}>
+          <Typography variant="h5">Meetings</Typography>
             <Meetings>
-              Meetings:
-              <ul>
-                {meetings.map((meeting) => (
-                  <li key={meeting.meetingid}>
-                    <Grid container direction="row" alignItems="center">
-                      <Grid item xs={11}>
-                        <Typography>
-                          Title: 
-                          {meeting.meetingTitle}
-                          Description: 
-                          {meeting.meetingDescription}
-                          Start Time: 
-                          {meeting.startTime}
-                          End Time: 
-                          {meeting.endTime}
-                          Meeting Date: 
-                          {meeting.meetingDate}
-                        </Typography>
-                      </Grid>
-                      {Number(id) === currentUser.userid && (
-                        <Grid item xs={1}>
-                          <Button
-                            onClick={() =>
-                              handleDeleteMeeting(meeting.meetingid)}
-                            variant="outlined"
-                            sx={{
-                              float: "right",
-                              width: "65px",
-                              height: "20px",
-                              fontSize: "0.6em",
-                              borderColor: "red",
-                              color: "red",
-                              borderWidth: "2px",
-                              borderRadius: "2px",
-                              padding: 0,
-                              transition: "0.3s",
-                              "&:hover": {
-                                backgroundColor: "red",
-                                color: "white",
-                              },
-                            }}
-                            >
-                            Delete
-                          </Button>
-                        </Grid>
-                      )}
-                    </Grid>
-                  </li>
-                ))}
-              </ul>
-              <Button
+              {meetings.map((meeting) => (
+                <Card className="MuiCard-root" key={meeting.meetingid}>
+                  <CardContent className="MuiCardContent-root">
+                    <div>
+                      <Typography className="MuiTypography-root">
+                      <span style={{fontWeight: 'bold', textDecoration: 'underline'}}> Title:</span> {meeting.meetingTitle}
+                      </Typography>
+                      <Typography className="MuiTypography-root">
+                      <span style={{fontWeight: 'bold', textDecoration: 'underline'}}> Description:</span> {meeting.meetingDescription}
+                      </Typography>
+                      <Typography className="MuiTypography-root">
+                      <span style={{fontWeight: 'bold', textDecoration: 'underline'}}> Start Time:</span> {meeting.startTime}
+                      </Typography>
+                      <Typography className="MuiTypography-root">
+                      <span style={{fontWeight: 'bold', textDecoration: 'underline'}}> End Time:</span> {meeting.endTime}
+                      </Typography>
+                      <Typography className="MuiTypography-root">
+                      <span style={{fontWeight: 'bold', textDecoration: 'underline'}}> Meeting Date:</span> {meeting.meetingDate}
+                      </Typography>
+                    </div>
+                    {Number(id) === currentUser.userid && (
+                      <Button
+                        onClick={() => handleDeleteMeeting(meeting.meetingid)}
+                        className="MuiButton-root"
+                      >
+                        Delete
+                      </Button>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </Meetings>
+            <Button
                 onClick={openMeetingModal}
                 disabled={Number(id) !== currentUser.userid}
               >
@@ -408,7 +413,6 @@ useEffect(() => {
                 open={isMeetingModalOpen}
                 handleClose={closeMeetingModal}
               />
-            </Meetings>
           </Paper>
           <Paper elevation={1} sx={{ margin: 1, padding: 1 }}>
             <Notes>
@@ -437,7 +441,8 @@ useEffect(() => {
               <ul>
                 {notes.map(
                   (note, index) =>
-                    note.userid === currentUser.userid && Number(id) === currentUser.userid && (
+                    note.userid === currentUser.userid &&
+                    Number(id) === currentUser.userid && (
                       <li key={index}>
                         {editingNoteIndex === index ? (
                           <form onSubmit={handleUpdateNote}>
@@ -489,6 +494,15 @@ useEffect(() => {
               </ul>
             </Notes>
           </Paper>
+          <Snackbar
+            open={openAlert}
+            autoHideDuration={6000}
+            onClose={() => setOpenAlert(false)}
+            >
+            <Alert onClose={() => setOpenAlert(false)} severity={alertSeverity} sx={{ width: '100%' }}>
+              {alertMessage}
+            </Alert>
+            </Snackbar>
           <Button
                 onClick={() => {(!inNetwork) ? addToNetwork() : removeFromNetwork()}}
                 disabled={Number(id) === currentUser.userid}
@@ -499,7 +513,6 @@ useEffect(() => {
       </Grid>
       <FooterBar />
     </Background>
-    
   );
 }
 

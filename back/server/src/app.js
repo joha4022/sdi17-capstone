@@ -10,7 +10,6 @@ const PORT = process.env.PORT || 3001;
 const knex = require('knex')(require('../knexfile.js')[process.env.NODE_ENV || 'development']);
 const Crypto = require('crypto')
 
-
 app.use(express.json());
 app.use(cors());
 app.use(fileUpload());
@@ -33,7 +32,7 @@ const verify_pw = (password) => {
 }
 console.log('password verified: ', verify_pw(password))
 
-
+// '/upload' & 'getphoto' no errors
 // For handling the upload request
 app.post("/upload", function (req, res) {
     // When a file has been uploaded
@@ -96,7 +95,7 @@ app.get('/all', function (req, res) {
         );
 });
 
-
+// UPDATED: commented out the base portion of the select. base table was updated awhile back.
 app.get('/all2', function (req, res) {
     knex('users')
 
@@ -118,11 +117,11 @@ app.get('/all2', function (req, res) {
             'users.branch',
             'users.sme',
             'users.admin',
-            'user.userverified',
-            'base.basename',
-            'base.branch',
-            'base.city',
-            'base.state',
+            'users.userverified',
+            //'base.basename',
+            // 'base.branch',
+            // 'base.city',
+            // 'base.state',
             //'category.name'
 
         )
@@ -130,7 +129,8 @@ app.get('/all2', function (req, res) {
         .catch(err =>
             res.status(404).json({
                 message:
-                    'The data you are looking for could not be found. Please try again'
+                    'The data you are looking for could not be found. Please try again',
+                error: err
             })
         );
 });
@@ -237,7 +237,7 @@ app.delete('/deletecategory', function (req, res) {
                     .where('network.networkid', elem.networkid)
                     .del()
                     .then(() => console.log('leaving 1st'))
-            })//of map
+            })
         })
         .then(() => {
             knex('sme')
@@ -415,7 +415,7 @@ app.post('/smes', (req, res) => {
         .where('category_id', category_id)
         .then((data) => {
             if (data.length > 0) {
-                res.status(404).json({ code:404, message: `User *${user_id}* already has this SME category!` });
+                res.status(404).json({ code: 404, message: `User *${user_id}* already has this SME category!` });
             } else {
                 knex('sme')
                     .insert({
@@ -436,17 +436,6 @@ app.post('/smes', (req, res) => {
 
 app.delete('/deletesme', function (req, res) {
     const { user_id, category_id } = req.body;
-
-    //to delete a sme in sme table it needs to delete the relation in network
-    //network has sme_id foreign key and user_id foreign key
-    //join network and the sme table
-    //delete everywhere there's a sme_id
-
-    //delete the smeid in the network table
-    // knex('sme')
-    //     .select('smeid')
-    //     .where('user_id', user_id)
-    //     .where('category_id', category_id)
 
     knex('network')
         .where('sme_id',
@@ -469,6 +458,7 @@ app.delete('/deletesme', function (req, res) {
                         });
                     }
                     res.status(200).json({
+                        code: 200,
                         message: 'User category relationship deleted successfully',
                     });
                 })
@@ -615,12 +605,14 @@ app.post('/createuser', (req, res) => {
         })
         .catch((err) =>
             res.status(500).json({
-                message: 'An error occurred while fetching the login',
+                message: 'An error occurred while creating user',
                 error: err,
             })
         );
 });
 
+//if password is changed then do that piece
+//if password not empty then we can hash
 app.patch('/updateuser', (req, res) => {
     const
         {
@@ -643,7 +635,53 @@ app.patch('/updateuser', (req, res) => {
             base_id
         } = req.body
 
-    knex('users')
+    //if statement for this spacific thing
+    if (!password) {
+        knex('users')
+        .where({ userid: userid })
+        .update({
+            firstname: firstname,
+            lastname: lastname,
+            username: username,
+            email: email,
+            supervisoremail: supervisoremail,
+            approveremail: approveremail,
+            phonenumber: phonenumber,
+            password: password,
+            worklocation: worklocation,
+            bio: bio,
+            photo: photo,
+            branch: branch,
+            sme: sme,
+            admin: admin,
+            userverified: userverified,
+            base_id: base_id
+        }, [
+            'firstname',
+            'lastname',
+            'username',
+            'email',
+            'supervisoremail',
+            'approveremail',
+            'phonenumber',
+            'password',
+            'worklocation',
+            'bio',
+            'photo',
+            'branch',
+            'sme',
+            'admin',
+            'userverified',
+            'base_id'
+        ])
+        .then((data) => res.status(201).json(data))
+        .catch((err) => res.status(500).json({
+            message: 'Error updating user information',
+            error: err,
+            code: 500
+        }))
+    } else {
+        knex('users')
         .where({ userid: userid })
         .update({
             firstname: firstname,
@@ -688,8 +726,56 @@ app.patch('/updateuser', (req, res) => {
             error: err,
             code: 500
         }))
+    }
+    //original code
+    // knex('users')
+    //     .where({ userid: userid })
+    //     .update({
+    //         firstname: firstname,
+    //         lastname: lastname,
+    //         username: username,
+    //         email: email,
+    //         supervisoremail: supervisoremail,
+    //         approveremail: approveremail,
+    //         phonenumber: phonenumber,
+    //         password: password,
+    //         hashedpassword: get_hash(password), ////just added, can be deleted if giving issues
+    //         worklocation: worklocation,
+    //         bio: bio,
+    //         photo: photo,
+    //         branch: branch,
+    //         sme: sme,
+    //         admin: admin,
+    //         userverified: userverified,
+    //         base_id: base_id
+    //     }, [
+    //         'firstname',
+    //         'lastname',
+    //         'username',
+    //         'email',
+    //         'supervisoremail',
+    //         'approveremail',
+    //         'phonenumber',
+    //         'password',
+    //         'hashedpassword',
+    //         'worklocation',
+    //         'bio',
+    //         'photo',
+    //         'branch',
+    //         'sme',
+    //         'admin',
+    //         'userverified',
+    //         'base_id'
+    //     ])
+    //     .then((data) => res.status(201).json(data))
+    //     .catch((err) => res.status(500).json({
+    //         message: 'Error updating user information',
+    //         error: err,
+    //         code: 500
+    //     }))
 })
 
+// WORKS WELL WITH NO ERRORS
 app.delete('/deleteuser/:userid', function (req, res) {
     const userid = req.params.userid;
 
@@ -816,9 +902,11 @@ app.patch('/updatebase', (req, res) => {
         }))
 })
 
+// DON'T FORSEE USING THIS END POINT.
 app.delete('/deletebase', function (req, res) {
     const { baseid } = req.body;
 
+    //option 1
     knex('base')
         .where('baseid', baseid)
         .del()
@@ -839,6 +927,35 @@ app.delete('/deletebase', function (req, res) {
                 error: err,
             })
         );
+
+    //option number 2
+    // knex('users')
+    //     .join('base', 'users.base_id','base.baseid')
+    //     .select('users.base_id')
+    //     .where('users.base_id', baseid)
+    //     .update({
+    //         'base_id': null
+    //     })
+    //     .then(() => {
+    //         knex('base')
+    //             .where('baseid', baseid)
+    //             .del()
+    //             .then((rowCount) => {
+    //                 if (rowCount === 0) {
+    //                     return res.status(404).json({
+    //                         message: 'This base is not found'
+    //                     });
+    //                 }
+    //                 res.status(201).json({
+    //                     message: 'Base deleted successfully'
+    //                 });
+    //             })
+    //             .catch((err) => res.status(500).json({
+    //                 message: 'An error occured trying to delete base',
+    //                 error: err
+    //             }));
+    //     })
+
 });
 
 //=============================================================================================//
@@ -884,10 +1001,13 @@ app.post('/network', (req, res) => {
 
 });
 
+//NO CHANGE NEEDED, WORKS WITH NO ERRORS
 app.delete('/deletenetworkSME', function (req, res) {
     const { user_id, sme_id } = req.body;
-    console.log('USER OUTPUT ', user_id);
 
+    //in the body of the delete request we need the user_id and the sme_id
+    //these two are needed to delete the networkid
+    //OR you can modify the req.body to equal the networkid, you'll get the same result
     knex('network')
         .where('user_id', user_id)
         .where('sme_id', sme_id)
@@ -1025,6 +1145,7 @@ app.post('/meetings', (req, res) => {
         );
 });
 
+// NO UPDATE NEEDED, WORKS WELL WITH NO ERRORS
 app.delete('/deletemeeting', function (req, res) {
     const { meetingid } = req.body;
     if (!meetingid) {
@@ -1095,6 +1216,7 @@ app.post('/attendmeeting', (req, res) => {
         );
 });
 
+// WORKS WELL WITH NO ERRORS
 app.delete('/deleteuserfrommeeting', function (req, res) {
     const { user_id, meeting_id } = req.body;
     console.log('USER OUTPUT ', user_id);

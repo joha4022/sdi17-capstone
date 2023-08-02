@@ -1,6 +1,5 @@
 import React, { useState, useContext } from "react";
 import { AppContext } from "../App";
-import Autosuggest from 'react-autosuggest';
 import { debounce } from "lodash";
 import MuiAlert from "@mui/material/Alert";
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Snackbar } from "@mui/material";
@@ -34,6 +33,8 @@ function MeetingFormModal ({ open, handleClose }) {
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
+    const selectedMeetingDate = new Date(meetingData.meetingDate);
+    const currentDate = new Date();
 
     const newMeeting = {
       meetingTitle: meetingData.meetingTitle,
@@ -45,7 +46,10 @@ function MeetingFormModal ({ open, handleClose }) {
         .split(",")
         .map((attendee) => attendee.trim()),
     };
-    // setMeetings([...meetings, newMeeting]);
+    if (selectedMeetingDate < currentDate) {
+      alert(`You cannot schedule a meeting before ${currentDate.toLocaleDateString()}.`);
+      return;
+    }
     fetch("http://localhost:3001/meetings", {
       method: "POST",
       headers: {
@@ -56,7 +60,7 @@ function MeetingFormModal ({ open, handleClose }) {
       .then((response) => response.json())
       .then((data) => {
         console.log("Success:", data);
-        setMeetings([...meetings, newMeeting]);
+        setMeetings([...meetings, data]);
         setMeetingData({
           meetingTitle: "",
           meetingDescription: "",
@@ -85,11 +89,15 @@ function MeetingFormModal ({ open, handleClose }) {
 
   const getSuggestions = async (value) => {
     const lastUsername = value.split(',').pop().trim();
+    const query = lastUsername.toLowerCase();
 
     try {
-      const response = await fetch(`http://localhost:3001/users/suggest?q=${lastUsername}`);
+      const response = await fetch(`http://localhost:3001/users/suggest?q=${query}`);
       const data = await response.json();
-      setSuggestions(data);
+      const filteredSuggestions = data.filter(
+        (suggestion) => suggestion.username.toLowerCase().includes(query)
+      );
+      setSuggestions(filteredSuggestions);
     } catch (error) {
       console.log('Failed to fetch suggestions:', error);
     }
