@@ -306,7 +306,7 @@ app.get("/smes", (req, res) => {
         );
 });
 
-app.get("/smes/:id", (req, res) => {
+app.get("/smesnetwork/:id", (req, res) => {
     const userid = req.params.id
     knex("users")
         .join("base", "users.base_id", "base.baseid")

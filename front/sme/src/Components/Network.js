@@ -57,7 +57,7 @@ const Network = () => {
       ? fetch("http://localhost:3001/smes")
           .then((res) => res.json())
           .then((data) => setSMEs(data))
-      : fetch(`http://localhost:3001/smes/${currentUser.userid}`)
+      : fetch(`http://localhost:3001/smesnetwork/${currentUser.userid}`)
           .then((res) => res.json())
           .then((data) => setSMEs(data));
   }, [onNetwork]);
