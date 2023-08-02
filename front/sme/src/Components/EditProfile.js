@@ -131,25 +131,24 @@ export default function EditProfile() {
   const closeDeleteForm = () => setDeleteForm(false);
   const deleteAccount = () => {
     if (username === deleteUsername) {
-      const deleteBody = JSON.stringify({
-        userid: userid
-      })
+      // const deleteBody = JSON.stringify({
+      //   userid: userid
+      // })
       const deleteOption = {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json'
-        },
-        body: deleteBody
+        }
       }
       fetch(`http://localhost:3001/deleteuser/${userid}`, deleteOption)
         .then()
       setBackdrop(true);
       setDeleteForm(false);
       alertDisplay2('Your account has been deleted and you will be redirected to the login page.');
-      sessionStorage.clear();
       setTimeout(() => {
         setBackdrop(false);
         navigate('/', { replace: true })
+        sessionStorage.clear();
       }, 3000)
     } else {
       alertDisplay('Please provide the correct username!')
@@ -177,7 +176,7 @@ export default function EditProfile() {
               }
             })
           })
-      }
+      } else {setCurrentSmeCategories([])}
       // fetch the existing user
       fetch('http://localhost:3001/')
         .then(res => res.json())
@@ -451,7 +450,7 @@ export default function EditProfile() {
 //------------------------------------------------CONSOLE LOGS------------------------------------------------//
 console.log(smeCategory)
 //------------------------------------------------RENDER------------------------------------------------//
-  if (currentUser && currentBases) {
+  if (currentUser && currentBases && currentSmeCategories) {
     return (
       <>
         <Collapse in={alert} sx={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9999 }}>
@@ -510,7 +509,7 @@ console.log(smeCategory)
                   }} />
                 <div className='editprofile-username-display'>{username}
                   <div className='editprofile-email-display'>{email}</div>
-                  <div className='editprofile-user-type'>{currentUser.admin ? 'Admin' : ''} {currentUser.sme ? '/ SME' : ''} {currentUser.sme === false && currentUser.admin === false ? `${currentUser.branch}` :''}</div>
+                  <div className='editprofile-user-type'>{currentUser.admin ? '(Admin)' : ''} {currentUser.sme ? ' SME' : ''} {currentUser.sme === false && currentUser.admin === false && currentUser.branch !== 'false' ? `${currentUser.branch}` :''}</div>
                   {currentSmeCategories ?
                     <>
                       {currentSmeCategories.map((cat, i) => {
@@ -563,7 +562,7 @@ console.log(smeCategory)
                             <tr>
                               <td>
                                 <div className='dropdown-category'>Phone Number</div>
-                                <TextField helperText='xxx-xxx-xxxx' onKeyUp={(e) => { setPhoneNumber(e.target.value) }} sx={{ width: '26ch' }} id="outlined-basic-phonenumber" size='small' label="Phone Number" variant="outlined" defaultValue={phoneNumber} />
+                                <TextField helperText='xxx-xxx-xxxx' onKeyUp={(e) => { setPhoneNumber(e.target.value) }} sx={{ width: '26ch' }} id="outlined-basic-phonenumber" size='small' label="Phone Number" variant="outlined" defaultValue={phoneNumber === false ? '' : phoneNumber} />
                               </td>
                               <td>
                                 <div className='register-category'>E-mail</div>
