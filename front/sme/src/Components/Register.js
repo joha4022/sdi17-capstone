@@ -36,7 +36,7 @@ export default function Register() {
   const [currentBases, setCurrentBases] = useState(false);
   const [existingBaseName, setExistingBaseName] = useState(false);
   const [baseid, setBaseid] = useState(false);
-  const [baseName, setBaseName] = useState(false);
+  const [baseName, setBaseName] = useState('Not Selected');
   const [baseCity, setBaseCity] = useState(false);
   const [baseLat, setBaseLat] = useState(false);
   const [baseLon, setBaseLon] = useState(false);
@@ -121,39 +121,6 @@ export default function Register() {
         },
         body: body
       }
-      if (categories.includes(smeCategory)) {
-        fetch('http://localhost:3001/smes', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            user_id: userid,
-            category_id: categories.indexOf(smeCategory)+1
-          })
-        })
-      } else {
-        // adds a new category to the sme category table
-        fetch('http://localhost:3001/createcategory', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            categoryname: smeCategory
-          })
-        })
-          .then(res => res.json())
-          .then(data => {
-            // even though the sme is pending the sme is still added to the sme table
-            fetch('http://localhost:3001/smes', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                user_id: userid,
-                category_id: data.categoryid
-              })
-            })
-          })
-      }
       // adding a user
       fetch('http://localhost:3001/createuser', option)
         .then(res => res.json())
@@ -172,6 +139,39 @@ export default function Register() {
                 sessionStorage.setItem('currentUser', JSON.stringify({ userid: userid }));
                 sessionStorage.setItem('loggedInUser', JSON.stringify({ userid: userid, firstname: firstname, lastname: lastname, sme: sme, admin: false }));
                 navigate(`/profile/${userid}`, { replace: true });
+              }
+              if (categories.includes(smeCategory)) {
+                fetch('http://localhost:3001/smes', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    user_id: userid,
+                    category_id: categories.indexOf(smeCategory) + 1
+                  })
+                })
+              } else {
+                // adds a new category to the sme category table
+                fetch('http://localhost:3001/createcategory', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                    categoryname: smeCategory
+                  })
+                })
+                  .then(res => res.json())
+                  .then(data => {
+                    // even though the sme is pending the sme is still added to the sme table
+                    fetch('http://localhost:3001/smes', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        user_id: userid,
+                        category_id: data.categoryid
+                      })
+                    })
+                  })
               }
             }, 2500)
           }
@@ -238,8 +238,8 @@ export default function Register() {
         setBaseName(currentBases[existingBaseName.baseid - 1].basename);
         setBaseCity(currentBases[existingBaseName.baseid - 1].basecity);
         setBaseState(currentBases[existingBaseName.baseid - 1].basestate);
-        setBaseLat(currentBases[existingBaseName.baseid-1].baselat);
-        setBaseLon(currentBases[existingBaseName.baseid-1].baselon);
+        setBaseLat(currentBases[existingBaseName.baseid - 1].baselat);
+        setBaseLon(currentBases[existingBaseName.baseid - 1].baselon);
         setBaseid(currentBases[existingBaseName.baseid - 1].baseid);
         setBackdrop(true);
         setTimeout(() => {
@@ -253,7 +253,7 @@ export default function Register() {
   const testString = `Must include at least 5 characters \nMust include at least one number \nMust include one uppercase letter`
 
   const smeHandler = (smeState) => {
-    if(smeState === true) {
+    if (smeState === true) {
       setSme(true);
       setUserverified('pending');
     } else {
@@ -299,7 +299,7 @@ export default function Register() {
                 <tr className='register-row'>
                   <td>
                     <div className='register-category'>Account Type</div>
-                    <FormControlLabel control={<Checkbox onClick={(e) => {smeHandler(e.target.checked) }} />} label="SME" />
+                    <FormControlLabel control={<Checkbox onClick={(e) => { smeHandler(e.target.checked) }} />} label="SME" />
                     <FormHelperText sx={{ width: '250px' }}>SME account will need to be verified before it can be used.</FormHelperText>
                   </td>
                   <td style={{ display: `${!sme ? 'none' : 'block'}` }}>
@@ -311,9 +311,9 @@ export default function Register() {
                       defaultValue=''
                       freeSolo
                       options={categories}
-                      renderInput={(params) => <TextField {...params} label='SME Category'/>}
-                      onKeyUp={(e) => { setSmeCategory(e.target.value)}}
-                      onClose={(e)=>{ setSmeCategory(e.target.textContent)}}
+                      renderInput={(params) => <TextField {...params} label='SME Category' />}
+                      onKeyUp={(e) => { setSmeCategory(e.target.value) }}
+                      onClose={(e) => { setSmeCategory(e.target.textContent) }}
                       onKeyDown={(e) => { if (e.key === 'Enter') { setSmeCategory(e.target.dataset.value) } }}>
                     </Autocomplete>
                   </td>
