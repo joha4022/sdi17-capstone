@@ -12,8 +12,6 @@ import dayjs from "dayjs";
 import TextareaAutosize from '@mui/base/TextareaAutosize';
 import FooterBar from "./FooterBar";
 import { AppContext } from '../App.js';
-import { set } from "lodash";
-
 
 function Profile({ userId }) {
   const [users, setUsers] = useState(null);
@@ -50,23 +48,16 @@ function Profile({ userId }) {
         setUsers(data[0]);
         setBio(data[0].bio);
 
-        if (data[0] && data[0].userverified) {
-          const resSME = await fetch(`http://localhost:3001/smes/${id}`);
+        if (data[0] && data[0].userverified === 'verified' && data[0].sme === true) {
+          const resSME = await fetch(`http://localhost:3001/smecategories/${id}`);
           if (!resSME.ok){
           throw new Error(`HTTP error! status: ${resSME.status}`);
         } else {
           const smeData = await resSME.json();
-          console.log('SME Data: ', smeData);
+          // console.log('SME Data: ', smeData);
           setSMECategories(smeData.map(sme => sme.categories).flat());
         }
       }
-        fetch('http://localhost:3001/getphoto', {
-            method: 'POST',
-            headers: { 'Content-type': 'application/json' },
-            body: JSON.stringify({ photopath: users.photo })
-          })
-            .then(res => res.blob())
-            .then(data => setPhoto(URL.createObjectURL(data)))
     }
   } catch (error) {
     console.error("Failed to fetch Profile Data: ", error);
@@ -74,6 +65,18 @@ function Profile({ userId }) {
     };
     fetchProfile();
   }, [id, meetings]);
+
+useEffect(() => {
+  if (users) {
+    fetch('http://localhost:3001/getphoto', {
+      method: 'POST',
+      headers: { 'Content-type' : 'application/json' },
+      body: JSON.stringify({ photopath: users.photo })
+    })
+    .then(res => res.blob())
+    .then(data => setPhoto(URL.createObjectURL(data)))
+  }
+}, [users]);
 
   useEffect(() => {
     fetch(`http://localhost:3001/usermeetings/${id}`)
@@ -207,7 +210,7 @@ function Profile({ userId }) {
                 <Badge
                 overlap='circular'
                 anchorOrigin={badgePosition}
-                badgeContent={users.userverified ? 
+                badgeContent={users.sme === true ? 
                   <MuiBox sx={{ textAlign: 'center' }}>
                   <img src="/images/Verified.png" alt="SME ICON" style={{width: '50%'}}/>
                 </MuiBox>
@@ -230,7 +233,7 @@ function Profile({ userId }) {
                     {users && `${users.firstname} ${users.lastname}`}
                   </ProfileDetail>
                 </ProfileDetails>
-                {users.userverified ? (
+                {users.sme === 'true' ? (
                 <ProfileDetails>                 
                   <Typography variant="h5">SME Categories:</Typography>
                   <ProfileDetail>
@@ -296,7 +299,6 @@ function Profile({ userId }) {
             </Bio>
           </Paper>
         </Grid>
-
         <Grid item xs={12} sm={4}>
           <Paper elevation={1} sx={{ margin: 1, padding: 1 }}>
             <Meetings>
@@ -307,8 +309,15 @@ function Profile({ userId }) {
                     <Grid container direction="row" alignItems="center">
                       <Grid item xs={11}>
                         <Typography>
-                          {meeting.meetingTitle}-{meeting.meetingDescription}-
-                          {meeting.startTime}-{meeting.endTime}-
+                          Title: 
+                          {meeting.meetingTitle}
+                          Description: 
+                          {meeting.meetingDescription}
+                          Start Time: 
+                          {meeting.startTime}
+                          End Time: 
+                          {meeting.endTime}
+                          Meeting Date: 
                           {meeting.meetingDate}
                         </Typography>
                       </Grid>
@@ -333,7 +342,8 @@ function Profile({ userId }) {
                                 backgroundColor: "red",
                                 color: "white",
                               },
-                            }}>
+                            }}
+                            >
                             Delete
                           </Button>
                         </Grid>
@@ -354,28 +364,6 @@ function Profile({ userId }) {
               />
             </Meetings>
           </Paper>
-
-          {/* Admin Button for Approve/Decline
-          <MuiBox display="flex" justifyContent="center">
-            {users.admin  && users.smestatus === 'pending' && (
-              <>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  sx={{ margin: 1, padding: 1 }}>
-                    { onClick={() => { approveSME(users.userid) }}> 
-                  Approve (SME)
-                </Button>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  sx={{ margin: 1, padding: 1 }} >
-                    onClick={() => { denySME(users.userid) }}> 
-                  Deny (SME)
-                </Button>
-              </>
-            )}
-          </MuiBox> */}
           <Paper elevation={1} sx={{ margin: 1, padding: 1 }}>
             <Notes>
               Notes:
@@ -420,7 +408,7 @@ function Profile({ userId }) {
                                 setEditingNoteText(e.target.value)
                               }
                             />
-                            <button type="submit">Update Note</button>
+                            <Button type="submit">Update Note</Button>
                           </form>
                         ) : (
                           <>
@@ -438,15 +426,15 @@ function Profile({ userId }) {
                             >
                               {note.text}
                             </span>
-                            <button onClick={() => handleEditNote(index)}>
+                            <Button onClick={() => handleEditNote(index)}>
                               Edit
-                            </button>
-                            <button
-                              style={{ color: "red" }}
+                            </Button>
+                            <Button
+                              style={{ color: "red", fontWeight: "bold" }}
                               onClick={() => handleDeleteNote(index)}
                             >
                               X
-                            </button>
+                            </Button>
                           </>
                         )}
                       </li>
