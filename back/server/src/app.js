@@ -366,13 +366,41 @@ app.get("/smesnetwork/:id", (req, res) => {
                     categories: item.categories, // categories will be returned as an array directly from the query
                 };
             });
-
             res.status(200).json(formattedData);
         })
         .catch((err) =>
             res.status(404).json({
                 message:
                     "The data you are looking for could not be found. Please try again",
+                error: err,
+            })
+        );
+});
+
+// API to fetch the SME categories for a specific user only
+app.get("/smecategories/:id", (req, res) => {
+    const userid = req.params.id
+    knex("users")
+        .join("sme", "users.userid", "sme.user_id")
+        .join("category", "sme.category_id", "category.categoryid")
+        .select(
+            "users.userid",
+            knex.raw("ARRAY_AGG(category.categoryname) AS categories")
+        )
+        .where("users.userid", userid)
+        .groupBy("users.userid")
+        .then((data) => {
+            const formattedData = data.map((item) => {
+                return {
+                    ...item,
+                    categories: item.categories, // categories will be returned as an array directly from the query
+                };
+            });
+            res.status(200).json(formattedData);
+        })
+        .catch((err) =>
+            res.status(404).json({
+                message: "The data you are looking for could not be found. Please try again",
                 error: err,
             })
         );
@@ -409,33 +437,48 @@ app.post('/smes', (req, res) => {
 app.delete('/deletesme', function (req, res) {
     const { user_id, category_id } = req.body;
 
-    //delete the smeid in the network table
-    knex('network')
-        .where('user_id', user_id)
-        .del()
+    //to delete a sme in sme table it needs to delete the relation in network
+    //network has sme_id foreign key and user_id foreign key
+    //join network and the sme table
+    //delete everywhere there's a sme_id
 
-    knex('sme')
-        .where('user_id', user_id)
-        .where('category_id', category_id)
+    //delete the smeid in the network table
+    // knex('sme')
+    //     .select('smeid')
+    //     .where('user_id', user_id)
+    //     .where('category_id', category_id)
+
+    knex('network')
+        .where('sme_id',
+            knex('sme')
+                .select('smeid')
+                .where('user_id', user_id)
+                .where('category_id', category_id)
+        )
         .del()
-        .then((rowCount) => {
-            console.log("here")
-            if (rowCount === 0) {
-                return res.status(404).json({
-                    message: 'User with this SME category is not found',
-                });
-            }
-            res.status(200).json({
-                code: 200,
-                message: 'User category relationship deleted successfully',
-            });
+        .then(() => {
+            knex('sme')
+                .where('user_id', user_id)
+                .where('category_id', category_id)
+                .del()
+                .then((rowCount) => {
+                    console.log("here")
+                    if (rowCount === 0) {
+                        return res.status(404).json({
+                            message: 'User with this SME category is not found',
+                        });
+                    }
+                    res.status(200).json({
+                        message: 'User category relationship deleted successfully',
+                    });
+                })
+                .catch((err) =>
+                    res.status(500).json({
+                        message: 'An error occurred while deleting user category relationship',
+                        error: err,
+                    })
+                );
         })
-        .catch((err) =>
-            res.status(500).json({
-                message: 'An error occurred while deleting user category relationship',
-                error: err,
-            })
-        );
 });
 
 
