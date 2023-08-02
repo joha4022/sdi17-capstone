@@ -126,7 +126,11 @@ const NoTransition = (props) => {
 
   return (
     <div>
-      <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="form-dialog-title"
+      >
         <DialogTitle id="form-dialog-title">Schedule Meeting</DialogTitle>
         <DialogContent>
           <form onSubmit={handleFormSubmit}>
@@ -176,14 +180,21 @@ const NoTransition = (props) => {
               value={meetingData.meetingDate}
               onChange={handleInputChange}
             />
-            <StyledAutosuggest            
+            <StyledAutosuggest
               suggestions={suggestions}
               onSuggestionsFetchRequested={onSuggestionFetchRequested}
               onSuggestionsClearRequested={onSuggestionsClearRequested}
               getSuggestionValue={getSuggestionValue}
               renderSuggestion={renderSuggestion}
-              renderSuggestionsContainer={({ containerProps, children, query }) => (
-                <div {...containerProps} style={{ maxHeight: '200px', overflow: 'auto' }}>
+              renderSuggestionsContainer={({
+                containerProps,
+                children,
+                query,
+              }) => (
+                <div
+                  {...containerProps}
+                  style={{ maxHeight: "200px", overflow: "auto" }}
+                >
                   {children}
                 </div>
               )}
@@ -191,11 +202,16 @@ const NoTransition = (props) => {
                 value: meetingData.attendees,
                 placeholder: "Attendees",
                 onChange: (_, { newValue, method }) => {
-                  if (method ==='click' || method === 'down' || method === 'up' || method === 'enter' ) {
-                    const usernames = meetingData.attendees.split(',');
+                  if (
+                    method === "click" ||
+                    method === "down" ||
+                    method === "up" ||
+                    method === "enter"
+                  ) {
+                    const usernames = meetingData.attendees.split(",");
                     usernames.pop();
                     usernames.push(newValue);
-                    newValue = usernames.join(',');
+                    newValue = usernames.join(",");
                   }
                   setMeetingData({ ...meetingData, attendees: newValue });
                 },
@@ -214,16 +230,22 @@ const NoTransition = (props) => {
         </DialogContent>
       </Dialog>
       <Snackbar
-        anchorOrigin={alertPosition} 
+        anchorOrigin={alertPosition}
         open={openAlert}
         autoHideDuration={6000}
         onClose={handleCloseAlert}
         TransitionComponent={NoTransition}
       >
-          <Alert onClose={handleCloseAlert} severity={alertSeverity} sx={{ width: '100%' }}>
-            {alertSeverity === 'success' ? 'Meeting created successfully! You may need to refresh for the changes to show.' : 'Error creating meeting!'}
-          </Alert>
-      </Snackbar>      
+        <Alert
+          onClose={handleCloseAlert}
+          severity={alertSeverity}
+          sx={{ width: "100%" }}
+        >
+          {alertSeverity === "success"
+            ? "Meeting created successfully! You may need to refresh for the changes to show."
+            : "Error creating meeting!"}
+        </Alert>
+      </Snackbar>
     </div>
   );
 }
