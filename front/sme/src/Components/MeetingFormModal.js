@@ -1,6 +1,5 @@
 import React, { useState, useContext } from "react";
 import { AppContext } from "../App";
-import Autosuggest from 'react-autosuggest';
 import { debounce } from "lodash";
 import MuiAlert from "@mui/material/Alert";
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Snackbar } from "@mui/material";
