@@ -1,6 +1,6 @@
 import React,{ useState, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
-import { Typography, Button, Avatar, Paper, Grid, Badge, Card, CardContent, Box as MuiBox } from "@mui/material";
+import { Typography, Button, Avatar, Paper, Grid, Badge, Card, CardContent, Box as MuiBox, Alert } from "@mui/material";
 import { ProfileDetails, ProfileDetail, Background, Bio, Notes, Meetings, AvatarAndDetails } from "../Styled";
 import Navbar from "./Navbar";
 import { DateCalendar } from "@mui/x-date-pickers";
@@ -23,6 +23,7 @@ function Profile({ userId }) {
   const [meetings, setMeetings] = useState([]);
   const [selectedDate, setSelectedDate] = useState(dayjs());
   const [bio, setBio] = useState('');
+  const [inNetwork, setInNetwork] = useState(false)
   const [smeCategories, setSMECategories] = useState(['']);
   const [badgePosition, setBadgePosition] = useState({
     vertical: 'bottom',
@@ -102,6 +103,51 @@ function Profile({ userId }) {
       localStorage.setItem(`notes-${currentUser.userid}`, JSON.stringify(notes));
     }
   }, [currentUser, notes]);
+
+  const addToNetwork = () => {
+    fetch('http://localhost:3001/network', {
+      method: 'POST',
+      headers: {
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({
+        user_id: currentUser.userid,
+        sme_id: Number(id)
+      })
+    })
+    .then(res => res.json())
+      .then(data => {
+        console.log('Success:', data)
+        setInNetwork(true)
+        if(data.message === "SME is already in your network !") {
+          const alert = window.alert('User is already in network');
+        }
+        })
+      .catch((error) => {
+        console.log('Failed to POST network:', error)
+      });
+  }
+
+  const removeFromNetwork = () => {
+    fetch('http://localhost:3001/deletenetworkSME', {
+      method: 'DELETE',
+      headers: {
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({
+        user_id: currentUser.userid,
+        sme_id: Number(id)
+      })
+    })
+    .then(res => res.json())
+      .then(data => {
+        console.log('Success:', data)
+        setInNetwork(false)
+        })
+      .catch((error) => {
+        console.log('Failed to DELETE network:', error)
+      });
+  }
 
   function updateUserBio(userid, newBio) {
     fetch(`http://localhost:3001/updateuser`, {
@@ -438,6 +484,12 @@ function Profile({ userId }) {
               </ul>
             </Notes>
           </Paper>
+          <Button
+                onClick={() => {(!inNetwork) ? addToNetwork() : removeFromNetwork()}}
+                disabled={Number(id) === currentUser.userid}
+              >
+                {inNetwork ? 'Remove from Network':'Add to Network'}
+          </Button>
         </Grid>
       </Grid>
       <FooterBar />
