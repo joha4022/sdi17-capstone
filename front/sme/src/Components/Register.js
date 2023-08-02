@@ -57,7 +57,12 @@ export default function Register() {
     fetch('http://localhost:3001/')
       .then(res => res.json())
       .then(data => {
-        setUserid(data[data.length-1].userid + 1);
+        const lastuser = [];
+        data.map(user=>{
+          lastuser.push(user.userid);
+        })
+        // console.log(lastuser.sort((a,b)=>{return a-b})[lastuser.length-1]+1)
+        setUserid(lastuser.sort((a,b)=>{return a-b})[lastuser.length-1]+1);
         const usernames = [...usernameList];
         data.map(user => {
           usernames.push(user.username);
@@ -114,7 +119,7 @@ export default function Register() {
         sme: sme,
         base_id: baseid,
         userverified: userverified,
-        // photo: photo
+        photo: './photos/Blank_Avatar.jpg'
       })
       const option = {
         method: 'POST',
@@ -151,7 +156,7 @@ export default function Register() {
                     category_id: categories.indexOf(smeCategory) + 1
                   })
                 })
-              } else if(sme === true && !categories.includes(smeCategory)) {
+              } else if (sme === true && !categories.includes(smeCategory)) {
                 // adds a new category to the sme category table
                 fetch('http://localhost:3001/createcategory', {
                   method: 'POST',
@@ -265,7 +270,15 @@ export default function Register() {
   }
 
   const supEmailHandler = (supervisorEmail) => {
-    
+    fetch('http://localhost:3001')
+      .then(res => res.json())
+      .then(data => {
+        data.map(user => {
+          if (user.email === supervisorEmail) {
+            setSupName(user.lastname + ', ' + user.firstname);
+          }
+        })
+      })
   }
 
   console.log(smeCategory);
@@ -322,7 +335,8 @@ export default function Register() {
                       options={categories}
                       renderInput={(params) => <TextField {...params} label='SME Category' />}
                       onKeyUp={(e) => { setSmeCategory(e.target.value) }}
-                      onClose={(e) => { setSmeCategory(e.target.textContent); setSmeCategory(document.querySelector('#outlined-select-smeCategory').value);  }}
+                      // onClose={(e) => { setSmeCategory(e.target.textContent); setSmeCategory(document.querySelector('#outlined-select-smeCategory').value); }}
+                      onChange={(e)=> { setSmeCategory(document.querySelector('#outlined-select-smeCategory').value); setSmeCategory(e.target.textContent)}}
                       onKeyDown={(e) => { if (e.key === 'Enter') { setSmeCategory(e.target.dataset.value) } }}>
                     </Autocomplete>
                   </td>
@@ -427,12 +441,16 @@ export default function Register() {
                 <tr className='register-row'>
                   <td>
                     <div className='register-category'>Supervisor's E-mail</div>
-                    <TextField error={!supEmail || !supEmail.includes('@') ? true : false} id="outlined-basic-supemail" sx={{ width: '28ch' }} required label="Supervisor's E-mail" variant="outlined" onKeyUp={(e) => { setSupEmail(e.target.value) }} />
+                    <TextField error={!supName ? true : false} id="outlined-basic-supemail" sx={{ width: '28ch' }} required label="Supervisor's E-mail" variant="outlined"
+                      onKeyUp={(e) => {
+                        if (e.key === 'Backspace') {
+                          setSupName(false);
+                        } else { setSupEmail(e.target.value); supEmailHandler(e.target.value) }
+                      }} />
                   </td>
-                  {/* <td>
-                    <div className='register-category'>Approver's E-mail</div>
-                    <TextField error={!appEmail || !appEmail.includes('@') ? true : false} required id="outlined-basic-appemail" sx={{ width: '28ch' }} label="Approver's E-mail" variant="outlined" onKeyUp={(e) => { setAppEmail(e.target.value) }} />
-                  </td> */}
+                  <td>
+                    <FormHelperText sx={{ width: '28ch' }} >{supName ? 'Supervisor : ' + supName : 'Supervisor not found.'}</FormHelperText>
+                  </td>
                 </tr>
                 <tr className='register-row'>
                   {/* list out bases from the database */}
@@ -443,7 +461,7 @@ export default function Register() {
                       size='large'
                       sx={{ width: '28ch', marginRight: '10px' }}
                       id="outlined-disabled"
-                      value={baseName !== false ? `${baseName === 'Not Selected'? baseName : baseName + ','} ${baseCity === false ? '' : baseCity} ${baseState === false ? '' : baseState}` : 'Add Base *'}
+                      value={baseName !== false ? `${baseName === 'Not Selected' ? baseName : baseName + ','} ${baseCity === false ? '' : baseCity} ${baseState === false ? '' : baseState}` : 'Add Base *'}
                     />
                   </td>
                   <td>
