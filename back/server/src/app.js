@@ -415,7 +415,7 @@ app.post('/smes', (req, res) => {
         .where('category_id', category_id)
         .then((data) => {
             if (data.length > 0) {
-                res.status(404).json({ code:404, message: `User *${user_id}* already has this SME category!` });
+                res.status(404).json({ code: 404, message: `User *${user_id}* already has this SME category!` });
             } else {
                 knex('sme')
                     .insert({
@@ -610,6 +610,8 @@ app.post('/createuser', (req, res) => {
         );
 });
 
+//if password is changed then do that piece
+//if password not empty then we can hash
 app.patch('/updateuser', (req, res) => {
     const
         {
@@ -632,7 +634,53 @@ app.patch('/updateuser', (req, res) => {
             base_id
         } = req.body
 
-    knex('users')
+    //if statement for this spacific thing
+    if (!password) {
+        knex('users')
+        .where({ userid: userid })
+        .update({
+            firstname: firstname,
+            lastname: lastname,
+            username: username,
+            email: email,
+            supervisoremail: supervisoremail,
+            approveremail: approveremail,
+            phonenumber: phonenumber,
+            password: password,
+            worklocation: worklocation,
+            bio: bio,
+            photo: photo,
+            branch: branch,
+            sme: sme,
+            admin: admin,
+            userverified: userverified,
+            base_id: base_id
+        }, [
+            'firstname',
+            'lastname',
+            'username',
+            'email',
+            'supervisoremail',
+            'approveremail',
+            'phonenumber',
+            'password',
+            'worklocation',
+            'bio',
+            'photo',
+            'branch',
+            'sme',
+            'admin',
+            'userverified',
+            'base_id'
+        ])
+        .then((data) => res.status(201).json(data))
+        .catch((err) => res.status(500).json({
+            message: 'Error updating user information',
+            error: err,
+            code: 500
+        }))
+    } else {
+        knex('users')
         .where({ userid: userid })
         .update({
             firstname: firstname,
@@ -677,6 +725,53 @@ app.patch('/updateuser', (req, res) => {
             error: err,
             code: 500
         }))
+    }
+    //original code
+    // knex('users')
+    //     .where({ userid: userid })
+    //     .update({
+    //         firstname: firstname,
+    //         lastname: lastname,
+    //         username: username,
+    //         email: email,
+    //         supervisoremail: supervisoremail,
+    //         approveremail: approveremail,
+    //         phonenumber: phonenumber,
+    //         password: password,
+    //         hashedpassword: get_hash(password), ////just added, can be deleted if giving issues
+    //         worklocation: worklocation,
+    //         bio: bio,
+    //         photo: photo,
+    //         branch: branch,
+    //         sme: sme,
+    //         admin: admin,
+    //         userverified: userverified,
+    //         base_id: base_id
+    //     }, [
+    //         'firstname',
+    //         'lastname',
+    //         'username',
+    //         'email',
+    //         'supervisoremail',
+    //         'approveremail',
+    //         'phonenumber',
+    //         'password',
+    //         'hashedpassword',
+    //         'worklocation',
+    //         'bio',
+    //         'photo',
+    //         'branch',
+    //         'sme',
+    //         'admin',
+    //         'userverified',
+    //         'base_id'
+    //     ])
+    //     .then((data) => res.status(201).json(data))
+    //     .catch((err) => res.status(500).json({
+    //         message: 'Error updating user information',
+    //         error: err,
+    //         code: 500
+    //     }))
 })
 
 // WORKS WELL WITH NO ERRORS
