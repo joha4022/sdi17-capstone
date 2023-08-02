@@ -67,8 +67,11 @@ export default function LoginPage() {
         } else if(data.code === 500) {
           alertDisplay(data.message)
         } else if(data.length === 1) {
-          if(data[0].userverified === false && data[0].sme === true) {
-            return (alertDisplay('Your account is not verified. Please contact your approver for approval.'))
+          if(data[0].userverified === 'pending' && data[0].sme === true) {
+            return (alertDisplay('Your account is not verified. Please contact your supervisor for approval.'))
+          }
+          if(data[0].userverified === 'declined' && data[0].sme === true) {
+            return (alertDisplay('Your account has been declined. Please contact your supervisor.'))
           }
           sessionStorage.setItem('currentUser', JSON.stringify({userid: data[0].userid}));
           sessionStorage.setItem('loggedInUser', JSON.stringify(data[0]));
