@@ -26,6 +26,7 @@ export default function EditProfile() {
   const [snackbar, setSnackBar] = useState(false);
   const [snackbarError, setSnackBarError] = useState(false);
   const [snackbarMessage, setSnackBarMessage] = useState(false);
+  const [supName, setSupName] = useState(false);
   // required options
   const [userid, setUserid] = useState(false);
   const [firstname, setFirstname] = useState(false);
@@ -44,7 +45,7 @@ export default function EditProfile() {
   const [bio, setBio] = useState(false);
   const [photo, setPhoto] = useState(false);
   const [changePhoto, setChangePhoto] = useState(false);
-  const [currentSmeCategories, setCurrentSmeCategories] = useState(false);
+  const [currentSmeCategories, setCurrentSmeCategories] = useState([]);
   const [categories, setCategories] = useState(false);
   const [smeCategory, setSmeCategory] = useState(false);
   // baseForm
@@ -154,7 +155,7 @@ export default function EditProfile() {
       alertDisplay('Please provide the correct username!')
     }
   }
-
+//---------------------------------------USE EFFECT-----------------------------------------------------------//
   useEffect(() => {
     if (sessionStorage.getItem('currentUser') !== null) {
       const userid = JSON.parse(sessionStorage.getItem('currentUser')).userid;
@@ -176,7 +177,7 @@ export default function EditProfile() {
               }
             })
           })
-      } else {setCurrentSmeCategories([])}
+      }
       // fetch the existing user
       fetch('http://localhost:3001/')
         .then(res => res.json())
@@ -198,6 +199,7 @@ export default function EditProfile() {
           setPassword(user.password);
           setPhoneNumber(user.phonenumber);
           setSupEmail(user.supervisoremail);
+          supEmailHandler(user.supervisoremail);
           setWorklocation(user.worklocation);
           setBio(user.bio);
           setBaseid(user.base_id);
@@ -378,78 +380,98 @@ export default function EditProfile() {
   }
 
   const deleteSme = (selectedCategory) => {
-    // fetch('http://localhost:3001/categories')
-    // .then(res=>res.json())
-    // .then(smeCat=>{
-    //   smeCat.map(cat=>{
-    //     if(cat.categoryname === selectedCategory){
-    //       fetch('http://localhost:3001/deletesme',{
-    //         method: 'DELETE',
-    //         headers: {'Content-Type': 'application/json'},
-    //         body: JSON.stringify({
-    //           user_id: userid,
-    //           category_id: cat.categoryid
-    //         })
-    //       })
-    //       .then(res=>res.json())
-    //       .then(data=>{
-    //         if(data.code === 200) {
-    //           setSnackBar(true);
-    //         }
-    //       })
-    //     } 
-    //   })
-    // })
+    if(currentSmeCategories.length === 1) {
+      alertDisplay('You cannot remove the last SME category, please add one before removing!');
+    } else {
+      fetch('http://localhost:3001/categories')
+      .then(res => res.json())
+      .then(smeCat => {
+        smeCat.map(cat => {
+          if (cat.categoryname === selectedCategory) {
+            fetch('http://localhost:3001/deletesme', {
+              method: 'DELETE',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                user_id: userid,
+                category_id: cat.categoryid
+              })
+            })
+              .then(res => res.json())
+              .then(data => {
+                if (data.code === 200) {
+                  snackbarDisplay('SME Category removed!');
+                }
+              })
+          }
+        })
+      })
+    }
   }
 
   const addCategory = () => {
     console.log(categories, smeCategory)
-    if (categories.includes(smeCategory)) {
-      fetch('http://localhost:3001/smes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          user_id: userid,
-          category_id: categories.indexOf(smeCategory)+1
-        })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if(data.code === 404) {
-          snackbarErrorDisplay('Duplicate SME category!');
-        } else if (data.code === 201) {
-          snackbarDisplay('SME Category has been updated!');
-        }
-      })
+    if (smeCategory === false || smeCategory === '') {
+      alertDisplay('Please select or type in the SME category');
     } else {
-      // adds a new category to the sme category table
-      fetch('http://localhost:3001/createcategory', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          categoryname: smeCategory
-        })
-      })
-        .then(res => res.json())
-        .then(data => {
-          // even though the sme is pending the sme is still added to the sme table
-          fetch('http://localhost:3001/smes', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              user_id: userid,
-              category_id: data.categoryid
-            })
+      if (categories.includes(smeCategory)) {
+        fetch('http://localhost:3001/smes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_id: userid,
+            category_id: categories.indexOf(smeCategory) + 1
           })
-          snackbarDisplay('SME Category has been updated!');
         })
+          .then(res => res.json())
+          .then(data => {
+            if (data.code === 404) {
+              snackbarErrorDisplay('Duplicate SME category!');
+            } else if (data.code === 201) {
+              snackbarDisplay('SME Category has been updated!');
+            }
+          })
+      } else {
+        // adds a new category to the sme category table
+        fetch('http://localhost:3001/createcategory', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            categoryname: smeCategory
+          })
+        })
+          .then(res => res.json())
+          .then(data => {
+            // even though the sme is pending the sme is still added to the sme table
+            fetch('http://localhost:3001/smes', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                user_id: userid,
+                category_id: data.categoryid
+              })
+            })
+            snackbarDisplay('SME Category has been updated!');
+          })
+      }
     }
   }
-//------------------------------------------------CONSOLE LOGS------------------------------------------------//
-console.log(smeCategory)
-//------------------------------------------------RENDER------------------------------------------------//
+
+  const supEmailHandler = (supervisorEmail) => {
+    fetch('http://localhost:3001')
+      .then(res => res.json())
+      .then(data => {
+        data.map(user => {
+          if (user.email === supervisorEmail) {
+            setSupName(user.lastname + ', ' + user.firstname);
+          }
+        })
+      })
+  }
+  //------------------------------------------------CONSOLE LOGS------------------------------------------------//
+  console.log(smeCategory)
+  //------------------------------------------------RENDER------------------------------------------------//
   if (currentUser && currentBases && currentSmeCategories) {
     return (
       <>
@@ -509,7 +531,7 @@ console.log(smeCategory)
                   }} />
                 <div className='editprofile-username-display'>{username}
                   <div className='editprofile-email-display'>{email}</div>
-                  <div className='editprofile-user-type'>{currentUser.admin ? '(Admin)' : ''} {currentUser.sme ? ' SME' : ''} {currentUser.sme === false && currentUser.admin === false && currentUser.branch !== 'false' ? `${currentUser.branch}` :''}</div>
+                  <div className='editprofile-user-type'>{currentUser.admin ? '(Admin)' : ''} {currentUser.sme ? ' SME' : ''} {currentUser.sme === false && currentUser.admin === false && currentUser.branch !== 'false' ? `${currentUser.branch}` : ''}</div>
                   {currentSmeCategories ?
                     <>
                       {currentSmeCategories.map((cat, i) => {
@@ -536,7 +558,7 @@ console.log(smeCategory)
                   </ListItemButton>
                   <Collapse in={row1} timeout="auto" unmountOnExit>
                     <List component="div" disablePadding>
-                      <ListItemButton sx={{ pl: 4, ":hover": {background: 'none', cursor: 'default'}}} >
+                      <ListItemButton sx={{ pl: 4, ":hover": { background: 'none', cursor: 'default' } }} >
                         <table>
                           <tbody>
                             <tr className='register-row'>
@@ -586,7 +608,7 @@ console.log(smeCategory)
                   </ListItemButton>
                   <Collapse in={row2} timeout="auto" unmountOnExit>
                     <List component="div" disablePadding>
-                      <ListItemButton sx={{ pl: 4 , ":hover": {background: 'none', cursor: 'default'}}}>
+                      <ListItemButton sx={{ pl: 4, ":hover": { background: 'none', cursor: 'default' } }}>
                         <table>
                           <tbody>
                             <tr>
@@ -621,7 +643,7 @@ console.log(smeCategory)
                   </ListItemButton>
                   <Collapse in={row3} timeout="auto" unmountOnExit>
                     <List component="div" disablePadding>
-                      <ListItemButton sx={{ pl: 4, ":hover": {background: 'none', cursor: 'default'} }} >
+                      <ListItemButton sx={{ pl: 4, ":hover": { background: 'none', cursor: 'default' } }} >
                         <table>
                           <tbody>
                             <tr>
@@ -631,7 +653,16 @@ console.log(smeCategory)
                               </td>
                               <td>
                                 <div className='dropdown-category'>Supervisor Email</div>
-                                <TextField required error={!supEmail || !supEmail.includes('@') ? true : false} defaultValue={supEmail} sx={{ width: '28ch' }} size='small' id="outlined-basic-suppEmail" label="Supervisor Email" variant="outlined" onKeyUp={(e) => { setSupEmail(e.target.value) }} />
+                                <TextField required error={!supName ? true : false} defaultValue={supEmail} sx={{ width: '28ch' }} size='small' id="outlined-basic-suppEmail" label="Supervisor Email" variant="outlined"
+                                  onKeyUp={(e) => {
+                                    if (e.key === 'Backspace') {
+                                      setSupName(false);
+                                    } else { setSupEmail(e.target.value); supEmailHandler(e.target.value) }
+                                  }}
+                                />
+                              </td>
+                              <td>
+                                <FormHelperText sx={{ width: '28ch' }} >{supName ? 'Supervisor : ' + supName : 'Supervisor not found.'}</FormHelperText>
                               </td>
                             </tr>
                             <tr>
@@ -715,10 +746,10 @@ console.log(smeCategory)
                                   return (
                                     <tr key={i}>
                                       <td>
-                                        <TextField size='small' disabled defaultValue={cat} />
+                                        <TextField size='small' disabled value={cat} />
                                       </td>
                                       <td>
-                                        <Button id={cat} color='error' className='loginpage-button' size='small' variant='contained' onClick={(e)=>{deleteSme(e.target.id)}}>Delete</Button>
+                                        <Button id={cat} color='error' className='loginpage-button' size='small' variant='contained' onClick={(e) => { deleteSme(e.target.id) }}>Delete</Button>
                                       </td>
                                     </tr>)
                                 })}
@@ -733,13 +764,14 @@ console.log(smeCategory)
                                       freeSolo
                                       options={categories}
                                       renderInput={(params) => <TextField {...params} label='SME Category' />}
-                                      onKeyUp={(e) => { setSmeCategory(e.target.value) }}                                     
-                                      onClose={(e) => { setSmeCategory(document.querySelector('#outlined-select-smeCategory').value); setSmeCategory(e.target.textContent); }}
+                                      onKeyUp={(e) => { setSmeCategory(e.target.value) }}
+                                      //onClose={(e) => { setSmeCategory(e.target.textContent)}}
+                                      onChange={(e) => { setSmeCategory(document.querySelector('#outlined-select-smeCategory').value); setSmeCategory(e.target.textContent) }}
                                       onKeyDown={(e) => { if (e.key === 'Enter') { setSmeCategory(e.target.dataset.value) } }}>
                                     </Autocomplete>
                                   </td>
                                   <td>
-                                    <Button sx={{ marginBottom: '10px' }} className='loginpage-button' size='small' variant='contained' onClick={()=>{addCategory()}}>Add</Button>
+                                    <Button sx={{ marginBottom: '10px' }} className='loginpage-button' size='small' variant='contained' onClick={() => { addCategory() }}>Add</Button>
                                   </td>
                                 </tr>
                                 <Button sx={{ marginBottom: '10px' }} className='loginpage-button' size='small' variant='contained' onClick={() => { displaySmeCategory() }}>Add SME Category</Button>
@@ -761,7 +793,7 @@ console.log(smeCategory)
                   </ListItemButton>
                   <Collapse in={row4} timeout="auto" unmountOnExit>
                     <List component="div" disablePadding>
-                      <ListItemButton sx={{ pl: 4 , ":hover": {background: 'none', cursor: 'default'}}}>
+                      <ListItemButton sx={{ pl: 4, ":hover": { background: 'none', cursor: 'default' } }}>
                         <table>
                           <tbody>
                             <tr>
@@ -884,7 +916,7 @@ console.log(smeCategory)
                 <div className='editprofile-category'><FontAwesomeIcon className='side-menu-icon' icon={faUserXmark} />Delete Account</div>
                 <List>
                   <List component="div" disablePadding>
-                    <ListItemButton sx={{ pl: 4 , ":hover": {background: 'none', cursor: 'default'}}}>
+                    <ListItemButton sx={{ pl: 4, ":hover": { background: 'none', cursor: 'default' } }}>
                       <Button color='error' className='loginpage-button' size='medium' variant='contained' onClick={openDeleteForm}>Delete</Button>
                     </ListItemButton>
                   </List>
