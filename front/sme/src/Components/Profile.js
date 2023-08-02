@@ -59,6 +59,8 @@ function Profile({ userId }) {
           setSMECategories(smeData.map(sme => sme.categories).flat());
         }
       }
+      console.log("Profile ID:", id);
+      console.log("Current User ID:", currentUser.userid);
     }
   } catch (error) {
     console.error("Failed to fetch Profile Data: ", error);
