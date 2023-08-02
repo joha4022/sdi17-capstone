@@ -34,6 +34,8 @@ function MeetingFormModal ({ open, handleClose }) {
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
+    const selectedMeetingDate = new Date(meetingData.meetingDate);
+    const currentDate = new Date();
 
     const newMeeting = {
       meetingTitle: meetingData.meetingTitle,
@@ -45,6 +47,10 @@ function MeetingFormModal ({ open, handleClose }) {
         .split(",")
         .map((attendee) => attendee.trim()),
     };
+    if (selectedMeetingDate < currentDate) {
+      alert(`You cannot schedule a meeting before ${currentDate.toLocaleDateString()}.`);
+      return;
+    }
     // setMeetings([...meetings, newMeeting]);
     fetch("http://localhost:3001/meetings", {
       method: "POST",

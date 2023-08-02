@@ -1,5 +1,5 @@
 import {styled} from 'styled-components';
-import { Card, CardContent, Paper, AppBar as MuiAppBar, Box as MuiBox  } from "@mui/material";
+import { Paper, AppBar as MuiAppBar, Box as MuiBox  } from "@mui/material";
 import Autosuggest from 'react-autosuggest';
 
 const Home = styled.div`
@@ -82,7 +82,8 @@ const StyledAutosuggest = styled(Autosuggest)`
 
 const Meetings = styled(Paper)`
   flex-grow: 3;
-  overflow: auto;
+  overflow-y: auto;
+  max-height: 40vh;
   margin: 20px;
   padding: 20px;
 
