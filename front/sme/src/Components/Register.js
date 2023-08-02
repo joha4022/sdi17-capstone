@@ -69,7 +69,7 @@ export default function Register() {
         data.map(user => {
           usernames.push(user.username);
         })
-        console.log(usernames);
+        // console.log(usernames);
         setUsernameList(usernames);
       })
     fetch('http://localhost:3001/categories')
@@ -95,7 +95,7 @@ export default function Register() {
     }, 2500)
   }
 
-  console.log(sme)
+  // console.log(sme)
 
   const register = () => {
     if (!firstname || !lastname || !username || !email || !supEmail || !password || !password2 || !baseName) {
@@ -298,7 +298,7 @@ export default function Register() {
       })
   }
 
-  console.log(smeCategory);
+  // console.log(smeCategory);
 
 
   if (currentBases && categories) {

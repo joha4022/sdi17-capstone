@@ -1,6 +1,6 @@
 import React,{ useState, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
-import { Typography, Button, Avatar, Paper, Grid, Badge, Card, CardContent, Box as MuiBox, Alert } from "@mui/material";
+import { Typography, Button, Avatar, Paper, Grid, Badge, Card, CardContent, Box as MuiBox, Snackbar, Alert } from "@mui/material";
 import { ProfileDetails, ProfileDetail, Background, Bio, Notes, Meetings, AvatarAndDetails } from "../Styled";
 import Navbar from "./Navbar";
 import { DateCalendar } from "@mui/x-date-pickers";
@@ -25,6 +25,9 @@ function Profile({ userId }) {
   const [bio, setBio] = useState('');
   const [inNetwork, setInNetwork] = useState(false)
   const [smeCategories, setSMECategories] = useState(['']);
+  const [openAlert, setOpenAlert] = useState(false);
+  const [alertSeverity, setAlertSeverity] = useState("success");
+  const [alertMessage, setAlertMessage] = useState('');
   const [badgePosition, setBadgePosition] = useState({
     vertical: 'bottom',
     horizontal: 'right',
@@ -55,12 +58,11 @@ function Profile({ userId }) {
           throw new Error(`HTTP error! status: ${resSME.status}`);
         } else {
           const smeData = await resSME.json();
-          // console.log('SME Data: ', smeData);
+
           setSMECategories(smeData.map(sme => sme.categories).flat());
         }
       }
-      console.log("Profile ID:", id);
-      console.log("Current User ID:", currentUser.userid);
+
     }
   } catch (error) {
     console.error("Failed to fetch Profile Data: ", error);
@@ -166,9 +168,15 @@ function Profile({ userId }) {
       .then(data => {
         console.log('Success:', data);
         setUsers({ ...users, bio: newBio });
+        setOpenAlert(true);
+        setAlertSeverity("success");
+        setAlertMessage("Bio updated successfully!");
         })
       .catch((error) => {
         console.log('Failed to PATCH BIO:', error);
+        setOpenAlert(true);
+        setAlertSeverity("error");
+        setAlertMessage("Failed to update bio!");
       });
   }
 
@@ -486,6 +494,15 @@ function Profile({ userId }) {
               </ul>
             </Notes>
           </Paper>
+          <Snackbar
+            open={openAlert}
+            autoHideDuration={6000}
+            onClose={() => setOpenAlert(false)}
+            >
+            <Alert onClose={() => setOpenAlert(false)} severity={alertSeverity} sx={{ width: '100%' }}>
+              {alertMessage}
+            </Alert>
+            </Snackbar>
           <Button
                 onClick={() => {(!inNetwork) ? addToNetwork() : removeFromNetwork()}}
                 disabled={Number(id) === currentUser.userid}
