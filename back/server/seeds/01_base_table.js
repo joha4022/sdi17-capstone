@@ -7,11 +7,11 @@ exports.seed = async function(knex) {
   await knex('base').del()
   await knex('base').insert([
     {
-      basename: 'Not Listed ',
-      basecity: 'N/A',
-      basestate: 'N/A',
-      baselat: 39.8283,
-      baselon: -98.5795
+      basename: 'Fort Drum',
+      basecity: 'Fort Drum',
+      basestate: 'NY',
+      baselat: 44.042332,
+      baselon: -75.758163
    },
     
     {  

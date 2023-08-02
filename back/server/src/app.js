@@ -415,7 +415,7 @@ app.post('/smes', (req, res) => {
         .where('category_id', category_id)
         .then((data) => {
             if (data.length > 0) {
-                res.status(404).json({ message: `User *${user_id}* already has this SME category!` });
+                res.status(404).json({ code:404, message: `User *${user_id}* already has this SME category!` });
             } else {
                 knex('sme')
                     .insert({

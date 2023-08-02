@@ -24,6 +24,8 @@ export default function EditProfile() {
   const [row3, setRow3] = useState(false);
   const [row4, setRow4] = useState(false);
   const [snackbar, setSnackBar] = useState(false);
+  const [snackbarError, setSnackBarError] = useState(false);
+  const [snackbarMessage, setSnackBarMessage] = useState(false);
   // required options
   const [userid, setUserid] = useState(false);
   const [firstname, setFirstname] = useState(false);
@@ -297,10 +299,19 @@ export default function EditProfile() {
     }
   }
 
-  const snackbarDisplay = () => {
+  const snackbarDisplay = (message) => {
+    setSnackBarMessage(message);
     setSnackBar(true);
     setTimeout(() => {
       setSnackBar(false);
+    }, 2000)
+  }
+
+  const snackbarErrorDisplay = (message) => {
+    setSnackBarMessage(message);
+    setSnackBarError(true);
+    setTimeout(() => {
+      setSnackBarError(false);
     }, 2000)
   }
 
@@ -403,9 +414,15 @@ export default function EditProfile() {
           category_id: categories.indexOf(smeCategory)+1
         })
       })
-      snackbarDisplay();
+      .then(res => res.json())
+      .then(data => {
+        if(data.code === 404) {
+          snackbarErrorDisplay('Duplicate SME category!');
+        } else if (data.code === 201) {
+          snackbarDisplay('SME Category has been updated!');
+        }
+      })
     } else {
-      console.log('category does not exist')
       // adds a new category to the sme category table
       fetch('http://localhost:3001/createcategory', {
         method: 'POST',
@@ -427,12 +444,12 @@ export default function EditProfile() {
               category_id: data.categoryid
             })
           })
-          snackbarDisplay();
+          snackbarDisplay('SME Category has been updated!');
         })
     }
   }
 //------------------------------------------------CONSOLE LOGS------------------------------------------------//
-
+console.log(smeCategory)
 //------------------------------------------------RENDER------------------------------------------------//
   if (currentUser && currentBases) {
     return (
@@ -717,8 +734,8 @@ export default function EditProfile() {
                                       freeSolo
                                       options={categories}
                                       renderInput={(params) => <TextField {...params} label='SME Category' />}
-                                      onKeyUp={(e) => { setSmeCategory(e.target.value) }}
-                                      onClose={() => { setSmeCategory(document.querySelector('#outlined-select-smeCategory').value) }}
+                                      onKeyUp={(e) => { setSmeCategory(e.target.value) }}                                     
+                                      onClose={(e) => { setSmeCategory(document.querySelector('#outlined-select-smeCategory').value); setSmeCategory(e.target.textContent); }}
                                       onKeyDown={(e) => { if (e.key === 'Enter') { setSmeCategory(e.target.dataset.value) } }}>
                                     </Autocomplete>
                                   </td>
@@ -911,7 +928,14 @@ export default function EditProfile() {
           open={snackbar}
         >
           <Alert severity="success" sx={{ width: '100%' }}>
-            SME category updated!
+            {snackbarMessage}
+          </Alert>
+        </Snackbar>
+        <Snackbar
+          open={snackbarError}
+        >
+          <Alert severity="error" sx={{ width: '100%' }}>
+            {snackbarMessage}
           </Alert>
         </Snackbar>
         <FooterBar />
