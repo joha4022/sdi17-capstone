@@ -1,5 +1,5 @@
 import './Register.css'
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FormControlLabel, TextField, IconButton, OutlinedInput, InputLabel, InputAdornment, FormControl, Button, Collapse, Alert, Typography, AlertTitle, Box, Modal, MenuItem, Backdrop, CircularProgress, FormHelperText, Checkbox, Autocomplete } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
@@ -7,8 +7,10 @@ import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import FooterBar from './FooterBar';
 import Navbar from './Navbar';
+import { AppContext } from '../App';
 
 export default function Register() {
+  const {setCurrentUser} = useContext(AppContext);
   const [showPassword, setShowPassword] = useState(false);
   const [usernameList, setUsernameList] = useState([]);
   // required options
@@ -143,6 +145,20 @@ export default function Register() {
               if (sme) {
                 navigate(`/register/${data.code}`, { replace: true });
               } else {
+                setCurrentUser({userid: userid,
+                  firstname: firstname,
+                  lastname: lastname,
+                  username: username,
+                  password: password,
+                  email: email,
+                  supervisoremail: supEmail,
+                  approveremail: appEmail,
+                  phonenumber: phoneNumber,
+                  branch: branch,
+                  sme: sme,
+                  base_id: baseid,
+                  userverified: userverified,
+                  photo: './photos/Blank_Avatar.jpg'});
                 sessionStorage.setItem('currentUser', JSON.stringify({ userid: userid }));
                 sessionStorage.setItem('loggedInUser', JSON.stringify({ userid: userid, firstname: firstname, lastname: lastname, sme: sme, admin: false }));
                 navigate(`/profile/${userid}`, { replace: true });

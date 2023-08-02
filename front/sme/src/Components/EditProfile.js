@@ -45,7 +45,7 @@ export default function EditProfile() {
   const [bio, setBio] = useState(false);
   const [photo, setPhoto] = useState(false);
   const [changePhoto, setChangePhoto] = useState(false);
-  const [currentSmeCategories, setCurrentSmeCategories] = useState(false);
+  const [currentSmeCategories, setCurrentSmeCategories] = useState([]);
   const [categories, setCategories] = useState(false);
   const [smeCategory, setSmeCategory] = useState(false);
   // baseForm
@@ -155,7 +155,7 @@ export default function EditProfile() {
       alertDisplay('Please provide the correct username!')
     }
   }
-
+//---------------------------------------USE EFFECT-----------------------------------------------------------//
   useEffect(() => {
     if (sessionStorage.getItem('currentUser') !== null) {
       const userid = JSON.parse(sessionStorage.getItem('currentUser')).userid;
@@ -177,7 +177,7 @@ export default function EditProfile() {
               }
             })
           })
-      } else { setCurrentSmeCategories([]) }
+      }
       // fetch the existing user
       fetch('http://localhost:3001/')
         .then(res => res.json())
@@ -380,73 +380,81 @@ export default function EditProfile() {
   }
 
   const deleteSme = (selectedCategory) => {
-    fetch('http://localhost:3001/categories')
-    .then(res=>res.json())
-    .then(smeCat=>{
-      smeCat.map(cat=>{
-        if(cat.categoryname === selectedCategory){
-          fetch('http://localhost:3001/deletesme',{
-            method: 'DELETE',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-              user_id: userid,
-              category_id: cat.categoryid
+    if(currentSmeCategories.length === 1) {
+      alertDisplay('You cannot remove the last SME category, please add one before removing!');
+    } else {
+      fetch('http://localhost:3001/categories')
+      .then(res => res.json())
+      .then(smeCat => {
+        smeCat.map(cat => {
+          if (cat.categoryname === selectedCategory) {
+            fetch('http://localhost:3001/deletesme', {
+              method: 'DELETE',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                user_id: userid,
+                category_id: cat.categoryid
+              })
             })
-          })
-          .then(res=>res.json())
-          .then(data=>{
-            if(data.code === 200) {
-              snackbarDisplay('SME Category removed!');
-            }
-          })
-        } 
+              .then(res => res.json())
+              .then(data => {
+                if (data.code === 200) {
+                  snackbarDisplay('SME Category removed!');
+                }
+              })
+          }
+        })
       })
-    })
+    }
   }
 
   const addCategory = () => {
     console.log(categories, smeCategory)
-    if (categories.includes(smeCategory)) {
-      fetch('http://localhost:3001/smes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          user_id: userid,
-          category_id: categories.indexOf(smeCategory) + 1
-        })
-      })
-        .then(res => res.json())
-        .then(data => {
-          if (data.code === 404) {
-            snackbarErrorDisplay('Duplicate SME category!');
-          } else if (data.code === 201) {
-            snackbarDisplay('SME Category has been updated!');
-          }
-        })
+    if (smeCategory === false || smeCategory === '') {
+      alertDisplay('Please select or type in the SME category');
     } else {
-      // adds a new category to the sme category table
-      fetch('http://localhost:3001/createcategory', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          categoryname: smeCategory
-        })
-      })
-        .then(res => res.json())
-        .then(data => {
-          // even though the sme is pending the sme is still added to the sme table
-          fetch('http://localhost:3001/smes', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              user_id: userid,
-              category_id: data.categoryid
-            })
+      if (categories.includes(smeCategory)) {
+        fetch('http://localhost:3001/smes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_id: userid,
+            category_id: categories.indexOf(smeCategory) + 1
           })
-          snackbarDisplay('SME Category has been updated!');
         })
+          .then(res => res.json())
+          .then(data => {
+            if (data.code === 404) {
+              snackbarErrorDisplay('Duplicate SME category!');
+            } else if (data.code === 201) {
+              snackbarDisplay('SME Category has been updated!');
+            }
+          })
+      } else {
+        // adds a new category to the sme category table
+        fetch('http://localhost:3001/createcategory', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            categoryname: smeCategory
+          })
+        })
+          .then(res => res.json())
+          .then(data => {
+            // even though the sme is pending the sme is still added to the sme table
+            fetch('http://localhost:3001/smes', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                user_id: userid,
+                category_id: data.categoryid
+              })
+            })
+            snackbarDisplay('SME Category has been updated!');
+          })
+      }
     }
   }
 
@@ -738,7 +746,7 @@ export default function EditProfile() {
                                   return (
                                     <tr key={i}>
                                       <td>
-                                        <TextField size='small' disabled defaultValue={cat} />
+                                        <TextField size='small' disabled value={cat} />
                                       </td>
                                       <td>
                                         <Button id={cat} color='error' className='loginpage-button' size='small' variant='contained' onClick={(e) => { deleteSme(e.target.id) }}>Delete</Button>
@@ -758,7 +766,7 @@ export default function EditProfile() {
                                       renderInput={(params) => <TextField {...params} label='SME Category' />}
                                       onKeyUp={(e) => { setSmeCategory(e.target.value) }}
                                       //onClose={(e) => { setSmeCategory(e.target.textContent)}}
-                                      onChange={(e)=> { setSmeCategory(document.querySelector('#outlined-select-smeCategory').value); setSmeCategory(e.target.textContent)}}
+                                      onChange={(e) => { setSmeCategory(document.querySelector('#outlined-select-smeCategory').value); setSmeCategory(e.target.textContent) }}
                                       onKeyDown={(e) => { if (e.key === 'Enter') { setSmeCategory(e.target.dataset.value) } }}>
                                     </Autocomplete>
                                   </td>
