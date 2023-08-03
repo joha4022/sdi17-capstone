@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "npm run baseline && nodemon ./src/app.js",
-    "test": "jest --coverage ./src/app.test.js",
+    "test": "jest  ./src/app.test.js",
     "baseline": "node PG_Run_Start_Migrate_Seed.js"
   },
   "author": "",
