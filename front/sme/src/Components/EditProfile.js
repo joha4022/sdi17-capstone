@@ -126,7 +126,7 @@ export default function EditProfile() {
           setBackdrop(true);
           setTimeout(() => {
             setBackdrop(false);
-            alertDisplay2('Your profile has been updated!');
+            alertDisplay2('Your profile has been updated');
           }, 1500)
         }
       })
