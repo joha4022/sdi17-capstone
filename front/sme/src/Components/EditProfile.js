@@ -102,6 +102,7 @@ export default function EditProfile() {
       username: username,
       password: `${newPassword ? newPassword : password}`,
       email: email,
+      worklocation: worklocation,
       supervisoremail: supEmail,
       phonenumber: phoneNumber,
       branch: branch,
