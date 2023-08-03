@@ -12,4 +12,4 @@
 # (https://colorhunt.co/palette/f8f1f1d2c8c8a3816a0a065d)
 
 # Database Design:
-# ![Alt text](Database_ERD.png)
+# ![Alt text](<Database ERD.png>)
