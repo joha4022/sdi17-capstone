@@ -91,6 +91,9 @@ export default function EditProfile() {
     if (username === '') {
       return alertDisplay('Your username cannot be blank!')
     }
+    if (usernameList.includes(username)) {
+      return alertDisplay('The username exists in the system!')
+    }
     row();
     const body = JSON.stringify({
       userid: userid,
@@ -99,6 +102,7 @@ export default function EditProfile() {
       username: username,
       password: `${newPassword ? newPassword : password}`,
       email: email,
+      worklocation: worklocation,
       supervisoremail: supEmail,
       phonenumber: phoneNumber,
       branch: branch,
@@ -122,7 +126,7 @@ export default function EditProfile() {
           setBackdrop(true);
           setTimeout(() => {
             setBackdrop(false);
-            alertDisplay2('Your profile has been updated!');
+            alertDisplay2('Your profile has been updated');
           }, 1500)
         }
       })
@@ -543,6 +547,7 @@ export default function EditProfile() {
                     sx={{
                       marginTop: '2.5rem',
                       display: `${changePhoto ? 'block' : 'none'}`,
+                      backgroundColor: '#0A065D', color: 'white', ":hover": { backgroundColor: '#0A065D' }
                     }}
                     onClick={() => { changeProfilePic() }}
                     variant='contained'
@@ -591,7 +596,7 @@ export default function EditProfile() {
                                 <TextField defaultValue={email} size='small' error={!email ? true : false} required id="outlined-basic-email" sx={{ width: '26ch' }} label="E-mail" variant="outlined" helperText='DoD or Personal E-mail' onKeyUp={(e) => { setEmail(e.target.value) }} />
                               </td>
                             </tr>
-                            <Button className='loginpage-button' size='medium' variant='contained' onClick={() => { save(handleRow1) }}>Save</Button>
+                            <Button sx={{backgroundColor: '#0A065D', color: 'white', ":hover": { backgroundColor: '#0A065D' }}}className='loginpage-button' size='medium' variant='contained' onClick={() => { save(handleRow1) }}>Save</Button>
                           </tbody>
                         </table>
                       </ListItemButton>
@@ -626,7 +631,7 @@ export default function EditProfile() {
                                 />
                               </td>
                             </tr>
-                            <Button className='loginpage-button' size='medium' variant='contained' onClick={() => { save(handleRow2) }}>Save</Button>
+                            <Button sx={{backgroundColor: '#0A065D', color: 'white', ":hover": { backgroundColor: '#0A065D' }}} className='loginpage-button' size='medium' variant='contained' onClick={() => { save(handleRow2) }}>Save</Button>
                           </tbody>
                         </table>
                       </ListItemButton>
@@ -730,13 +735,13 @@ export default function EditProfile() {
                                         </tr>
                                       </tbody>
                                     </table>
-                                    <Button className='loginpage-button' size='large' variant='contained' onClick={() => { addBase() }}>Change Base</Button>
-                                    <Button className='loginpage-button' size='large' sx={{ marginLeft: '6.5rem' }} variant='contained' onClick={handleClose}>Close</Button>
+                                    <Button sx={{backgroundColor: '#0A065D', color: 'white', ":hover": { backgroundColor: '#0A065D' }}} className='loginpage-button' size='large' variant='contained' onClick={() => { addBase() }}>Change Base</Button>
+                                    <Button className='loginpage-button' size='large' sx={{ marginLeft: '6.5rem', backgroundColor: '#0A065D', color: 'white', ":hover": { backgroundColor: '#0A065D' }}} variant='contained' onClick={handleClose}>Close</Button>
                                   </Box>
                                 </Modal>
                               </td>
                               <td>
-                                <Button sx={{ marginTop: '1.25rem' }} className='loginpage-button' size='medium' variant='contained' onClick={handleOpen}>Change Base</Button>
+                                <Button sx={{ marginTop: '1.25rem', backgroundColor: '#0A065D', color: 'white', ":hover": { backgroundColor: '#0A065D' }}} className='loginpage-button' size='medium' variant='contained' onClick={handleOpen}>Change Base</Button>
                               </td>
                             </tr>
                             {JSON.parse(sessionStorage.getItem('loggedInUser')).sme === true ?
@@ -771,12 +776,12 @@ export default function EditProfile() {
                                     </Autocomplete>
                                   </td>
                                   <td>
-                                    <Button sx={{ marginBottom: '10px' }} className='loginpage-button' size='small' variant='contained' onClick={() => { addCategory() }}>Add</Button>
+                                    <Button sx={{ marginBottom: '10px', backgroundColor: '#0A065D', color: 'white', ":hover": { backgroundColor: '#0A065D' }}} className='loginpage-button' size='small' variant='contained' onClick={() => { addCategory() }}>Add</Button>
                                   </td>
                                 </tr>
-                                <Button sx={{ marginBottom: '10px' }} className='loginpage-button' size='small' variant='contained' onClick={() => { displaySmeCategory() }}>Add SME Category</Button>
+                                <Button sx={{ marginBottom: '10px', backgroundColor: '#0A065D', color: 'white', ":hover": { backgroundColor: '#0A065D' }}} className='loginpage-button' size='small' variant='contained' onClick={() => { displaySmeCategory() }}>Add SME Category</Button>
                               </tr> : <></>}
-                            <Button className='loginpage-button' size='medium' variant='contained' onClick={() => { save(handleRow3) }}>Save</Button>
+                            <Button sx={{backgroundColor: '#0A065D', color: 'white', ":hover": { backgroundColor: '#0A065D' }}} className='loginpage-button' size='medium' variant='contained' onClick={() => { save(handleRow3) }}>Save</Button>
                           </tbody>
                         </table>
                       </ListItemButton>
@@ -904,7 +909,7 @@ export default function EditProfile() {
                                 </FormControl>
                               </td>
                             </tr>
-                            <Button className='loginpage-button' size='medium' variant='contained' onClick={() => { save(handleRow4) }}>Save</Button>
+                            <Button sx={{backgroundColor: '#0A065D', color: 'white', ":hover": { backgroundColor: '#0A065D' }}} className='loginpage-button' size='medium' variant='contained' onClick={() => { save(handleRow4) }}>Save</Button>
                           </tbody>
                         </table>
                       </ListItemButton>
@@ -947,7 +952,7 @@ export default function EditProfile() {
                         variant="outlined"
                         onKeyUp={(e) => { setDeleteUsername(e.target.value) }} />
                       <Button className='loginpage-button' color='error' size='large' variant='contained' onClick={() => { deleteAccount() }}>Delete Account</Button>
-                      <Button className='loginpage-button' size='large' sx={{ marginLeft: '6.5rem' }} variant='contained' onClick={closeDeleteForm}>Close</Button>
+                      <Button className='loginpage-button' size='large' sx={{ marginLeft: '6.5rem', backgroundColor: '#0A065D', color: 'white', ":hover": { backgroundColor: '#0A065D' }}} variant='contained' onClick={closeDeleteForm}>Close</Button>
                     </Box>
                   </Modal>
                 </List>

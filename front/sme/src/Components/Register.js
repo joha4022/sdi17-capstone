@@ -10,7 +10,7 @@ import Navbar from './Navbar';
 import { AppContext } from '../App';
 
 export default function Register() {
-  const {setCurrentUser} = useContext(AppContext);
+  const { setCurrentUser } = useContext(AppContext);
   const [showPassword, setShowPassword] = useState(false);
   const [usernameList, setUsernameList] = useState([]);
   // required options
@@ -60,11 +60,11 @@ export default function Register() {
       .then(res => res.json())
       .then(data => {
         const lastuser = [];
-        data.map(user=>{
+        data.map(user => {
           lastuser.push(user.userid);
         })
         // console.log(lastuser.sort((a,b)=>{return a-b})[lastuser.length-1]+1)
-        setUserid(lastuser.sort((a,b)=>{return a-b})[lastuser.length-1]+1);
+        setUserid(lastuser.sort((a, b) => { return a - b })[lastuser.length - 1] + 1);
         const usernames = [...usernameList];
         data.map(user => {
           usernames.push(user.username);
@@ -146,7 +146,8 @@ export default function Register() {
               if (sme) {
                 navigate(`/register/${data.code}`, { replace: true });
               } else {
-                setCurrentUser({userid: userid,
+                setCurrentUser({
+                  userid: userid,
                   firstname: firstname,
                   lastname: lastname,
                   username: username,
@@ -159,7 +160,8 @@ export default function Register() {
                   sme: sme,
                   base_id: baseid,
                   userverified: userverified,
-                  photo: './photos/Blank_Avatar.jpg'});
+                  photo: './photos/Blank_Avatar.jpg'
+                });
                 sessionStorage.setItem('currentUser', JSON.stringify({ userid: userid }));
                 sessionStorage.setItem('loggedInUser', JSON.stringify({ userid: userid, firstname: firstname, lastname: lastname, sme: sme, admin: false }));
                 navigate(`/profile/${userid}`, { replace: true });
@@ -259,19 +261,26 @@ export default function Register() {
       }
     } else {
       if (existingBaseName.name !== '+ Add a new base') {
-        setBaseName(currentBases[existingBaseName.baseid - 1].basename);
-        setBaseCity(currentBases[existingBaseName.baseid - 1].basecity);
-        setBaseState(currentBases[existingBaseName.baseid - 1].basestate);
-        setBaseLat(currentBases[existingBaseName.baseid - 1].baselat);
-        setBaseLon(currentBases[existingBaseName.baseid - 1].baselon);
-        setBaseid(currentBases[existingBaseName.baseid - 1].baseid);
-        setBackdrop(true);
-        setTimeout(() => {
-          setBackdrop(false);
-        }, 1000)
-        setButtonLabel('Change Base');
-        setBaseForm(false);
+        if (existingBaseName === false) {
+          alertDisplay('Please select a base.')
+        } else {
+          setBaseName(currentBases[existingBaseName.baseid - 1].basename);
+          setBaseCity(currentBases[existingBaseName.baseid - 1].basecity);
+          setBaseState(currentBases[existingBaseName.baseid - 1].basestate);
+          setBaseLat(currentBases[existingBaseName.baseid - 1].baselat);
+          setBaseLon(currentBases[existingBaseName.baseid - 1].baselon);
+          setBaseid(currentBases[existingBaseName.baseid - 1].baseid);
+          setBackdrop(true);
+          setTimeout(() => {
+            setBackdrop(false);
+          }, 1000)
+          setButtonLabel('Change Base');
+          setBaseForm(false);
+        }
       }
+      // } else if (baseName === 'Not Selected') {
+      //   alertDisplay('Please complete all the required fields!');
+      // }
     }
   }
   const testString = `Must include at least 5 characters \nMust include at least one number \nMust include one uppercase letter`
@@ -353,7 +362,7 @@ export default function Register() {
                       renderInput={(params) => <TextField {...params} label='SME Category' />}
                       onKeyUp={(e) => { setSmeCategory(e.target.value) }}
                       // onClose={(e) => { setSmeCategory(e.target.textContent); setSmeCategory(document.querySelector('#outlined-select-smeCategory').value); }}
-                      onChange={(e)=> { setSmeCategory(document.querySelector('#outlined-select-smeCategory').value); setSmeCategory(e.target.textContent)}}
+                      onChange={(e) => { setSmeCategory(document.querySelector('#outlined-select-smeCategory').value); setSmeCategory(e.target.textContent) }}
                       onKeyDown={(e) => { if (e.key === 'Enter') { setSmeCategory(e.target.dataset.value) } }}>
                     </Autocomplete>
                   </td>
@@ -482,7 +491,7 @@ export default function Register() {
                     />
                   </td>
                   <td>
-                    <Button sx={{ margin: '23px 0px 0px 0px' }} className='loginpage-button' size='large' variant='contained' onClick={handleOpen}>{buttonLabel}</Button>
+                    <Button sx={{ margin: '23px 0px 0px 0px', backgroundColor: '#0A065D', color: 'white', ":hover": { backgroundColor: '#0A065D' } }} className='loginpage-button' size='large' variant='contained' onClick={handleOpen}>{buttonLabel}</Button>
                     <Modal
                       open={baseForm}
                       onClose={handleClose}
@@ -549,7 +558,7 @@ export default function Register() {
                             </tr>
                           </tbody>
                         </table>
-                        <Button className='loginpage-button' size='large' variant='contained' onClick={() => { addBase() }}>Add Base</Button>
+                        <Button sx={{ backgroundColor: '#0A065D', color: 'white', ":hover": { backgroundColor: '#0A065D' } }} className='loginpage-button' size='large' variant='contained' onClick={() => { addBase() }}>Add Base</Button>
                       </Box>
                     </Modal>
                   </td>
@@ -557,7 +566,7 @@ export default function Register() {
               </tbody>
             </table>
             <div className='register-button-row'>
-              <Button sx={{ marginTop: '20px' }} className='loginpage-button' size='large' variant='contained' onClick={() => {
+              <Button sx={{ marginTop: '20px', backgroundColor: '#0A065D', color: 'white', ":hover": { backgroundColor: '#0A065D' } }} className='loginpage-button' size='large' variant='contained' onClick={() => {
                 register();
               }}>Register</Button>
             </div>
