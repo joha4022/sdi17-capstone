@@ -147,13 +147,16 @@ export default function LoginPage() {
               onClick={() => {
                 signin();
               }}
+              sx={{backgroundColor: '#F8F1F1', color: '#5A5A5A', ":hover" : {backgroundColor: '#F8F1F1'}}} 
             >Sign In</Button>
           </div>
           <div className='or-section'>OR</div>
           <div className='create-account-section'>
             <Button className='loginpage-button' size='large' variant='contained' onClick={() => {
               navigate('/register')
-            }}>Register</Button>
+            }}
+              sx={{backgroundColor: '#A3816A', color: 'white', ":hover" : {backgroundColor: '#A3816A'}}} 
+            >Register</Button>
           </div>
         </div>
         <div className='logo-section'>
