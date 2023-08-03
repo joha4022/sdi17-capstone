@@ -20,17 +20,17 @@ password = 'password2'
 
 const get_hash = (password) => {
     hashed_password = Crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha1').toString('base64')
-    console.log('HASHED PW FROM LINE 24:', hashed_password)
+   // console.log('HASHED PW FROM LINE 24:', hashed_password)
     return hashed_password
 }
 
 const verify_pw = (password) => {
     if (hashed_password === get_hash(password)) {
-        console.log("Hashes Equal")
+        //console.log("Hashes Equal")
         return true
     } else { return false }
 }
-console.log('password verified: ', verify_pw(password))
+//console.log('password verified: ', verify_pw(password))
 
 // '/upload' & 'getphoto' no errors
 // For handling the upload request
