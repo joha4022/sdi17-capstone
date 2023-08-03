@@ -16,7 +16,7 @@ export default function LandingPage() {
             <h1 className='register-landing-h1'>Thank you</h1>
             <div className='register-landing-message'>Your account will be reviewed by the administrator and you will receive a notification email once your account has been approved.</div>
             <div className='register-landing-button'>
-              <Button className='loginpage-button' size='large' variant="contained" onClick={()=>{navigate('/', {replace: true})}}>Return Home</Button>
+              <Button sx={{color: '#A3816A'}} className='loginpage-button' size='large' variant="contained" onClick={()=>{navigate('/', {replace: true})}}>Return Home</Button>
             </div>
           </div>
         </div>
