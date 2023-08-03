@@ -9,81 +9,81 @@ exports.seed = async function(knex) {
     {
       meetingTitle: 'Capstone',
       meetingDescription: 'Work on Capstone',
-      startTime: '7AM PT',
-      endTime: '3PM PT',
-      meetingDate: '7/25/2023'
+      startTime: '7:00',
+      endTime: '08:00',
+      meetingDate: '2023-08-13'
     },
 
     {
-      meetingTitle: 'Meeting A',
-      meetingDescription: 'Work on A',
-      startTime: '7AM PT',
-      endTime: '3PM PT',
-      meetingDate: '7/26/2023'
+      meetingTitle: 'Tech change talk',
+      meetingDescription: 'Discuss changes to some technology.',
+      startTime: '13:00',
+      endTime: '15:00',
+      meetingDate: '2023-08-09'
     },
 
     {
-      meetingTitle: 'Meeting B',
-      meetingDescription: 'Work on B',
-      startTime: '7AM PT',
-      endTime: '3PM PT',
-      meetingDate: '7/27/2023'
+      meetingTitle: 'Talk about JS',
+      meetingDescription: 'Chat about how much we like JavaScript.',
+      startTime: '09:00',
+      endTime: '12:00',
+      meetingDate: '2023-08-20'
     },
     {
-      meetingTitle: 'Meeting C',
-      meetingDescription: 'Work on C',
-      startTime: '7AM PT',
-      endTime: '3PM PT',
-      meetingDate: '7/28/2023'
+      meetingTitle: 'Product wireframe design',
+      meetingDescription: 'Meeting with a group to assist them in creation of a product.',
+      startTime: '1000',
+      endTime: '11:00',
+      meetingDate: '2023-08-29'
     },
     {
-      meetingTitle: 'Meeting D',
-      meetingDescription: 'Work on D',
-      startTime: '7AM PT',
-      endTime: '3PM PT',
-      meetingDate: '7/29/2023'
+      meetingTitle: 'Tech talk',
+      meetingDescription: 'Discuss new technology coming up this year.',
+      startTime: '14:00',
+      endTime: '16:00',
+      meetingDate: '2023-09-13'
     },
     {
-      meetingTitle: 'Meeting E',
-      meetingDescription: 'Work on E',
-      startTime: '7AM PT',
-      endTime: '3PM PT',
-      meetingDate: '7/30/2023'
+      meetingTitle: 'Web change discussion',
+      meetingDescription: 'Discuss minor changes to a website and gain some insight.',
+      startTime: '15:00',
+      endTime: '17:00',
+      meetingDate: '2023-10-14'
     },
     {
-      meetingTitle: 'Meeting F',
-      meetingDescription: 'Work on F',
-      startTime: '7AM PT',
-      endTime: '3PM PT',
-      meetingDate: '7/31/2023'
+      meetingTitle: 'Innovation Meet',
+      meetingDescription: 'Discuss some innovating tachnology that some could be involved with.',
+      startTime: '07:30',
+      endTime: '10:30',
+      meetingDate: '2023-11-17'
     },
     {
-      meetingTitle: 'Meeting G',
-      meetingDescription: 'Work on G',
-      startTime: '7AM PT',
-      endTime: '3PM PT',
-      meetingDate: '8/1/2023'
+      meetingTitle: 'Morning Meet',
+      meetingDescription: 'Morning sitdown to discuss way forward.',
+      startTime: '08:30',
+      endTime: '09:00',
+      meetingDate: '2023-11-01'
     },
     {
       meetingTitle: 'Meeting H',
-      meetingDescription: 'Work on H',
-      startTime: '7AM PT',
-      endTime: '3PM PT',
-      meetingDate: '8/2/2023'
+      meetingDescription: 'Supply needs to explain new ordering process.',
+      startTime: '12:30',
+      endTime: '14:45',
+      meetingDate: '2023-12-13'
     },
     {
-      meetingTitle: 'Meeting I',
-      meetingDescription: 'Work on I',
-      startTime: '7AM PT',
-      endTime: '3PM PT',
-      meetingDate: '8/3/2023'
+      meetingTitle: 'Hash out Vacation Timeline',
+      meetingDescription: 'Discuss vacation timeline for section.',
+      startTime: '15:35',
+      endTime: '16:15',
+      meetingDate: '2023-10-25'
     },
     {
-      meetingTitle: 'Meeting J',
-      meetingDescription: 'Work on J',
-      startTime: '7AM PT',
-      endTime: '3PM PT',
-      meetingDate: '8/4/2023'
+      meetingTitle: 'Budget Overview',
+      meetingDescription: 'Discuss upcoming changes to finacial sector.',
+      startTime: '08:30',
+      endTime: '09:00',
+      meetingDate: '2023-09-02'
     },
 
   ]);
