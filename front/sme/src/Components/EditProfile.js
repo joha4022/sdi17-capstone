@@ -91,6 +91,9 @@ export default function EditProfile() {
     if (username === '') {
       return alertDisplay('Your username cannot be blank!')
     }
+    if (usernameList.includes(username)) {
+      return alertDisplay('The username exists in the system!')
+    }
     row();
     const body = JSON.stringify({
       userid: userid,
@@ -99,6 +102,7 @@ export default function EditProfile() {
       username: username,
       password: `${newPassword ? newPassword : password}`,
       email: email,
+      worklocation: worklocation,
       supervisoremail: supEmail,
       phonenumber: phoneNumber,
       branch: branch,
@@ -470,7 +474,7 @@ export default function EditProfile() {
       })
   }
   //------------------------------------------------CONSOLE LOGS------------------------------------------------//
-  console.log(smeCategory)
+  // console.log(smeCategory)
   //------------------------------------------------RENDER------------------------------------------------//
   if (currentUser && currentBases && currentSmeCategories) {
     return (

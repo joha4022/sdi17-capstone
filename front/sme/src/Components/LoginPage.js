@@ -161,7 +161,7 @@ export default function LoginPage() {
           <div className='reviews-section'>
             <h2 className='sme-h2'>Creating Solutions Together</h2>
             <p className='p1'>SME: Subject Matter Expert Military Enabler</p>
-            <p className='p1'>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.</p>
+            <p className='p1'>SME is an exclusive professional networking platform designed to bridge the gap between the military, defense industry, and civilian sectors.This platform serves as a hub for professionals, veterans, defense contractors, and government agencies.</p>
           </div>
         </div>
       </div>
