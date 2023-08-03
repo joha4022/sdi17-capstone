@@ -547,7 +547,7 @@ export default function EditProfile() {
                     sx={{
                       marginTop: '2.5rem',
                       display: `${changePhoto ? 'block' : 'none'}`,
-                      marginTop: '20px', backgroundColor: '#0A065D', color: 'white', ":hover": { backgroundColor: '#0A065D' }
+                      backgroundColor: '#0A065D', color: 'white', ":hover": { backgroundColor: '#0A065D' }
                     }}
                     onClick={() => { changeProfilePic() }}
                     variant='contained'
