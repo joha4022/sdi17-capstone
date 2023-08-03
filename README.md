@@ -3,7 +3,8 @@
 # Project Name:
 # Subject Matter Experts (SME)
 
-# LOGO: ![Alt text](Logo_background_purp.png)
+# LOGO:
+# ![Alt text](Logo_background_purp.png)
 
 # Componets used:
 # React, Knex, Express, PostGres(Database), Docker, Material UI, CORS, Path, Crypto, Express-fileupload
