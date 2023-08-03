@@ -1252,7 +1252,7 @@ app.post('/login/', (req, res) => {
     hashedpw = get_hash(pw) //user input
 
     knex('users')
-        .select('userid', 'firstname', 'lastname', 'admin', 'sme', 'userverified', 'branch')
+        .select('userid', 'firstname', 'lastname', 'admin', 'sme', 'userverified', 'branch', 'photo')
         .where('username', user)
         //changed from 'password' to 'hashedpassword'
         .where('hashedpassword', get_hash(pw))
