@@ -385,6 +385,14 @@ function Profile({ userId }) {
               </Button>
             </Bio>
           </Paper>
+          <Button
+            onClick={() => {
+              !inNetwork ? addToNetwork() : removeFromNetwork();
+            }}
+            disabled={Number(id) === currentUser.userid}
+          >
+            {inNetwork ? "Remove from Network" : "Add to Network"}
+          </Button>
         </Grid>
         <Grid item xs={12} sm={4}>
           <Paper elevation={1} sx={{ margin: 1, padding: 1 }}>
@@ -572,14 +580,6 @@ function Profile({ userId }) {
               {alertMessage}
             </Alert>
           </Snackbar>
-          <Button
-            onClick={() => {
-              !inNetwork ? addToNetwork() : removeFromNetwork();
-            }}
-            disabled={Number(id) === currentUser.userid}
-          >
-            {inNetwork ? "Remove from Network" : "Add to Network"}
-          </Button>
         </Grid>
       </Grid>
       <FooterBar />
